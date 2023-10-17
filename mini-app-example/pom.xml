@@ -111,8 +111,8 @@
         </dependency>
         <dependency>
             <groupId>com.github.rosauromatib</groupId>
-            <artifactId>mini-app</artifactId>
-            <version>v1.0.01</version>
+            <artifactId>toast-ui-grid-addon</artifactId>
+            <version>v1.2.24</version>
         </dependency>
         <dependency>
             <groupId>com.github.rosauromatib</groupId>
