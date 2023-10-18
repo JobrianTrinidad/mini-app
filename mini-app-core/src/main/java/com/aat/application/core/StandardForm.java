@@ -224,9 +224,10 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
                 try {
                     String headerName = header.substring(0, 1).toLowerCase()
                             + header.substring(1);
-                    Field headerField = entityClass.getDeclaredField(headerName);
+//                    Field headerField = entityClass.getDeclaredField(headerName);
+                    Field headerField  = data.getClass().getDeclaredField(headerName);
                     headerField.setAccessible(true);
-                    Object dataSel = headerField.get(data);
+                    Object dataSel = headerField.get((Object) data);
                     switch (headerOptions.get(header)) {
                         case "input":
                             rowData.set(i, dataSel != null ? dataSel.toString() : "");
