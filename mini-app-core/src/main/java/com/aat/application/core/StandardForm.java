@@ -115,14 +115,10 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
             int columnIndex = item.getHeaders().indexOf(colName);
             if (event.getRow() >= tableData.size()) {
                 try {
-                    tableData.add(entityClass.getDeclaredConstructor().newInstance());
-                } catch (InstantiationException e) {
-                    throw new RuntimeException(e);
-                } catch (IllegalAccessException e) {
-                    throw new RuntimeException(e);
-                } catch (InvocationTargetException e) {
-                    throw new RuntimeException(e);
-                } catch (NoSuchMethodException e) {
+//                    tableData.add(entityClass.getDeclaredConstructor().newInstance());
+                    tableData.add((T) Object.class.getDeclaredConstructor().newInstance());
+                } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
+                         NoSuchMethodException e) {
                     throw new RuntimeException(e);
                 }
             }
@@ -130,7 +126,8 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
             if (columnIndex >= 0) {
                 String header = headers.get(columnIndex);
                 try {
-                    Field field = entityClass.getDeclaredField(header);
+//                    Field field = entityClass.getDeclaredField(header);
+                    Field field = row.getClass().getDeclaredField(header);
                     field.setAccessible(true);
                     switch (headerOptions.get(header)) {
                         case "input":
