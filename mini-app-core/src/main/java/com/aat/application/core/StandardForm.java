@@ -35,7 +35,7 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
     List<Item> items = new ArrayList<>();
     List<T> tableData = new ArrayList<>();
 
-    public StandardForm(Class<T> entityClass, S service) {
+    public StandardForm(Class<T> entityClass, S service) throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
         addClassName("demo-app-form");
         this.service = service;
 
@@ -43,16 +43,17 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
         save = new Button("Save");
         close = new Button("Cancel");
 
-        headers = configureHeader(entityClass);
-        configureGrid(entityClass);
+        headers = configureHeader();
+        configureGrid();
 
-        add(getToolbar(entityClass), grid);
+        add(getToolbar(), grid);
 
 //        binder.bindInstanceFields(this);
     }
 
-    private List<String> configureHeader(Class<T> entityClass) {
-        Field[] fields = entityClass.getDeclaredFields();
+    private List<String> configureHeader() throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+        T instance = (T) Object.class.getDeclaredConstructor().newInstance();
+        Field[] fields = instance.getClass().getDeclaredFields();
 
         List<String> fieldNames = new ArrayList<>();
         for (int i = 1; i < fields.length; i++) {
@@ -75,15 +76,15 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
         return fieldNames;
     }
 
-    private void configureGrid(Class<T> entityClass) {
+    private void configureGrid() {
         grid = new TuiGrid();
         grid.addClassName("scheduler-grid");
 
         grid.setHeaders(headers);
 
-        grid.setColumns(this.getColumns(entityClass));
+        grid.setColumns(this.getColumns());
 
-        items = this.getTableData(entityClass);
+        items = this.getTableData();
         grid.setItems(items);
 
         grid.setRowHeaders(List.of("checkbox"));
@@ -115,7 +116,6 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
             int columnIndex = item.getHeaders().indexOf(colName);
             if (event.getRow() >= tableData.size()) {
                 try {
-//                    tableData.add(entityClass.getDeclaredConstructor().newInstance());
                     tableData.add((T) Object.class.getDeclaredConstructor().newInstance());
                 } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
                          NoSuchMethodException e) {
@@ -202,7 +202,7 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
 //        grid.setTableHeight(750);
     }
 
-    private List<Item> getTableData(Class<T> entityClass) {
+    private List<Item> getTableData() {
 
         List<Item> TableData = new ArrayList<>();
         if (filterText != null)
@@ -274,7 +274,7 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
         return TableData;
     }
 
-    private List<com.vaadin.componentfactory.tuigrid.model.Column> getColumns(Class<T> entityClass) {
+    private List<com.vaadin.componentfactory.tuigrid.model.Column> getColumns() {
         List<com.vaadin.componentfactory.tuigrid.model.Column> columns = new ArrayList<>();
         int nId = 0;
 
@@ -336,11 +336,11 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
         return columns;
     }
 
-    private HorizontalLayout getToolbar(Class<T> entityClass) {
+    private HorizontalLayout getToolbar() {
         filterText.setPlaceholder("Filter by name...");
         filterText.setClearButtonVisible(true);
         filterText.setValueChangeMode(ValueChangeMode.LAZY);
-        filterText.addValueChangeListener(e -> updateList(entityClass));
+        filterText.addValueChangeListener(e -> updateList());
 
         HorizontalLayout toolbar = new HorizontalLayout(filterText);
 
@@ -349,8 +349,8 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
         return toolbar;
     }
 
-    private void updateList(Class<T> entityClass) {
-        grid.setItems(this.getTableData(entityClass));
+    private void updateList() {
+        grid.setItems(this.getTableData());
         add(grid);
     }
 
