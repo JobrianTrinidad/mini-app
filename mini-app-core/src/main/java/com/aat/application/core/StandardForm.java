@@ -153,7 +153,7 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
                             int ordinal = Integer.parseInt(event.getColValue().substring(0, 1)) - 1;
 
                             Object dataSel = field.get(row);
-                            if(dataSel == null)
+                            if (dataSel == null)
                                 dataSel = field.getType().getDeclaredConstructor().newInstance();
                             Field selField = dataSel.getClass().getDeclaredFields()[0];
                             selField.setAccessible(true);
@@ -226,19 +226,19 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
                             + header.substring(1);
                     Field headerField = entityClass.getDeclaredField(headerName);
                     headerField.setAccessible(true);
+                    Object dataSel = headerField.get(data);
                     switch (headerOptions.get(header)) {
                         case "input":
-                            rowData.set(i, String.valueOf(headerField.get(data)));
+                            rowData.set(i, dataSel != null ? dataSel.toString() : "");
                             break;
                         case "select_enum":
-                            rowData.set(i, String.valueOf(((Enum) headerField.get(data)).ordinal() + 1));
+                            rowData.set(i, String.valueOf(((Enum) dataSel).ordinal() + 1));
                             break;
                         case "select_class":
                             headerName = header.substring(0, 1).toUpperCase()
                                     + header.substring(1);
                             int index = 0;
-                            Object dataSel = headerField.get(data);
-                            if(dataSel == null)
+                            if (dataSel == null)
                                 dataSel = headerField.getType().getDeclaredConstructor().newInstance();
                             Field selField = dataSel.getClass().getDeclaredField("name");
                             selField.setAccessible(true);

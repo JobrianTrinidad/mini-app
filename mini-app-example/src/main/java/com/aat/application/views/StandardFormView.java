@@ -2,6 +2,7 @@ package com.aat.application.views;
 
 import com.aat.application.core.ZJTEntity;
 import com.aat.application.data.repository.BaseEntityRepository;
+import com.aat.application.data.repository.StandardFormRepository;
 import com.aat.application.data.service.BaseEntityService;
 import com.aat.application.form.CommonForm;
 import com.vaadin.flow.router.*;
@@ -12,7 +13,7 @@ public class StandardFormView<T extends ZJTEntity> extends CommonView<T> {
     protected CommonForm<T> form;
     protected final BaseEntityRepository<T> repository;
 
-    public StandardFormView(BaseEntityRepository<T> repository) {
+    public StandardFormView(StandardFormRepository<T> repository) {
         super(repository);
         this.repository = repository;
     }
