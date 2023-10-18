@@ -35,7 +35,7 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
     List<Item> items = new ArrayList<>();
     List<T> tableData = new ArrayList<>();
 
-    public StandardForm(Class<T> entityClass, S service) throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
+    public StandardForm(Class<T> entityClass, S service) {
         addClassName("demo-app-form");
         this.service = service;
 
@@ -43,7 +43,7 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
         save = new Button("Save");
         close = new Button("Cancel");
 
-        headers = configureHeader();
+        headers = configureHeader(entityClass);
         configureGrid();
 
         add(getToolbar(), grid);
@@ -51,9 +51,8 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
 //        binder.bindInstanceFields(this);
     }
 
-    private List<String> configureHeader() throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
-        T instance = (T) Object.class.getDeclaredConstructor().newInstance();
-        Field[] fields = instance.getClass().getDeclaredFields();
+    private List<String> configureHeader(Class<T> entityClass) {
+        Field[] fields = entityClass.getDeclaredFields();
 
         List<String> fieldNames = new ArrayList<>();
         for (int i = 1; i < fields.length; i++) {
