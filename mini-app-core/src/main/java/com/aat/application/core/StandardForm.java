@@ -7,11 +7,8 @@ import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.formlayout.FormLayout;
-import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.TextField;
-import com.vaadin.flow.data.binder.BeanValidationBinder;
-import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.value.ValueChangeMode;
 
 import java.lang.reflect.Field;
@@ -23,7 +20,6 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
 
     private static final long serialVersionUID = -5183438338263448739L;
 
-    protected Binder<T> binder;
     protected TextField filterText = new TextField();
     protected Button save;
     protected Button close;
@@ -44,7 +40,7 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
         close = new Button("Cancel");
 
         headers = configureHeader(entityClass);
-        configureGrid();
+        configureGrid(entityClass);
 
         add(getToolbar(), grid);
 
@@ -75,7 +71,7 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
         return fieldNames;
     }
 
-    private void configureGrid() {
+    private void configureGrid(Class<T> entityClass) {
         grid = new TuiGrid();
         grid.addClassName("scheduler-grid");
 
@@ -107,15 +103,20 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
             else
                 tableData = service.findAll(null);
 
-            Comparator<T> comparator = Comparator.comparing(item -> item.getName());
-            Collections.sort(tableData, comparator);
+            Comparator<T> comparator = Comparator.comparing(ZJTEntity::getName);
+            tableData.sort(comparator);
 
             GuiItem item = (GuiItem) items.get(event.getRow());
             String colName = event.getColName();
             int columnIndex = item.getHeaders().indexOf(colName);
             if (event.getRow() >= tableData.size()) {
                 try {
-                    tableData.add((T) Object.class.getDeclaredConstructor().newInstance());
+                    if (tableData.size() == 0)
+                        tableData.add(entityClass.getDeclaredConstructor().newInstance());
+                    else {
+                        T row = tableData.get(0);
+                        tableData.add((T) row.getClass().getDeclaredConstructor().newInstance());
+                    }
                 } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
                          NoSuchMethodException e) {
                     throw new RuntimeException(e);
@@ -125,7 +126,6 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
             if (columnIndex >= 0) {
                 String header = headers.get(columnIndex);
                 try {
-//                    Field field = entityClass.getDeclaredField(header);
                     Field field = row.getClass().getDeclaredField(header);
                     field.setAccessible(true);
                     switch (headerOptions.get(header)) {
@@ -171,16 +171,10 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
                             }
                             break;
                         default:
-                            field.set(row, event.getColValue());
                             break;
                     }
-                } catch (NoSuchFieldException | IllegalAccessException e) {
-                    throw new RuntimeException(e);
-                } catch (InvocationTargetException e) {
-                    throw new RuntimeException(e);
-                } catch (InstantiationException e) {
-                    throw new RuntimeException(e);
-                } catch (NoSuchMethodException e) {
+                } catch (NoSuchFieldException | IllegalAccessException | InvocationTargetException |
+                         InstantiationException | NoSuchMethodException e) {
                     throw new RuntimeException(e);
                 }
             }
@@ -209,8 +203,8 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
         else
             tableData = service.findAll(null);
 
-        Comparator<T> comparator = Comparator.comparing(item -> item.getName());
-        Collections.sort(tableData, comparator);
+        Comparator<T> comparator = Comparator.comparing(ZJTEntity::getName);
+        tableData.sort(comparator);
 
         for (T data :
                 tableData) {
@@ -220,16 +214,15 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
                 try {
                     String headerName = header.substring(0, 1).toLowerCase()
                             + header.substring(1);
-//                    Field headerField = entityClass.getDeclaredField(headerName);
-                    Field headerField  = data.getClass().getDeclaredField(headerName);
+                    Field headerField = data.getClass().getDeclaredField(headerName);
                     headerField.setAccessible(true);
-                    Object dataSel = headerField.get((Object) data);
+                    Object dataSel = headerField.get(data);
                     switch (headerOptions.get(header)) {
                         case "input":
                             rowData.set(i, dataSel != null ? dataSel.toString() : "");
                             break;
                         case "select_enum":
-                            rowData.set(i, String.valueOf(((Enum) dataSel).ordinal() + 1));
+                            rowData.set(i, String.valueOf(((Enum<?>) dataSel).ordinal() + 1));
                             break;
                         case "select_class":
                             headerName = header.substring(0, 1).toUpperCase()
@@ -255,13 +248,8 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
                             break;
                     }
 
-                } catch (NoSuchFieldException | IllegalAccessException e) {
-                    throw new RuntimeException(e);
-                } catch (InvocationTargetException e) {
-                    throw new RuntimeException(e);
-                } catch (InstantiationException e) {
-                    throw new RuntimeException(e);
-                } catch (NoSuchMethodException e) {
+                } catch (NoSuchFieldException | IllegalAccessException | InvocationTargetException |
+                         InstantiationException | NoSuchMethodException e) {
                     throw new RuntimeException(e);
                 }
             }
@@ -289,6 +277,7 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
             column.setEditable(true);
             column.setSortable(true);
             column.setSortingType("asc");
+            int index = 1;
             switch (headerOptions.get(header)) {
                 case "input":
                     column.setType("input");
@@ -299,7 +288,6 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
                     column.setTarget("");
                     List<RelationOption> elementsList = new ArrayList<>();
                     Class<?> fieldEnum = headerTypeOptions.get(header);
-                    int index = 1;
                     for (Enum elementList : ((Class<Enum>) fieldEnum).getEnumConstants()) {
                         RelationOption option = new RelationOption(elementList.toString(), String.valueOf(index++));
                         elementsList.add(option);
@@ -312,7 +300,6 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
                     column.setTarget("");
                     GlobalData.addData(headerName);
                     List<ZJTEntity> results = GlobalData.listData.get(headerName);
-                    index = 1;
                     List<RelationOption> options = new ArrayList<>();
                     for (Object result : results) {
                         try {
@@ -359,21 +346,8 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
         save.addClickShortcut(Key.ENTER);
         close.addClickShortcut(Key.ESCAPE);
 
-//        save.addClickListener(event -> validateAndSave());
-//        close.addClickListener(event -> fireEvent(new CloseEvent(this)));
-
         return new HorizontalLayout(save, close);
     }
-
-//    private void validateAndSave() {
-//        if (binder.isValid()) {
-//            fireEvent(new SaveEvent(this, binder.getBean()));
-//        }
-//    }
-//
-//    public void setBean(T bean) {
-//        binder.setBean(bean);
-//    }
 
     private void delete() {
         if (grid.getCheckedItems().length == 0)
