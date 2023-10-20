@@ -61,15 +61,15 @@ public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>>
 
         timeline.setMultiselect(true);
         timeline.setWidthFull();
-//        boolean bAutoZoom = false;
+        boolean bAutoZoom = false;
 
         // Select Item
-//        TextField tfSelected = new TextField();
+        TextField tfSelected = new TextField();
 
-//        VerticalLayout selectRangeLayout = getSelectRangeLayout(timeline, bAutoZoom, groupItems);
-//        HorizontalLayout zoomOptionsLayout = getSelectItemAndZoomOptionLayout(timeline, items, tfSelected, bAutoZoom);
+        VerticalLayout selectRangeLayout = getSelectRangeLayout(timeline, bAutoZoom, groupItems);
+        HorizontalLayout zoomOptionsLayout = getSelectItemAndZoomOptionLayout(timeline, items, tfSelected, bAutoZoom);
 
-        add(timeline);
+        add(selectRangeLayout, zoomOptionsLayout, timeline);
     }
 
     private List<Item> getItems() {

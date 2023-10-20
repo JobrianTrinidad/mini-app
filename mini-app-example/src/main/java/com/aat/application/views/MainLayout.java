@@ -59,11 +59,11 @@ public class MainLayout extends AppLayout {
         // AppNav is not yet an official component.
         // For documentation, visit https://github.com/vaadin/vcf-nav#readme
         AppNav nav = new AppNav();
-        AppNavItem parent = new AppNavItem("Setup Data");
+        AppNavItem parent = new AppNavItem("Mini-Core");
         parent.setIcon(LineAwesomeIcon.FOLDER.create());
         nav.addItem(parent);
-//        parent.addItem(new AppNavItem("Pricing Type", StandardFormView.class, LineAwesomeIcon.PRODUCT_HUNT.create())
-//                .withParameter(StandardFormView.class, "entityClass", ZJTPricingType.class.getSimpleName()));
+        parent.addItem(new AppNavItem("Tui Grid", StandardFormView.class, LineAwesomeIcon.PRODUCT_HUNT.create())
+                .withParameter(StandardFormView.class, "entityClass", ZJTPricingType.class.getSimpleName()));
 //        parent.addItem(new AppNavItem("Trip Element", StandardFormView.class, LineAwesomeIcon.PRODUCT_HUNT.create())
 //                .withParameter(StandardFormView.class, "entityClass", ZJTElement.class.getSimpleName()));
 //        parent.addItem(new AppNavItem("Resource Category", StandardFormView.class, LineAwesomeIcon.PRODUCT_HUNT.create())

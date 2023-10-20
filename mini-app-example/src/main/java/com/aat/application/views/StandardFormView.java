@@ -24,9 +24,8 @@ public class StandardFormView<T extends ZJTEntity> extends CommonView<T> {
             remove(form);
 
         form = new GridCommonForm<>(entityClass, new BaseEntityService<>(repository));
-//        form.setWidth("25em");
-        TimeLineCommonForm<T> form1 = new TimeLineCommonForm<>(entityClass, new BaseEntityService<>(repository));
-        add(form, form1);
+        form.setWidth("25em");
+        add(form);
     }
 
     @Override
