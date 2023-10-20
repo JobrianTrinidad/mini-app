@@ -1,6 +1,6 @@
 package com.aat.application.data.service;
 
-import com.aat.application.core.ZJTService;
+import com.aat.application.core.data.service.ZJTService;
 import com.aat.application.data.repository.BaseEntityRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

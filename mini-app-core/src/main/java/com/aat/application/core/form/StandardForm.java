@@ -1,5 +1,7 @@
-package com.aat.application.core;
+package com.aat.application.core.form;
 
+import com.aat.application.core.data.entity.ZJTEntity;
+import com.aat.application.core.data.service.ZJTService;
 import com.aat.application.util.GlobalData;
 import com.vaadin.componentfactory.tuigrid.TuiGrid;
 import com.vaadin.componentfactory.tuigrid.model.*;

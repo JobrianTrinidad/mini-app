@@ -1,8 +1,7 @@
 package com.aat.application.views;
 
-import com.aat.application.core.ZJTEntity;
+import com.aat.application.core.data.entity.ZJTEntity;
 import com.aat.application.data.repository.BaseEntityRepository;
-import com.aat.application.form.CommonForm;
 import com.aat.application.util.GlobalData;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.*;
@@ -12,7 +11,6 @@ import org.springframework.util.MultiValueMap;
 
 public abstract class CommonView<T extends ZJTEntity> extends VerticalLayout implements RouterLayout, BeforeEnterObserver, HasDynamicTitle {
 
-    protected CommonForm<T> form;
     protected final BaseEntityRepository<T> repository;
     protected Class<T> entityClass;
     private String title = "";

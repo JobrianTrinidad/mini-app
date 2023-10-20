@@ -6,15 +6,16 @@ import com.aat.application.data.repository.StandardFormRepository;
 import com.aat.application.data.service.BaseEntityService;
 import com.aat.application.form.GridCommonForm;
 import com.aat.application.form.TimeLineCommonForm;
-import com.vaadin.flow.router.*;
+import com.vaadin.flow.router.BeforeEnterEvent;
+import com.vaadin.flow.router.Route;
 
-@Route(value = "commonview", layout = MainLayout.class)
-public class StandardFormView<T extends ZJTEntity> extends CommonView<T> {
+@Route(value = "timeline", layout = MainLayout.class)
+public class TimeLineFormView<T extends ZJTEntity> extends CommonView<T> {
 
-    protected GridCommonForm<T> form;
+    protected TimeLineCommonForm<T> form;
     protected final BaseEntityRepository<T> repository;
 
-    public StandardFormView(StandardFormRepository<T> repository) {
+    public TimeLineFormView(StandardFormRepository<T> repository) {
         super(repository);
         this.repository = repository;
     }
@@ -23,10 +24,8 @@ public class StandardFormView<T extends ZJTEntity> extends CommonView<T> {
         if (form != null)
             remove(form);
 
-        form = new GridCommonForm<>(entityClass, new BaseEntityService<>(repository));
-//        form.setWidth("25em");
-        TimeLineCommonForm<T> form1 = new TimeLineCommonForm<>(entityClass, new BaseEntityService<>(repository));
-        add(form, form1);
+        form = new TimeLineCommonForm<>(entityClass, new BaseEntityService<>(repository));
+        add(form);
     }
 
     @Override

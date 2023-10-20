@@ -1,6 +1,6 @@
 package com.aat.application.data.entity;
 
-import com.aat.application.core.ZJTEntity;
+import com.aat.application.core.data.entity.ZJTEntity;
 import com.vaadin.flow.router.PageTitle;
 import jakarta.persistence.*;
 

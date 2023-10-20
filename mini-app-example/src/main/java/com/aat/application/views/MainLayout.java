@@ -62,14 +62,16 @@ public class MainLayout extends AppLayout {
         AppNavItem parent = new AppNavItem("Setup Data");
         parent.setIcon(LineAwesomeIcon.FOLDER.create());
         nav.addItem(parent);
-        parent.addItem(new AppNavItem("Pricing Type", StandardFormView.class, LineAwesomeIcon.PRODUCT_HUNT.create())
-                .withParameter(StandardFormView.class, "entityClass", ZJTPricingType.class.getSimpleName()));
-        parent.addItem(new AppNavItem("Trip Element", StandardFormView.class, LineAwesomeIcon.PRODUCT_HUNT.create())
-                .withParameter(StandardFormView.class, "entityClass", ZJTElement.class.getSimpleName()));
-        parent.addItem(new AppNavItem("Resource Category", StandardFormView.class, LineAwesomeIcon.PRODUCT_HUNT.create())
-                .withParameter(StandardFormView.class, "entityClass", ZJTResourceCategory.class.getSimpleName()));
-        parent.addItem(new AppNavItem("Resource Type", StandardFormView.class, LineAwesomeIcon.PRODUCT_HUNT.create())
-                .withParameter(StandardFormView.class, "entityClass", ZJTResourceType.class.getSimpleName()));
+//        parent.addItem(new AppNavItem("Pricing Type", StandardFormView.class, LineAwesomeIcon.PRODUCT_HUNT.create())
+//                .withParameter(StandardFormView.class, "entityClass", ZJTPricingType.class.getSimpleName()));
+//        parent.addItem(new AppNavItem("Trip Element", StandardFormView.class, LineAwesomeIcon.PRODUCT_HUNT.create())
+//                .withParameter(StandardFormView.class, "entityClass", ZJTElement.class.getSimpleName()));
+//        parent.addItem(new AppNavItem("Resource Category", StandardFormView.class, LineAwesomeIcon.PRODUCT_HUNT.create())
+//                .withParameter(StandardFormView.class, "entityClass", ZJTResourceCategory.class.getSimpleName()));
+//        parent.addItem(new AppNavItem("Resource Type", StandardFormView.class, LineAwesomeIcon.PRODUCT_HUNT.create())
+//                .withParameter(StandardFormView.class, "entityClass", ZJTResourceType.class.getSimpleName()));
+        parent.addItem(new AppNavItem("Group TimeLine", TimeLineFormView.class, LineAwesomeIcon.PRODUCT_HUNT.create())
+                .withParameter(TimeLineFormView.class, "entityClass", ZJTResourceType.class.getSimpleName()));
         return nav;
     }
 

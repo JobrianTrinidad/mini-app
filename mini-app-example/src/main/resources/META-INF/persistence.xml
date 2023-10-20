@@ -6,8 +6,8 @@
              version="2.1">
     <persistence-unit name="aat_persistence_unit" transaction-type="RESOURCE_LOCAL">
         <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
-<!--        <class>com.aat.application.core.ZJTEntity</class>-->
-<!--        <class>com.aat.application.core.StandardForm</class>-->
+<!--        <class>com.aat.application.core.data.entity.ZJTEntity</class>-->
+<!--        <class>com.aat.application.core.form.StandardForm</class>-->
 <!--        <class>com.aat.application.data.entity.ZJTElement</class>-->
 <!--        <class>com.aat.application.data.entity.ZJTPricingType</class>-->
 <!--        <class>com.example.EntityClass2</class>-->

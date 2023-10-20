@@ -1,6 +1,6 @@
 package com.aat.application.util;
 
-import com.aat.application.core.ZJTEntity;
+import com.aat.application.core.data.entity.ZJTEntity;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
