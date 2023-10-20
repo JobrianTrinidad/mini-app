@@ -4,7 +4,6 @@ import com.aat.application.core.data.entity.ZJTEntity;
 import com.aat.application.data.repository.BaseEntityRepository;
 import com.aat.application.data.repository.StandardFormRepository;
 import com.aat.application.data.service.BaseEntityService;
-import com.aat.application.form.GridCommonForm;
 import com.aat.application.form.TimeLineCommonForm;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.Route;
@@ -23,7 +22,6 @@ public class TimeLineFormView<T extends ZJTEntity> extends CommonView<T> {
     private void configureForm() {
         if (form != null)
             remove(form);
-
         form = new TimeLineCommonForm<>(entityClass, new BaseEntityService<>(repository));
         add(form);
     }
@@ -34,5 +32,4 @@ public class TimeLineFormView<T extends ZJTEntity> extends CommonView<T> {
         if (entityClass != null)
             configureForm();
     }
-
 }

@@ -113,11 +113,11 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
             int columnIndex = item.getHeaders().indexOf(colName);
             if (event.getRow() >= tableData.size()) {
                 try {
-                    if (tableData.size() == 0)
+                    if (tableData.isEmpty())
                         tableData.add(entityClass.getDeclaredConstructor().newInstance());
                     else {
-                        T row = tableData.get(0);
-                        tableData.add((T) row.getClass().getDeclaredConstructor().newInstance());
+                        T newRow = (T) tableData.get(0).getClass().getDeclaredConstructor().newInstance();
+                        tableData.add(newRow);
                     }
                 } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
                          NoSuchMethodException e) {
@@ -137,7 +137,7 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
                         case "select_enum":
                             Class<?> enumTypes = headerTypeOptions.get(header);
                             if (enumTypes.isEnum()) {
-                                Enum<?>[] enumConstants = ((Class<Enum<?>>) enumTypes).getEnumConstants();
+                                Enum<?>[] enumConstants = getEnumConstants(enumTypes);
                                 int ordinal = Integer.parseInt(event.getColValue().substring(0, 1)) - 1;
                                 if (ordinal >= 0 && ordinal < enumConstants.length) {
                                     Enum<?> enumValue = enumConstants[ordinal];
@@ -167,8 +167,7 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
                                         field.set(row, dataSel);
                                         break;
                                     }
-                                } catch (RuntimeException | IllegalAccessException e3) {
-                                    e3.printStackTrace();
+                                } catch (RuntimeException | IllegalAccessException ignored) {
                                 }
                             }
                             break;
@@ -182,13 +181,9 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
             }
 
             // Asynchronously save the modified row
-            CompletableFuture.runAsync(() -> {
-                service.save(row);
-            });
+            CompletableFuture.runAsync(() -> service.save(row));
         });
-        grid.addItemDeleteListener(listener -> {
-            delete();
-        });
+        grid.addItemDeleteListener(listener -> delete());
 
         grid.setAutoSave(true);
         grid.setSizeFull();
@@ -290,7 +285,7 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
                     column.setTarget("");
                     List<RelationOption> elementsList = new ArrayList<>();
                     Class<?> fieldEnum = headerTypeOptions.get(header);
-                    for (Enum elementList : ((Class<Enum>) fieldEnum).getEnumConstants()) {
+                    for (Enum<?> elementList : getEnumConstants(fieldEnum)) {
                         RelationOption option = new RelationOption(elementList.toString(), String.valueOf(index++));
                         elementsList.add(option);
                     }
@@ -310,8 +305,7 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
                             String name = (String) nameField.get(result);
                             RelationOption option = new RelationOption(name, String.valueOf(index++));
                             options.add(option);
-                        } catch (NoSuchFieldException | IllegalAccessException e3) {
-                            e3.printStackTrace();
+                        } catch (NoSuchFieldException | IllegalAccessException ignored) {
                         }
                     }
                     column.setRelationOptions(options);
@@ -352,45 +346,14 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
     }
 
     private void delete() {
-        if (grid.getCheckedItems().length == 0)
-            return;
-        for (int checkedRow :
-                grid.getCheckedItems()) {
+        int[] checkedItems = grid.getCheckedItems();
+        for (int checkedRow : checkedItems) {
             service.delete(tableData.get(checkedRow));
         }
     }
-//
-//    // Events
-//    public static abstract class StandardFormEvent<T extends ZJTEntity, S extends ZJTService<T>> extends ComponentEvent<StandardForm<T, S>> {
-//        private final T bean;
-//
-//        protected StandardFormEvent(StandardForm<T, S> source, T bean) {
-//            super(source, false);
-//            this.bean = bean;
-//        }
-//
-//        public T getBean() {
-//            return bean;
-//        }
-//    }
-//
-//    public static class SaveEvent<T extends ZJTEntity, S extends ZJTService<T>> extends StandardFormEvent<T, S> {
-//        SaveEvent(StandardForm<T, S> source, T bean) {
-//            super(source, bean);
-//        }
-//    }
-//
-//    public static class CloseEvent<T extends ZJTEntity, S extends ZJTService<T>> extends StandardFormEvent<T, S> {
-//        CloseEvent(StandardForm<T, S> source) {
-//            super(source, null);
-//        }
-//    }
-//
-//    public Registration addSaveListener(ComponentEventListener<SaveEvent<T, S>> listener) {
-//        return addListener(SaveEvent.class, (ComponentEventListener) listener);
-//    }
-//
-//    public Registration addCloseListener(ComponentEventListener<CloseEvent<T, S>> listener) {
-//        return addListener(CloseEvent.class, (ComponentEventListener) listener);
-//    }
+
+    @SuppressWarnings("unchecked")
+    private static <T extends Enum<T>> Enum<T>[] getEnumConstants(Class<?> enumTypes) {
+        return ((Class<T>) enumTypes).getEnumConstants();
+    }
 }

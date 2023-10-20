@@ -10,7 +10,6 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.datetimepicker.DateTimePicker;
-import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.Paragraph;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -27,7 +26,6 @@ import java.util.List;
 public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>> extends VerticalLayout {
 
     private static final long serialVersionUID = -5183438338263448740L;
-
     protected TextField filterText = new TextField();
     protected Button save;
     protected Button close;
@@ -44,20 +42,18 @@ public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>>
         save = new Button("Save");
         close = new Button("Cancel");
 
-        configureTimeLine(entityClass);
-
-//        add(getToolbar(), timeline);
-//add(timeline);
+        configureTimeLine();
     }
 
-    private void configureTimeLine(Class<T> entityClass) {
+    private void configureTimeLine() {
         List<Item> items = getItems();
         List<GroupItem> groupItems = getGroupItems();
         timeline = new Timeline(items, groupItems);
 
         // setting timeline range
         timeline.setTimelineRange(
-                LocalDateTime.of(2023, 1, 1, 00, 00, 00), LocalDateTime.of(2023, 9, 25, 00, 00, 00));
+                LocalDateTime.of(2023, 1, 1, 0, 0, 0), 
+                LocalDateTime.of(2023, 9, 25, 0, 0, 0));
 
         timeline.setMultiselect(true);
         timeline.setWidthFull();
@@ -74,39 +70,38 @@ public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>>
 
     private List<Item> getItems() {
         Item item1 = new Item(
-                LocalDateTime.of(2023, 8, 11, 2, 30, 00),
-                LocalDateTime.of(2023, 8, 11, 7, 00, 00),
+                LocalDateTime.of(2023, 8, 11, 2, 30, 0),
+                LocalDateTime.of(2023, 8, 11, 7, 0, 0),
                 "Item 1", 1);
         item1.setId("0");
         item1.setEditable(true);
         item1.setUpdateTime(true);
 
         Item item2 = new Item(
-                LocalDateTime.of(2023, 8, 13, 0, 00, 00),
-                LocalDateTime.of(2023, 8, 13, 12, 00, 00),
+                LocalDateTime.of(2023, 8, 13, 0, 0, 0),
+                LocalDateTime.of(2023, 8, 13, 12, 0, 0),
                 "Item 2", 6);
         item2.setId("1");
         item2.setEditable(true);
         item2.setUpdateTime(true);
 
         Item item3 = new Item(
-                LocalDateTime.of(2023, 8, 14, 2, 30, 00),
-                LocalDateTime.of(2023, 8, 15, 1, 00, 00),
+                LocalDateTime.of(2023, 8, 14, 2, 30, 0),
+                LocalDateTime.of(2023, 8, 15, 1, 0, 0),
                 "Item 3", 100);
         item3.setId("2");
         item3.setEditable(true);
         item3.setUpdateTime(true);
 
         Item item4 = new Item(
-                LocalDateTime.of(2023, 8, 16, 1, 30, 00),
-                LocalDateTime.of(2023, 8, 17, 1, 00, 00),
+                LocalDateTime.of(2023, 8, 16, 1, 30, 0),
+                LocalDateTime.of(2023, 8, 17, 1, 0, 0),
                 "Item 4", 106);
         item4.setId("3");
         item4.setEditable(true);
         item4.setUpdateTime(true);
 
-        List<Item> items = Arrays.asList(item1, item2, item3, item4);
-        return items;
+        return Arrays.asList(item1, item2, item3, item4);
     }
 
     private List<GroupItem> getGroupItems() {
@@ -135,11 +130,10 @@ public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>>
         GroupItem groupItem105 = new GroupItem(105, "Oceania", true, 2);
         GroupItem groupItem106 = new GroupItem(106, "Africa", true, 2);
 
-        List<GroupItem> groupItems = Arrays.asList(groupItem10, groupItem1, groupItem1243, groupItem1525, groupItem1624, groupItem2076,
+        return Arrays.asList(groupItem10, groupItem1, groupItem1243, groupItem1525, groupItem1624, groupItem2076,
                 groupItem1345, groupItem2078, groupItem1826, groupItem2107,
                 groupItem2, groupItem3, groupItem4, groupItem5, groupItem6, groupItem100, groupItem101,
                 groupItem102, groupItem103, groupItem104, groupItem105, groupItem106);
-        return groupItems;
     }
 
     private VerticalLayout getSelectRangeLayout(Timeline timeline, boolean bAutoZoom, List<GroupItem> groupItems) {
@@ -157,12 +151,12 @@ public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>>
         comboBox.setAllowCustomValue(true);
 
         DateTimePicker datePicker1 = new DateTimePicker("Item start date: ");
-        datePicker1.setMin(LocalDateTime.of(2023, 1, 10, 00, 00, 00));
-        datePicker1.setMax(LocalDateTime.of(2023, 8, 22, 00, 00, 00));
+        datePicker1.setMin(LocalDateTime.of(2023, 1, 10, 0, 0, 0));
+        datePicker1.setMax(LocalDateTime.of(2023, 8, 22, 0, 0, 0));
 
         DateTimePicker datePicker2 = new DateTimePicker("Item end date: ");
-        datePicker2.setMin(LocalDateTime.of(2023, 1, 10, 00, 00, 00));
-        datePicker2.setMax(LocalDateTime.of(2023, 8, 22, 00, 00, 00));
+        datePicker2.setMin(LocalDateTime.of(2023, 1, 10, 0, 0, 0));
+        datePicker2.setMax(LocalDateTime.of(2023, 8, 22, 0, 0, 0));
 
         datePicker1.addValueChangeListener(
                 e -> {
@@ -202,9 +196,7 @@ public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>>
 
     private HorizontalLayout getSelectItemAndZoomOptionLayout(Timeline timeline, List<Item> items, TextField textField, boolean bAutoZoom) {
         VerticalLayout selectLayout = new VerticalLayout();
-        Button setSelectBtn = new Button("Select Item", e -> {
-            timeline.setSelectItem(textField.getValue());
-        });
+        Button setSelectBtn = new Button("Select Item", e -> timeline.setSelectItem(textField.getValue()));
         selectLayout.add(textField, setSelectBtn);
 
         HorizontalLayout zoomOptionsLayout = new HorizontalLayout();
@@ -223,17 +215,17 @@ public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>>
         );
 
         timeline.addGroupItemClickListener(e -> {
-            String temp = "";
+            StringBuilder temp = new StringBuilder();
             for (Item item : items) {
                 if (Integer.parseInt(item.getGroupID()) == Integer.parseInt(e.getGroupId())) {
-                    if (!temp.equals(""))
-                        temp += "," + item.getId();
+                    if (temp.length() > 0)
+                        temp.append(",").append(item.getId());
                     else
-                        temp += item.getId();
+                        temp.append(item.getId());
 
                 }
             }
-            e.getTimeline().onSelectItem(e.getTimeline(), temp, false);
+            e.getTimeline().onSelectItem(e.getTimeline(), temp.toString(), false);
         });
 
 
@@ -256,10 +248,8 @@ public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>>
     }
 
     private Renderer<GroupItem> createRenderer() {
-        StringBuilder tpl = new StringBuilder();
-        tpl.append("<span style= \"font-weight: ${item.width}; font-size: ${item.fontsize}\">${item.content}</span>");
 
-        return LitRenderer.<GroupItem>of(tpl.toString())
+        return LitRenderer.<GroupItem>of("<span style= \"font-weight: ${item.width}; font-size: ${item.fontsize}\">${item.content}</span>")
                 .withProperty("width", groupItem -> {
                     if (groupItem.getTreeLevel() == 1)
                         return "bolder";
@@ -299,39 +289,4 @@ public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>>
 
         return new HorizontalLayout(save, close);
     }
-
-//
-//    // Events
-//    public static abstract class StandardFormEvent<T extends ZJTEntity, S extends ZJTService<T>> extends ComponentEvent<StandardForm<T, S>> {
-//        private final T bean;
-//
-//        protected StandardFormEvent(StandardForm<T, S> source, T bean) {
-//            super(source, false);
-//            this.bean = bean;
-//        }
-//
-//        public T getBean() {
-//            return bean;
-//        }
-//    }
-//
-//    public static class SaveEvent<T extends ZJTEntity, S extends ZJTService<T>> extends StandardFormEvent<T, S> {
-//        SaveEvent(StandardForm<T, S> source, T bean) {
-//            super(source, bean);
-//        }
-//    }
-//
-//    public static class CloseEvent<T extends ZJTEntity, S extends ZJTService<T>> extends StandardFormEvent<T, S> {
-//        CloseEvent(StandardForm<T, S> source) {
-//            super(source, null);
-//        }
-//    }
-//
-//    public Registration addSaveListener(ComponentEventListener<SaveEvent<T, S>> listener) {
-//        return addListener(SaveEvent.class, (ComponentEventListener) listener);
-//    }
-//
-//    public Registration addCloseListener(ComponentEventListener<CloseEvent<T, S>> listener) {
-//        return addListener(CloseEvent.class, (ComponentEventListener) listener);
-//    }
 }
