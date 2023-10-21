@@ -19,8 +19,12 @@ import com.vaadin.flow.data.renderer.LitRenderer;
 import com.vaadin.flow.data.renderer.Renderer;
 import com.vaadin.flow.data.value.ValueChangeMode;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 
 public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>> extends VerticalLayout {
@@ -33,6 +37,8 @@ public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>>
     private Button addItemButton;
     Timeline timeline;
     protected S service;
+
+    List<T> itemData = new ArrayList<>();
 
     public TimeLineForm(Class<T> entityClass, S service) {
         addClassName("demo-app-form");
@@ -52,7 +58,7 @@ public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>>
 
         // setting timeline range
         timeline.setTimelineRange(
-                LocalDateTime.of(2023, 1, 1, 0, 0, 0), 
+                LocalDateTime.of(2023, 1, 1, 0, 0, 0),
                 LocalDateTime.of(2023, 9, 25, 0, 0, 0));
 
         timeline.setMultiselect(true);
@@ -69,66 +75,110 @@ public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>>
     }
 
     private List<Item> getItems() {
-        Item item1 = new Item(
-                LocalDateTime.of(2023, 8, 11, 2, 30, 0),
-                LocalDateTime.of(2023, 8, 11, 7, 0, 0),
-                "Item 1", 1);
-        item1.setId("0");
-        item1.setEditable(true);
-        item1.setUpdateTime(true);
 
-        Item item2 = new Item(
-                LocalDateTime.of(2023, 8, 13, 0, 0, 0),
-                LocalDateTime.of(2023, 8, 13, 12, 0, 0),
-                "Item 2", 6);
-        item2.setId("1");
-        item2.setEditable(true);
-        item2.setUpdateTime(true);
+        List<Item> TableData = new ArrayList<>();
+//        if (filterText != null)
+//            itemData = service.findAll(filterText.getValue());
+//        else
+            itemData = service.findAll(null);
 
-        Item item3 = new Item(
-                LocalDateTime.of(2023, 8, 14, 2, 30, 0),
-                LocalDateTime.of(2023, 8, 15, 1, 0, 0),
-                "Item 3", 100);
-        item3.setId("2");
-        item3.setEditable(true);
-        item3.setUpdateTime(true);
+        Comparator<T> comparator = Comparator.comparing(ZJTEntity::getName);
+        itemData.sort(comparator);
 
-        Item item4 = new Item(
-                LocalDateTime.of(2023, 8, 16, 1, 30, 0),
-                LocalDateTime.of(2023, 8, 17, 1, 0, 0),
-                "Item 4", 106);
-        item4.setId("3");
-        item4.setEditable(true);
-        item4.setUpdateTime(true);
+        for (T data :
+                itemData) {
+            try {
+                Item item = getItem(data);
+                item.setEditable(true);
+                item.setUpdateTime(true);
+                TableData.add(item);
+            } catch (NoSuchFieldException | IllegalAccessException e) {
+                throw new RuntimeException(e);
+            }
+        }
 
-        return Arrays.asList(item1, item2, item3, item4);
+//        Item item1 = new Item(
+//                LocalDateTime.of(2023, 8, 11, 2, 30, 0),
+//                LocalDateTime.of(2023, 8, 11, 7, 0, 0),
+//                "Item 1", 1);
+//        item1.setId("0");
+//        item1.setEditable(true);
+//        item1.setUpdateTime(true);
+//
+//        Item item2 = new Item(
+//                LocalDateTime.of(2023, 8, 13, 0, 0, 0),
+//                LocalDateTime.of(2023, 8, 13, 12, 0, 0),
+//                "Item 2", 6);
+//        item2.setId("1");
+//        item2.setEditable(true);
+//        item2.setUpdateTime(true);
+//
+//        Item item3 = new Item(
+//                LocalDateTime.of(2023, 8, 14, 2, 30, 0),
+//                LocalDateTime.of(2023, 8, 15, 1, 0, 0),
+//                "Item 3", 100);
+//        item3.setId("2");
+//        item3.setEditable(true);
+//        item3.setUpdateTime(true);
+//
+//        Item item4 = new Item(
+//                LocalDateTime.of(2023, 8, 16, 1, 30, 0),
+//                LocalDateTime.of(2023, 8, 17, 1, 0, 0),
+//                "Item 4", 106);
+//        item4.setId("3");
+//        item4.setEditable(true);
+//        item4.setUpdateTime(true);
+//
+//        return Arrays.asList(item1, item2, item3, item4);
+        return TableData;
+    }
+
+    private static <T extends ZJTEntity> Item getItem(T data) throws NoSuchFieldException, IllegalAccessException {
+        Field startTimeField = data.getClass().getDeclaredField("startTime");
+        startTimeField.setAccessible(true);
+        Object startTimeVal = startTimeField.get(data);
+        Field endTimeField = data.getClass().getDeclaredField("endTime");
+        endTimeField.setAccessible(true);
+        Object endTimeVal = endTimeField.get(data);
+        Field nameField = data.getClass().getDeclaredField("name");
+        nameField.setAccessible(true);
+        Object nameVal = nameField.get(data);
+        Field idField = data.getClass().getDeclaredField("id");
+        idField.setAccessible(true);
+        Object idVal = idField.get(data);
+        Item item = new Item(
+                (LocalDateTime) startTimeVal,
+                (LocalDateTime) endTimeVal,
+                (String) nameVal, 1);
+        item.setId(String.valueOf(idVal));
+        return item;
     }
 
     private List<GroupItem> getGroupItems() {
 
-        GroupItem groupItem1243 = new GroupItem(1243, "Level 3 1243", true, 3);
-        GroupItem groupItem1525 = new GroupItem(1525, "Level 3 1525", true, 3);
-        GroupItem groupItem1624 = new GroupItem(1624, "Level 3 1624", true, 3);
-        GroupItem groupItem2076 = new GroupItem(2076, "Level 3 2076", true, 3);
-        GroupItem groupItem1345 = new GroupItem(1345, "Level 3 1345", true, 3);
-        GroupItem groupItem2078 = new GroupItem(2078, "Level 3 2078", true, 3);
-        GroupItem groupItem1826 = new GroupItem(1826, "Level 3 1826", true, 3);
-        GroupItem groupItem2107 = new GroupItem(2107, "Level 3 2107", true, 3);
-        GroupItem groupItem10 = new GroupItem(10, "Group 10", "1,2,3,4,5,6", true, 1);
+        GroupItem groupItem1243 = new GroupItem(1243, "Level 3 1243", true, 2);
+        GroupItem groupItem1525 = new GroupItem(1525, "Level 3 1525", true, 2);
+        GroupItem groupItem1624 = new GroupItem(1624, "Level 3 1624", true, 2);
+        GroupItem groupItem2076 = new GroupItem(2076, "Level 3 2076", true, 2);
+        GroupItem groupItem1345 = new GroupItem(1345, "Level 3 1345", true, 2);
+        GroupItem groupItem2078 = new GroupItem(2078, "Level 3 2078", true, 2);
+        GroupItem groupItem1826 = new GroupItem(1826, "Level 3 1826", true, 2);
+        GroupItem groupItem2107 = new GroupItem(2107, "Level 3 2107", true, 2);
+        GroupItem groupItem10 = new GroupItem(10, "Group 10", "1,2,3,4,5,6", true, 0);
         GroupItem groupItem1 = new GroupItem(1, "North America", "1243,1525,1624,1345,2078,1826,2076,2107",
-                true, 2);
-        GroupItem groupItem2 = new GroupItem(2, "Latin America", true, 2);
-        GroupItem groupItem3 = new GroupItem(3, "Europe", true, 2);
-        GroupItem groupItem4 = new GroupItem(4, "Asia", true, 2);
-        GroupItem groupItem5 = new GroupItem(5, "Oceania", true, 2);
-        GroupItem groupItem6 = new GroupItem(6, "Africa", true, 2);
-        GroupItem groupItem100 = new GroupItem(100, "Group 100", "101, 102, 103, 104, 105, 106", true, 1);
-        GroupItem groupItem101 = new GroupItem(101, "North America", true, 2);
-        GroupItem groupItem102 = new GroupItem(102, "Latin America", true, 2);
-        GroupItem groupItem103 = new GroupItem(103, "Europe", true, 2);
-        GroupItem groupItem104 = new GroupItem(104, "Asia", true, 2);
-        GroupItem groupItem105 = new GroupItem(105, "Oceania", true, 2);
-        GroupItem groupItem106 = new GroupItem(106, "Africa", true, 2);
+                true, 1);
+        GroupItem groupItem2 = new GroupItem(2, "Latin America", true, 1);
+        GroupItem groupItem3 = new GroupItem(3, "Europe", true, 1);
+        GroupItem groupItem4 = new GroupItem(4, "Asia", true, 1);
+        GroupItem groupItem5 = new GroupItem(5, "Oceania", true, 1);
+        GroupItem groupItem6 = new GroupItem(6, "Africa", true, 1);
+        GroupItem groupItem100 = new GroupItem(100, "Group 100", "101, 102, 103, 104, 105, 106", true, 0);
+        GroupItem groupItem101 = new GroupItem(101, "North America", true, 1);
+        GroupItem groupItem102 = new GroupItem(102, "Latin America", true, 1);
+        GroupItem groupItem103 = new GroupItem(103, "Europe", true, 1);
+        GroupItem groupItem104 = new GroupItem(104, "Asia", true, 1);
+        GroupItem groupItem105 = new GroupItem(105, "Oceania", true, 1);
+        GroupItem groupItem106 = new GroupItem(106, "Africa", true, 1);
 
         return Arrays.asList(groupItem10, groupItem1, groupItem1243, groupItem1525, groupItem1624, groupItem2076,
                 groupItem1345, groupItem2078, groupItem1826, groupItem2107,
@@ -268,6 +318,7 @@ public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>>
                 })
                 .withProperty("content", GroupItem::getContent);
     }
+
     private HorizontalLayout getToolbar() {
         filterText.setPlaceholder("Filter by name...");
         filterText.setClearButtonVisible(true);

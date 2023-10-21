@@ -1,10 +1,7 @@
 package com.aat.application.views;
 
 
-import com.aat.application.data.entity.ZJTElement;
-import com.aat.application.data.entity.ZJTPricingType;
-import com.aat.application.data.entity.ZJTResourceCategory;
-import com.aat.application.data.entity.ZJTResourceType;
+import com.aat.application.data.entity.*;
 import org.vaadin.lineawesome.LineAwesomeIcon;
 
 import com.aat.application.components.appnav.AppNav;
@@ -71,7 +68,7 @@ public class MainLayout extends AppLayout {
 //        parent.addItem(new AppNavItem("Resource Type", StandardFormView.class, LineAwesomeIcon.PRODUCT_HUNT.create())
 //                .withParameter(StandardFormView.class, "entityClass", ZJTResourceType.class.getSimpleName()));
         parent.addItem(new AppNavItem("Group TimeLine", TimeLineFormView.class, LineAwesomeIcon.PRODUCT_HUNT.create())
-                .withParameter(TimeLineFormView.class, "entityClass", ZJTResourceType.class.getSimpleName()));
+                .withParameter(TimeLineFormView.class, "entityClass", ZJTTimeLineItem.class.getSimpleName()));
         return nav;
     }
 
