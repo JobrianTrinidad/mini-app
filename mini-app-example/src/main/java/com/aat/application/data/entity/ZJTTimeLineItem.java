@@ -8,25 +8,26 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "zjt_timeline_item")
+@NamedQuery(name = "findAllGroup", query = "SELECT p FROM ZJTTimeLineNode p")
 public class ZJTTimeLineItem implements ZJTEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    @jakarta.persistence.Column(name = "id")
+    @Column(name = "id")
     private Long id;
 
     @Column
-    private String name;
+    private String title;
     @Column
-    private String description;
+    private String content;
 
     @ManyToOne
     @JoinColumn(name = "node_id")
-    private ZJTTimeLineNode node;
+    private ZJTTimeLineNode group;
     @Column(name = "start_time")
-    private LocalDateTime startTime;
+    private LocalDateTime start;
     @Column(name = "end_time")
-    private LocalDateTime endTime;
+    private LocalDateTime end;
 
     public Long getId() {
         return id;
@@ -37,44 +38,45 @@ public class ZJTTimeLineItem implements ZJTEntity {
     }
 
     @Override
+
     public String getName() {
-        return name;
+        return title;
     }
-
     @Override
-    public void setName(String name) {
-        this.name = name;
+
+    public void setName(String title) {
+        this.title = title;
     }
 
-    public String getDescription() {
-        return description;
+    public String getContent() {
+        return content;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setContent(String content) {
+        this.content = content;
     }
 
     public ZJTTimeLineNode getNode() {
-        return node;
+        return group;
     }
 
-    public void setNode(ZJTTimeLineNode node) {
-        this.node = node;
+    public void setNode(ZJTTimeLineNode group) {
+        this.group = group;
     }
 
     public LocalDateTime getStartTime() {
-        return startTime;
+        return start;
     }
 
-    public void setStartTime(LocalDateTime startTime) {
-        this.startTime = startTime;
+    public void setStartTime(LocalDateTime start) {
+        this.start = start;
     }
 
     public LocalDateTime getEndTime() {
-        return endTime;
+        return end;
     }
 
-    public void setEndTime(LocalDateTime endTime) {
-        this.endTime = endTime;
+    public void setEndTime(LocalDateTime end) {
+        this.end = end;
     }
 }

@@ -2,6 +2,7 @@ package com.aat.application.core.form;
 
 import com.aat.application.core.data.entity.ZJTEntity;
 import com.aat.application.core.data.service.ZJTService;
+import com.aat.application.util.GlobalData;
 import com.vaadin.componentfactory.timeline.Timeline;
 import com.vaadin.componentfactory.timeline.model.GroupItem;
 import com.vaadin.componentfactory.timeline.model.Item;
@@ -20,12 +21,8 @@ import com.vaadin.flow.data.renderer.Renderer;
 import com.vaadin.flow.data.value.ValueChangeMode;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>> extends VerticalLayout {
 
@@ -37,6 +34,9 @@ public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>>
     private Button addItemButton;
     Timeline timeline;
     protected S service;
+    List<String> headers;
+    Dictionary<String, String> headerOptions = new Hashtable<>();
+    Dictionary<String, Class<?>> headerTypeOptions = new Hashtable<>();
 
     List<T> itemData = new ArrayList<>();
 
@@ -44,11 +44,34 @@ public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>>
         addClassName("demo-app-form");
         this.service = service;
 
-//        binder = new BeanValidationBinder<>(entityClass);
         save = new Button("Save");
         close = new Button("Cancel");
-
+        headers = configureHeader(entityClass);
         configureTimeLine();
+    }
+
+    private List<String> configureHeader(Class<T> entityClass) {
+        Field[] fields = entityClass.getDeclaredFields();
+
+        List<String> fieldNames = new ArrayList<>();
+        for (int i = 1; i < fields.length; i++) {
+            if (fields[i].getAnnotation(jakarta.persistence.Column.class) != null) {
+
+                fieldNames.add(fields[i].getName());
+                headerOptions.put(fields[i].getName(), "input");
+            }
+            if (fields[i].getAnnotation(jakarta.persistence.Enumerated.class) != null) {
+                fieldNames.add(fields[i].getName());
+                headerTypeOptions.put(fields[i].getName(), fields[i].getType());
+                headerOptions.put(fields[i].getName(), "select_enum");
+            }
+            if (fields[i].getAnnotation(jakarta.persistence.JoinColumn.class) != null) {
+                fieldNames.add(fields[i].getName());
+                headerOptions.put(fields[i].getName(), "select_class");
+            }
+        }
+
+        return fieldNames;
     }
 
     private void configureTimeLine() {
@@ -57,9 +80,7 @@ public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>>
         timeline = new Timeline(items, groupItems);
 
         // setting timeline range
-        timeline.setTimelineRange(
-                LocalDateTime.of(2023, 1, 1, 0, 0, 0),
-                LocalDateTime.of(2023, 9, 25, 0, 0, 0));
+        timeline.setTimelineRange(LocalDateTime.of(2023, 1, 1, 0, 0, 0), LocalDateTime.of(2023, 9, 25, 0, 0, 0));
 
         timeline.setMultiselect(true);
         timeline.setWidthFull();
@@ -77,113 +98,70 @@ public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>>
     private List<Item> getItems() {
 
         List<Item> TableData = new ArrayList<>();
-//        if (filterText != null)
-//            itemData = service.findAll(filterText.getValue());
-//        else
-            itemData = service.findAll(null);
+        if (filterText != null) itemData = service.findAll(filterText.getValue());
+        else itemData = service.findAll(null);
 
-        Comparator<T> comparator = Comparator.comparing(ZJTEntity::getName);
-        itemData.sort(comparator);
 
         for (T data :
                 itemData) {
-            try {
-                Item item = getItem(data);
-                item.setEditable(true);
-                item.setUpdateTime(true);
-                TableData.add(item);
-            } catch (NoSuchFieldException | IllegalAccessException e) {
-                throw new RuntimeException(e);
-            }
-        }
+            Item item = new Item();
 
-//        Item item1 = new Item(
-//                LocalDateTime.of(2023, 8, 11, 2, 30, 0),
-//                LocalDateTime.of(2023, 8, 11, 7, 0, 0),
-//                "Item 1", 1);
-//        item1.setId("0");
-//        item1.setEditable(true);
-//        item1.setUpdateTime(true);
-//
-//        Item item2 = new Item(
-//                LocalDateTime.of(2023, 8, 13, 0, 0, 0),
-//                LocalDateTime.of(2023, 8, 13, 12, 0, 0),
-//                "Item 2", 6);
-//        item2.setId("1");
-//        item2.setEditable(true);
-//        item2.setUpdateTime(true);
-//
-//        Item item3 = new Item(
-//                LocalDateTime.of(2023, 8, 14, 2, 30, 0),
-//                LocalDateTime.of(2023, 8, 15, 1, 0, 0),
-//                "Item 3", 100);
-//        item3.setId("2");
-//        item3.setEditable(true);
-//        item3.setUpdateTime(true);
-//
-//        Item item4 = new Item(
-//                LocalDateTime.of(2023, 8, 16, 1, 30, 0),
-//                LocalDateTime.of(2023, 8, 17, 1, 0, 0),
-//                "Item 4", 106);
-//        item4.setId("3");
-//        item4.setEditable(true);
-//        item4.setUpdateTime(true);
-//
-//        return Arrays.asList(item1, item2, item3, item4);
+            for (int i = 0; i < headers.size(); i++) {
+                String header = headers.get(i);
+                try {
+                    Field headerField = data.getClass().getDeclaredField(header);
+                    headerField.setAccessible(true);
+                    Object dataSel = headerField.get(data);
+                    Field itemHeaderField = item.getClass().getDeclaredField(header);
+                    itemHeaderField.setAccessible(true);
+                    switch (headerOptions.get(header)) {
+                        case "input":
+                            itemHeaderField.set(item, dataSel);
+                            break;
+                        case "select_class":
+                            if (dataSel == null)
+                                dataSel = data.getClass().getDeclaredField(header);
+                            Field itemIdField = dataSel.getClass().getDeclaredField("groupId");
+                            itemIdField.setAccessible(true);
+                            itemHeaderField.set(item, String.valueOf(itemIdField.get(dataSel)));
+
+                            String headerName = header.substring(0, 1).toUpperCase()
+                                    + header.substring(1);
+                            GlobalData.addData(headerName);
+                            break;
+                        default:
+                            break;
+                    }
+
+                } catch (NoSuchFieldException | IllegalAccessException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+            TableData.add(item);
+
+        }
         return TableData;
     }
 
-    private static <T extends ZJTEntity> Item getItem(T data) throws NoSuchFieldException, IllegalAccessException {
-        Field startTimeField = data.getClass().getDeclaredField("startTime");
-        startTimeField.setAccessible(true);
-        Object startTimeVal = startTimeField.get(data);
-        Field endTimeField = data.getClass().getDeclaredField("endTime");
-        endTimeField.setAccessible(true);
-        Object endTimeVal = endTimeField.get(data);
-        Field nameField = data.getClass().getDeclaredField("name");
-        nameField.setAccessible(true);
-        Object nameVal = nameField.get(data);
-        Field idField = data.getClass().getDeclaredField("id");
-        idField.setAccessible(true);
-        Object idVal = idField.get(data);
-        Item item = new Item(
-                (LocalDateTime) startTimeVal,
-                (LocalDateTime) endTimeVal,
-                (String) nameVal, 1);
-        item.setId(String.valueOf(idVal));
-        return item;
-    }
-
     private List<GroupItem> getGroupItems() {
-
-        GroupItem groupItem1243 = new GroupItem(1243, "Level 3 1243", true, 2);
-        GroupItem groupItem1525 = new GroupItem(1525, "Level 3 1525", true, 2);
-        GroupItem groupItem1624 = new GroupItem(1624, "Level 3 1624", true, 2);
-        GroupItem groupItem2076 = new GroupItem(2076, "Level 3 2076", true, 2);
-        GroupItem groupItem1345 = new GroupItem(1345, "Level 3 1345", true, 2);
-        GroupItem groupItem2078 = new GroupItem(2078, "Level 3 2078", true, 2);
-        GroupItem groupItem1826 = new GroupItem(1826, "Level 3 1826", true, 2);
-        GroupItem groupItem2107 = new GroupItem(2107, "Level 3 2107", true, 2);
-        GroupItem groupItem10 = new GroupItem(10, "Group 10", "1,2,3,4,5,6", true, 0);
-        GroupItem groupItem1 = new GroupItem(1, "North America", "1243,1525,1624,1345,2078,1826,2076,2107",
-                true, 1);
-        GroupItem groupItem2 = new GroupItem(2, "Latin America", true, 1);
-        GroupItem groupItem3 = new GroupItem(3, "Europe", true, 1);
-        GroupItem groupItem4 = new GroupItem(4, "Asia", true, 1);
-        GroupItem groupItem5 = new GroupItem(5, "Oceania", true, 1);
-        GroupItem groupItem6 = new GroupItem(6, "Africa", true, 1);
-        GroupItem groupItem100 = new GroupItem(100, "Group 100", "101, 102, 103, 104, 105, 106", true, 0);
-        GroupItem groupItem101 = new GroupItem(101, "North America", true, 1);
-        GroupItem groupItem102 = new GroupItem(102, "Latin America", true, 1);
-        GroupItem groupItem103 = new GroupItem(103, "Europe", true, 1);
-        GroupItem groupItem104 = new GroupItem(104, "Asia", true, 1);
-        GroupItem groupItem105 = new GroupItem(105, "Oceania", true, 1);
-        GroupItem groupItem106 = new GroupItem(106, "Africa", true, 1);
-
-        return Arrays.asList(groupItem10, groupItem1, groupItem1243, groupItem1525, groupItem1624, groupItem2076,
-                groupItem1345, groupItem2078, groupItem1826, groupItem2107,
-                groupItem2, groupItem3, groupItem4, groupItem5, groupItem6, groupItem100, groupItem101,
-                groupItem102, groupItem103, groupItem104, groupItem105, groupItem106);
+        List<GroupItem> groupItems = new ArrayList<>();
+        List<ZJTEntity> groupResults = GlobalData.listData.get("Group");
+        for (Object groupResult :
+                groupResults) {
+            GroupItem groupItem = new GroupItem();
+            for (Field field :
+                    groupItem.getClass().getDeclaredFields()) {
+                try {
+                    Field headerField = groupResult.getClass().getDeclaredField(field.getName());
+                    headerField.setAccessible(true);
+                    field.setAccessible(true);
+                    field.set(groupItem, headerField.get(groupResult));
+                } catch (NoSuchFieldException | IllegalAccessException ignored) {
+                }
+            }
+            groupItems.add(groupItem);
+        }
+        return groupItems;
     }
 
     private VerticalLayout getSelectRangeLayout(Timeline timeline, boolean bAutoZoom, List<GroupItem> groupItems) {
@@ -208,35 +186,29 @@ public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>>
         datePicker2.setMin(LocalDateTime.of(2023, 1, 10, 0, 0, 0));
         datePicker2.setMax(LocalDateTime.of(2023, 8, 22, 0, 0, 0));
 
-        datePicker1.addValueChangeListener(
-                e -> {
-                    GroupItem selectedGroupItem = comboBox.getValue();
-                    newItem = createNewItem(datePicker1.getValue(), datePicker2.getValue(), selectedGroupItem.getGroupId());
-                });
-        datePicker2.addValueChangeListener(
-                e -> {
-                    GroupItem selectedGroupItem = comboBox.getValue();
-                    newItem = createNewItem(datePicker1.getValue(), datePicker2.getValue(), selectedGroupItem.getGroupId());
-                });
+        datePicker1.addValueChangeListener(e -> {
+            GroupItem selectedGroupItem = comboBox.getValue();
+            newItem = createNewItem(datePicker1.getValue(), datePicker2.getValue(), selectedGroupItem.getGroupId());
+        });
+        datePicker2.addValueChangeListener(e -> {
+            GroupItem selectedGroupItem = comboBox.getValue();
+            newItem = createNewItem(datePicker1.getValue(), datePicker2.getValue(), selectedGroupItem.getGroupId());
+        });
 
-        comboBox.addValueChangeListener(
-                e -> {
-                    GroupItem selectedGroupItem = comboBox.getValue();
-                    newItem = createNewItem(datePicker1.getValue(), datePicker2.getValue(), selectedGroupItem.getGroupId());
-                });
+        comboBox.addValueChangeListener(e -> {
+            GroupItem selectedGroupItem = comboBox.getValue();
+            newItem = createNewItem(datePicker1.getValue(), datePicker2.getValue(), selectedGroupItem.getGroupId());
+        });
 
         HorizontalLayout horizontalLayout = new HorizontalLayout();
         horizontalLayout.add(datePicker1, datePicker2, comboBox);
 
-        addItemButton =
-                new Button(
-                        "Add Item",
-                        e -> {
-                            timeline.addItem(newItem, bAutoZoom);
-                            newItem = null;
-                            datePicker1.clear();
-                            datePicker2.clear();
-                        });
+        addItemButton = new Button("Add Item", e -> {
+            timeline.addItem(newItem, bAutoZoom);
+            newItem = null;
+            datePicker1.clear();
+            datePicker2.clear();
+        });
         addItemButton.setDisableOnClick(true);
         addItemButton.setEnabled(false);
 
@@ -257,21 +229,17 @@ public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>>
 
         zoomOptionsLayout.add(oneDay, threeDays, fiveDays, selectLayout);
 
-        timeline.addItemSelectListener(
-                e -> {
-                    timeline.onSelectItem(e.getTimeline(), e.getItemId(), bAutoZoom);
-                    textField.setValue(e.getItemId());
-                }
-        );
+        timeline.addItemSelectListener(e -> {
+            timeline.onSelectItem(e.getTimeline(), e.getItemId(), bAutoZoom);
+            textField.setValue(e.getItemId());
+        });
 
         timeline.addGroupItemClickListener(e -> {
             StringBuilder temp = new StringBuilder();
             for (Item item : items) {
-                if (Integer.parseInt(item.getGroupID()) == Integer.parseInt(e.getGroupId())) {
-                    if (temp.length() > 0)
-                        temp.append(",").append(item.getId());
-                    else
-                        temp.append(item.getId());
+                if (Integer.parseInt(item.getGroup()) == Integer.parseInt(e.getGroupId())) {
+                    if (temp.length() > 0) temp.append(",").append(item.getId());
+                    else temp.append(item.getId());
 
                 }
             }
@@ -282,11 +250,11 @@ public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>>
         return zoomOptionsLayout;
     }
 
-    private Item createNewItem(LocalDateTime start, LocalDateTime end, String groupID) {
+    private Item createNewItem(LocalDateTime start, LocalDateTime end, int groupID) {
         if (start != null && end != null) {
             if (start.isBefore(end)) {
                 addItemButton.setEnabled(true);
-                return new Item(start, end, Integer.parseInt(groupID));
+                return new Item(start, end, groupID);
             } else {
                 Notification.show("End date should be after start date", 5000, Notification.Position.MIDDLE);
                 return null;
@@ -299,24 +267,15 @@ public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>>
 
     private Renderer<GroupItem> createRenderer() {
 
-        return LitRenderer.<GroupItem>of("<span style= \"font-weight: ${item.width}; font-size: ${item.fontsize}\">${item.content}</span>")
-                .withProperty("width", groupItem -> {
-                    if (groupItem.getTreeLevel() == 1)
-                        return "bolder";
-                    else if (groupItem.getTreeLevel() == 2)
-                        return "bold";
-                    else
-                        return "normal";
-                })
-                .withProperty("fontsize", groupItem -> {
-                    if (groupItem.getTreeLevel() == 1)
-                        return "1rem";
-                    else if (groupItem.getTreeLevel() == 2)
-                        return "0.9rem";
-                    else
-                        return "0.8rem";
-                })
-                .withProperty("content", GroupItem::getContent);
+        return LitRenderer.<GroupItem>of("<span style= \"font-weight: ${item.width}; font-size: ${item.fontsize}\">${item.content}</span>").withProperty("width", groupItem -> {
+            if (groupItem.getTreeLevel() == 1) return "bolder";
+            else if (groupItem.getTreeLevel() == 2) return "bold";
+            else return "normal";
+        }).withProperty("fontsize", groupItem -> {
+            if (groupItem.getTreeLevel() == 1) return "1rem";
+            else if (groupItem.getTreeLevel() == 2) return "0.9rem";
+            else return "0.8rem";
+        }).withProperty("content", GroupItem::getContent);
     }
 
     private HorizontalLayout getToolbar() {

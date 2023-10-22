@@ -31,4 +31,5 @@ public class BaseEntityService<T> implements ZJTService<T> {
     public void delete(T record) {
         generalRepository.deleteEntity(record);
     }
+
 }

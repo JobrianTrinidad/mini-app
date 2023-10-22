@@ -111,7 +111,7 @@
         <dependency>
             <groupId>com.github.rosauromatib</groupId>
             <artifactId>visjs-timeline-addon</artifactId>
-            <version>v1.0.0</version>
+            <version>v1.0.02</version>
             <scope>compile</scope>
         </dependency>
         <!--

@@ -4,6 +4,7 @@ import com.aat.application.core.data.entity.ZJTEntity;
 import com.vaadin.flow.router.PageTitle;
 import jakarta.persistence.Entity;
 import jakarta.persistence.*;
+import org.hibernate.Hibernate;
 
 import java.util.List;
 
@@ -14,63 +15,61 @@ public class ZJTTimeLineNode implements ZJTEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
+    @Column(name = "id")
+    private int groupId;
 
-    @Column
-    private String name;
-    @Column
-    private int level;
+    @Column(name = "name")
+    private String content;
+    @Column(name = "level")
+    private int treeLevel;
 
     @ManyToOne
     @JoinColumn(name = "parent_id")
     private ZJTTimeLineNode parent;
 
-    @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<ZJTTimeLineNode> children;
 
-    @OneToMany(mappedBy = "node", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "group", cascade = CascadeType.ALL)
     private List<ZJTTimeLineItem> items;
+    private boolean visible = true;
+    private String className = "";
+    private String nestedGroups;
 
     // getters
-    public Long getId() {
-        return id;
+
+    public int getGroupId() {
+        return groupId;
     }
 
-    public String getName() {
-        return name;
+    public void setGroupId(int groupId) {
+        this.groupId = groupId;
     }
 
-    public ZJTTimeLineNode getParent() {
-        return parent;
+    public int getTreeLevel() {
+        return treeLevel;
+    }
+
+    public void setTreeLevel(int treeLevel) {
+        this.treeLevel = treeLevel;
     }
 
     public List<ZJTTimeLineNode> getChildren() {
         return children;
     }
 
+    public void setChildren(List<ZJTTimeLineNode> children) {
+        this.children = children;
+    }
+
+    public ZJTTimeLineNode getParent() {
+        return parent;
+    }
+
     // setters
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public int getLevel() {
-        return level;
-    }
-
-    public void setLevel(int level) {
-        this.level = level;
-    }
 
     public void setParent(ZJTTimeLineNode parent) {
         this.parent = parent;
-    }
-
-    public void setChildren(List<ZJTTimeLineNode> children) {
-        this.children = children;
     }
 
     public List<ZJTTimeLineItem> getItems() {
@@ -79,5 +78,36 @@ public class ZJTTimeLineNode implements ZJTEntity {
 
     public void setItems(List<ZJTTimeLineItem> items) {
         this.items = items;
+    }
+
+    @Override
+    public String getName() {
+        return content;
+    }
+
+    @Override
+    public void setName(String content) {
+        this.content = content;
+    }
+
+    @PostLoad
+    public void updateNestedGroups() {
+        StringBuilder temp = new StringBuilder();
+        if (children != null) {
+            for (ZJTTimeLineNode node : children) {
+                temp.append(node.getGroupId()).append(",");
+            }
+            if (!temp.isEmpty()) {
+                temp.replace(temp.length() - 1, temp.length(), "");
+            }
+        }
+        if (temp.toString().isEmpty())
+            nestedGroups = null;
+        else
+            nestedGroups = temp.toString();
+    }
+
+    public String getNestedGroups() {
+        return nestedGroups;
     }
 }
