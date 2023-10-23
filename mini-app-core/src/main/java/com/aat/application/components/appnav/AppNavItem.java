@@ -2,16 +2,14 @@ package com.aat.application.components.appnav;
 
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.Tag;
-import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.dependency.JsModule;
 import com.vaadin.flow.dom.Element;
 import com.vaadin.flow.internal.StateTree;
 import com.vaadin.flow.router.*;
 import com.vaadin.flow.server.VaadinService;
+import com.vaadin.flow.server.VaadinSession;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * A menu item for the {@link AppNav} component.
@@ -180,12 +178,18 @@ public class AppNavItem extends Component {
     public AppNavItem setPath(Class<? extends Component> view) {
         String url = "";
 
-        if (this.parameters != null) {
+        if (this.parameters != null && this.parameters.size() == 2) {
 //            url = RouteConfiguration.forRegistry(getRouter().getRegistry()).getUrl(view);
-            RouterLink link = new RouterLink("Go to CommonView", view);
-            url = link.getHref() + "?entityClass=" + this.parameters.get("entityClass");
-        }
-        else
+//            RouterLink link = new RouterLink("Go to CommonView", view);
+//            url = link.getHref()
+//                    + "?entityClass=" + this.parameters.get("entityClass")
+//                    + "&layout=" + this.parameters.get("layout");
+            VaadinSession.getCurrent().setAttribute("entityClass", this.parameters.get("entityClass"));
+            VaadinSession.getCurrent().setAttribute("layout", this.parameters.get("layout"));
+
+            // Get the URL without parameters
+            url = RouteConfiguration.forRegistry(getRouter().getRegistry()).getUrl(view);
+        } else
             url = RouteConfiguration.forRegistry(getRouter().getRegistry()).getUrl(view);
         setPath(url);
         return this;

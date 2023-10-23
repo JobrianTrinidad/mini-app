@@ -92,7 +92,8 @@ public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>>
         VerticalLayout selectRangeLayout = getSelectRangeLayout(timeline, bAutoZoom, groupItems);
         HorizontalLayout zoomOptionsLayout = getSelectItemAndZoomOptionLayout(timeline, items, tfSelected, bAutoZoom);
 
-        add(selectRangeLayout, zoomOptionsLayout, timeline);
+//        add(selectRangeLayout, zoomOptionsLayout, timeline);
+        add(timeline);
     }
 
     private List<Item> getItems() {
