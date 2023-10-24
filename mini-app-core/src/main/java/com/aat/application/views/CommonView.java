@@ -25,7 +25,7 @@ public abstract class CommonView<T extends ZJTEntity> extends VerticalLayout imp
         this.repository = repository;
     }
 
-    protected void setForm(VerticalLayout form){
+    protected void setForm(VerticalLayout form) {
         try {
             CoreMainLayout layout = (CoreMainLayout) LayoutClass.getDeclaredConstructor().newInstance();
             layout.setContent(form);
@@ -48,10 +48,11 @@ public abstract class CommonView<T extends ZJTEntity> extends VerticalLayout imp
         });
         String entityClassName = parameters.getFirst("entityClass");
         String layoutClassName = (String) VaadinSession.getCurrent().getAttribute("layout");
+        String aPackage = (String) VaadinSession.getCurrent().getAttribute("package");
 
         if (entityClassName != null && layoutClassName != null) {
             try {
-                entityClass = (Class<T>) Class.forName(entityClassName);
+                entityClass = (Class<T>) Class.forName(aPackage + '.' + entityClassName);
                 LayoutClass = Class.forName(layoutClassName);
                 PageTitle pageTitleAnnotation = entityClass.getAnnotation(PageTitle.class);
                 if (pageTitleAnnotation != null) {
