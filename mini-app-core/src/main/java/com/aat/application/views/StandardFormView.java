@@ -4,8 +4,10 @@ import com.aat.application.core.data.entity.ZJTEntity;
 import com.aat.application.data.repository.BaseEntityRepository;
 import com.aat.application.data.service.BaseEntityService;
 import com.aat.application.form.GridCommonForm;
-import com.vaadin.flow.component.applayout.AppLayout;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.router.*;
+
+import java.lang.reflect.InvocationTargetException;
 
 @Route(value = "commonview", layout = CoreMainLayout.class)
 public class StandardFormView<T extends ZJTEntity> extends CommonView<T> {
@@ -17,12 +19,8 @@ public class StandardFormView<T extends ZJTEntity> extends CommonView<T> {
     }
 
     private void configureForm() {
-        if (form != null)
-            remove(form);
-
         form = new GridCommonForm<>(entityClass, new BaseEntityService<>(repository));
-        form.setWidth("25em");
-        add(form);
+        setForm(form);
     }
 
     @Override

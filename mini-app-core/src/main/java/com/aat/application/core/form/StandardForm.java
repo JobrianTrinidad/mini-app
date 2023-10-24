@@ -10,6 +10,7 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.value.ValueChangeMode;
 
@@ -18,7 +19,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
-public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>> extends FormLayout {
+public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>> extends VerticalLayout {
 
     private static final long serialVersionUID = -5183438338263448739L;
 
@@ -44,7 +45,7 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
         headers = configureHeader(entityClass);
         configureGrid(entityClass);
 
-        add(getToolbar(), grid);
+        add(new VerticalLayout(getToolbar(), grid));
 
 //        binder.bindInstanceFields(this);
     }

@@ -25,29 +25,8 @@ public class TimeLineFormView<T extends ZJTEntity> extends CommonView<T> {
     }
 
     private void configureForm() {
-        if (form != null)
-            remove(form);
         form = new TimeLineCommonForm<>(entityClass, new BaseEntityService<>(repository));
-//        add(form);
-        try {
-            Div layout = (Div) LayoutClass.getDeclaredConstructor().newInstance();
-            try {
-                Field[] fields = layout.getClass().getDeclaredFields();
-                Field field = layout.getClass().getDeclaredField("coreMainLayout");
-                field.setAccessible(true);
-                CoreMainLayout coreMainLayout = (CoreMainLayout) field.get(layout);
-                coreMainLayout.setContent(form);
-                UI.getCurrent().removeAll();
-                UI.getCurrent().add(coreMainLayout);
-            } catch (NoSuchFieldException | IllegalAccessException e) {
-                e.printStackTrace();
-            }
-
-        } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
-                 NoSuchMethodException e) {
-            throw new RuntimeException(e);
-        }
-
+        setForm(form);
     }
 
     @Override

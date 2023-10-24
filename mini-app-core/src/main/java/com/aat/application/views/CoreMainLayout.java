@@ -2,6 +2,7 @@ package com.aat.application.views;
 
 
 import com.aat.application.components.appnav.AppNav;
+import com.vaadin.flow.component.accordion.AccordionPanel;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
 import com.vaadin.flow.component.html.Footer;
@@ -26,6 +27,10 @@ public class CoreMainLayout extends AppLayout{
         addHeaderContent();
     }
 
+    protected AppNav getNavigation() {
+        return nav;
+    }
+
     private void addHeaderContent() {
         DrawerToggle toggle = new DrawerToggle();
         toggle.getElement().setAttribute("aria-label", "Menu toggle");
@@ -36,7 +41,7 @@ public class CoreMainLayout extends AppLayout{
         addToNavbar(true, toggle, viewTitle);
     }
 
-    protected void addDrawerContent() {
+    private void addDrawerContent() {
         H1 appName = new H1("JTT Scheduler");
         appName.addClassNames(LumoUtility.FontSize.LARGE, LumoUtility.Margin.NONE);
         Header header = new Header(appName);
@@ -46,11 +51,11 @@ public class CoreMainLayout extends AppLayout{
         addToDrawer(header, scroller, createFooter());
     }
 
-    public AppNav createNavigation() {
+    protected AppNav createNavigation() {
         return nav;
     }
 
-    public void setNavigation(AppNav nav){
+    protected void setNavigation(AppNav nav){
         this.nav = nav;
         addDrawerContent();
     }

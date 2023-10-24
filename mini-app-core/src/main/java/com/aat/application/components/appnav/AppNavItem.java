@@ -179,16 +179,13 @@ public class AppNavItem extends Component {
         String url = "";
 
         if (this.parameters != null && this.parameters.size() == 2) {
-//            url = RouteConfiguration.forRegistry(getRouter().getRegistry()).getUrl(view);
-//            RouterLink link = new RouterLink("Go to CommonView", view);
-//            url = link.getHref()
-//                    + "?entityClass=" + this.parameters.get("entityClass")
-//                    + "&layout=" + this.parameters.get("layout");
-            VaadinSession.getCurrent().setAttribute("entityClass", this.parameters.get("entityClass"));
             VaadinSession.getCurrent().setAttribute("layout", this.parameters.get("layout"));
 
+            RouterLink link = new RouterLink("Go to CommonView", view);
+            url = link.getHref()
+                    + "?entityClass=" + this.parameters.get("entityClass");
+
             // Get the URL without parameters
-            url = RouteConfiguration.forRegistry(getRouter().getRegistry()).getUrl(view);
         } else
             url = RouteConfiguration.forRegistry(getRouter().getRegistry()).getUrl(view);
         setPath(url);

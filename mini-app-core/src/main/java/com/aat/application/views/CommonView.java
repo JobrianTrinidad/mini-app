@@ -1,11 +1,18 @@
 package com.aat.application.views;
 
+import com.aat.application.components.appnav.AppNav;
 import com.aat.application.core.data.entity.ZJTEntity;
 import com.aat.application.data.repository.BaseEntityRepository;
+import com.vaadin.flow.component.UI;
+import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.*;
 
 import com.vaadin.flow.server.VaadinSession;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+
+import java.lang.reflect.InvocationTargetException;
 
 public abstract class CommonView<T extends ZJTEntity> extends VerticalLayout implements RouterLayout, BeforeEnterObserver, HasDynamicTitle {
 
@@ -18,12 +25,34 @@ public abstract class CommonView<T extends ZJTEntity> extends VerticalLayout imp
         this.repository = repository;
     }
 
+    protected void setForm(VerticalLayout form){
+        try {
+            CoreMainLayout layout = (CoreMainLayout) LayoutClass.getDeclaredConstructor().newInstance();
+            layout.setDrawerOpened(true);
+            AppNav nav = layout.getNavigation();
+            layout.getNavigation().setCollapsible(false);
+            layout.setContent(form);
+            UI.getCurrent().removeAll();
+            UI.getCurrent().add(layout);
+
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
+                 NoSuchMethodException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     @Override
     public void beforeEnter(BeforeEnterEvent event) {
-        String entityClassName = (String) VaadinSession.getCurrent().getAttribute("entityClass");
+        QueryParameters queryParameters = event.getLocation().getQueryParameters();
+        MultiValueMap<String, String> parameters = new LinkedMultiValueMap<>();
+
+        queryParameters.getParameters().forEach((key, values) -> {
+            values.forEach(value -> parameters.add(key, value));
+        });
+        String entityClassName = parameters.getFirst("entityClass");
         String layoutClassName = (String) VaadinSession.getCurrent().getAttribute("layout");
 
-        if (entityClassName != null) {
+        if (entityClassName != null && layoutClassName != null) {
             try {
                 entityClass = (Class<T>) Class.forName(entityClassName);
                 LayoutClass = Class.forName(layoutClassName);

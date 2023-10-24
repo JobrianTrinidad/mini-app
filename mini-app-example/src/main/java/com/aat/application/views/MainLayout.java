@@ -3,6 +3,7 @@ package com.aat.application.views;
 
 import com.aat.application.data.entity.*;
 import com.vaadin.flow.component.html.Div;
+import jakarta.websocket.OnOpen;
 import org.vaadin.lineawesome.LineAwesomeIcon;
 
 import com.aat.application.components.appnav.AppNav;
@@ -15,26 +16,23 @@ import com.vaadin.flow.router.Route;
  */
 @PageTitle("Main")
 @Route(value = "")
-public class MainLayout extends Div {
-    CoreMainLayout coreMainLayout;
+public class MainLayout extends CoreMainLayout {
     public MainLayout() {
-        setClassName("MainLayout");
-        coreMainLayout = new CoreMainLayout();
-        AppNav nav = getNavigation();
-        coreMainLayout.setNavigation(nav);
-        add(coreMainLayout);
+        super();
+        setNavigation(getNavigation());
     }
 
-    public AppNav getNavigation() {
+    @Override
+    protected AppNav getNavigation() {
         // AppNav is not yet an official component.
         // For documentation, visit https://github.com/vaadin/vcf-nav#readme
-        AppNav nav = new AppNav();
+        nav = new AppNav();
         AppNavItem parent = new AppNavItem("Mini-Core");
         parent.setIcon(LineAwesomeIcon.FOLDER.create());
         nav.addItem(parent);
         parent.addItem(new AppNavItem("Tui Grid", StandardFormView.class, LineAwesomeIcon.PRODUCT_HUNT.create())
-                        .withParameter(StandardFormView.class, "entityClass", ZJTPricingType.class.getName())
-                        .withParameter(StandardFormView.class, "layout", this.getClass().getName()));
+                .withParameter(StandardFormView.class, "entityClass", ZJTPricingType.class.getName())
+                .withParameter(StandardFormView.class, "layout", this.getClass().getName()));
 //        parent.addItem(new AppNavItem("Trip Element", StandardFormView.class, LineAwesomeIcon.PRODUCT_HUNT.create())
 //                .withParameter(StandardFormView.class, "entityClass", ZJTElement.class.getSimpleName()));
 //        parent.addItem(new AppNavItem("Resource Category", StandardFormView.class, LineAwesomeIcon.PRODUCT_HUNT.create())
