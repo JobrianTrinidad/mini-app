@@ -29,6 +29,7 @@ public class MainLayout extends CoreMainLayout {
         nav = new AppNav();
         AppNavItem parent = new AppNavItem("Mini-Core");
         parent.setIcon(LineAwesomeIcon.FOLDER.create());
+        parent.setExpanded(true);
         nav.addItem(parent);
         parent.addItem(new AppNavItem("Tui Grid", StandardFormView.class, LineAwesomeIcon.PRODUCT_HUNT.create())
                 .withParameter(StandardFormView.class, "entityClass", ZJTPricingType.class.getName())

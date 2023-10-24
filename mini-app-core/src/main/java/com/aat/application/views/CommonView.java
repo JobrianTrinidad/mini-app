@@ -28,9 +28,6 @@ public abstract class CommonView<T extends ZJTEntity> extends VerticalLayout imp
     protected void setForm(VerticalLayout form){
         try {
             CoreMainLayout layout = (CoreMainLayout) LayoutClass.getDeclaredConstructor().newInstance();
-            layout.setDrawerOpened(true);
-            AppNav nav = layout.getNavigation();
-            layout.getNavigation().setCollapsible(false);
             layout.setContent(form);
             UI.getCurrent().removeAll();
             UI.getCurrent().add(layout);
