@@ -4,8 +4,6 @@ import com.aat.application.core.data.entity.ZJTEntity;
 import com.vaadin.flow.router.PageTitle;
 import jakarta.persistence.*;
 
-import java.util.List;
-
 
 /**
  * Entity implementation class for Entity: ZJTPricingType
@@ -26,9 +24,6 @@ public class ZJTPricingType implements ZJTEntity {
 
     @Column
     private String description = "";
-
-    @OneToMany(mappedBy = "pricingType", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
-    private List<ZJTElement> children;
 
     public int getZjt_pricingtype_id() {
         return zjt_pricingtype_id;

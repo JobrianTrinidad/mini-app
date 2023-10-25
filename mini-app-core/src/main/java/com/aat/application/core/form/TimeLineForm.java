@@ -51,26 +51,27 @@ public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>>
     }
 
     private List<String> configureHeader(Class<T> entityClass) {
-        Field[] fields = entityClass.getDeclaredFields();
-
         List<String> fieldNames = new ArrayList<>();
-        for (int i = 1; i < fields.length; i++) {
-            if (fields[i].getAnnotation(jakarta.persistence.Column.class) != null) {
-
-                fieldNames.add(fields[i].getName());
-                headerOptions.put(fields[i].getName(), "input");
+        Class<?> currentClass = entityClass;
+        while (currentClass != null) {
+            Field[] fields = currentClass.getDeclaredFields();
+            for (Field field : fields) {
+                if (field.getAnnotation(jakarta.persistence.Column.class) != null) {
+                    fieldNames.add(field.getName());
+                    headerOptions.put(field.getName(), "input");
+                }
+                if (field.getAnnotation(jakarta.persistence.Enumerated.class) != null) {
+                    fieldNames.add(field.getName());
+                    headerTypeOptions.put(field.getName(), field.getType());
+                    headerOptions.put(field.getName(), "select_enum");
+                }
+                if (field.getAnnotation(jakarta.persistence.JoinColumn.class) != null) {
+                    fieldNames.add(field.getName());
+                    headerOptions.put(field.getName(), "select_class");
+                }
             }
-            if (fields[i].getAnnotation(jakarta.persistence.Enumerated.class) != null) {
-                fieldNames.add(fields[i].getName());
-                headerTypeOptions.put(fields[i].getName(), fields[i].getType());
-                headerOptions.put(fields[i].getName(), "select_enum");
-            }
-            if (fields[i].getAnnotation(jakarta.persistence.JoinColumn.class) != null) {
-                fieldNames.add(fields[i].getName());
-                headerOptions.put(fields[i].getName(), "select_class");
-            }
+            currentClass = currentClass.getSuperclass();
         }
-
         return fieldNames;
     }
 
@@ -110,7 +111,21 @@ public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>>
             for (int i = 0; i < headers.size(); i++) {
                 String header = headers.get(i);
                 try {
-                    Field headerField = data.getClass().getDeclaredField(header);
+                    Field headerField = null;
+                    Class<?> currentDataClass = data.getClass();
+                    while (currentDataClass != null) {
+                        try {
+                            headerField = currentDataClass.getDeclaredField(header);
+                            if (headerField != null) {
+                                break;
+                            }
+                        } catch (NoSuchFieldException e) {
+                            currentDataClass = currentDataClass.getSuperclass();
+                        }
+                    }
+                    if (headerField == null) {
+                        throw new RuntimeException("groupId field not found in class hierarchy");
+                    }
                     headerField.setAccessible(true);
                     Object dataSel = headerField.get(data);
                     Field itemHeaderField = item.getClass().getDeclaredField(header);
@@ -122,7 +137,21 @@ public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>>
                         case "select_class":
                             if (dataSel == null)
                                 dataSel = data.getClass().getDeclaredField(header);
-                            Field itemIdField = dataSel.getClass().getDeclaredField("groupId");
+                            Field itemIdField = null;
+                            Class<?> currentDataSelClass = dataSel.getClass();
+                            while (currentDataSelClass != null) {
+                                try {
+                                    itemIdField = currentDataSelClass.getDeclaredField("groupId");
+                                    if (itemIdField != null) {
+                                        break;
+                                    }
+                                } catch (NoSuchFieldException e) {
+                                    currentDataSelClass = currentDataSelClass.getSuperclass();
+                                }
+                            }
+                            if (itemIdField == null) {
+                                throw new RuntimeException("groupId field not found in class hierarchy");
+                            }
                             itemIdField.setAccessible(true);
                             itemHeaderField.set(item, String.valueOf(itemIdField.get(dataSel)));
 
@@ -153,11 +182,25 @@ public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>>
             for (Field field :
                     groupItem.getClass().getDeclaredFields()) {
                 try {
-                    Field headerField = groupResult.getClass().getDeclaredField(field.getName());
+                    Field headerField = null;
+                    Class<?> groupResultClass = groupResult.getClass();
+                    while (groupResultClass != null) {
+                        try {
+                            headerField = groupResultClass.getDeclaredField(field.getName());
+                            if (headerField != null) {
+                                break;
+                            }
+                        } catch (NoSuchFieldException e) {
+                            groupResultClass = groupResultClass.getSuperclass();
+                        }
+                    }
+                    if (headerField == null) {
+                        throw new RuntimeException("groupId field not found in class hierarchy");
+                    }
                     headerField.setAccessible(true);
                     field.setAccessible(true);
                     field.set(groupItem, headerField.get(groupResult));
-                } catch (NoSuchFieldException | IllegalAccessException ignored) {
+                } catch (IllegalAccessException ignored) {
                 }
             }
             groupItems.add(groupItem);

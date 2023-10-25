@@ -4,16 +4,9 @@ import com.aat.application.core.data.entity.ZJTEntity;
 import com.aat.application.data.repository.BaseEntityRepository;
 import com.aat.application.data.service.BaseEntityService;
 import com.aat.application.form.TimeLineCommonForm;
-import com.vaadin.flow.component.UI;
-import com.vaadin.flow.component.html.Div;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.aat.application.util.GlobalData;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.Route;
-
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.util.Optional;
 
 @Route(value = "timeline")
 public class TimeLineFormView<T extends ZJTEntity> extends CommonView<T> {

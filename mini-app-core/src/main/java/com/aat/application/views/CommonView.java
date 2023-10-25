@@ -51,7 +51,6 @@ public abstract class CommonView<T extends ZJTEntity> extends VerticalLayout imp
 
         if (entityClassName != null && layoutClassName != null) {
             try {
-//                entityClass = (Class<T>) Class.forName(aPackage + '.' + entityClassName);
                 entityClass = (Class<T>) Class.forName(entityClassName);
                 LayoutClass = Class.forName(layoutClassName);
                 PageTitle pageTitleAnnotation = entityClass.getAnnotation(PageTitle.class);

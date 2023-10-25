@@ -30,6 +30,7 @@ public class AppNavItem extends Component {
      */
     public AppNavItem(String label) {
         setLabel(label);
+        setExpanded(true);
     }
 
     /**

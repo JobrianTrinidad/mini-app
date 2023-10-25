@@ -29,7 +29,9 @@ public class BaseEntityRepository<T> {
             Type genericSuperclass = getClass().getGenericSuperclass();
             if (genericSuperclass instanceof ParameterizedType) {
                 Type[] actualTypeArguments = ((ParameterizedType) genericSuperclass).getActualTypeArguments();
-                entityClass = (Class<T>) actualTypeArguments[0];
+                 @SuppressWarnings("unchecked")
+                Class<T> actualTypeArgument = (Class<T>) actualTypeArguments[0];
+            entityClass = actualTypeArgument;
             } else {
                 throw new IllegalArgumentException("Unable to determine entity class type.");
             }
@@ -41,7 +43,8 @@ public class BaseEntityRepository<T> {
 
         if (stringFilter == null || stringFilter.isEmpty()) {
             TypedQuery<T> query = entityManager.createQuery("SELECT e FROM " + getEntityClassName() + " e", entityClass);
-            return query.getResultList();
+            List<T> result = query.getResultList();
+            return result;
         } else {
             TypedQuery<T> query = entityManager.createQuery("SELECT e FROM " + getEntityClassName() + " e WHERE lower(e.name) LIKE lower(:filter)", entityClass);
             query.setParameter("filter", "%" + stringFilter + "%");

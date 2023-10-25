@@ -1,27 +1,15 @@
 package com.aat.application.data.entity;
 
-import com.aat.application.core.data.entity.ZJTEntity;
 import com.vaadin.flow.router.PageTitle;
-import jakarta.persistence.Entity;
 import jakarta.persistence.*;
-import org.hibernate.Hibernate;
 
 import java.util.List;
 
 @Entity
 @Table(name = "zjt_timeline_node")
+@NamedQuery(name = "findAllGroup", query = "SELECT p FROM ZJTTimeLineNode p")
 @PageTitle("TimeLine")
-public class ZJTTimeLineNode implements ZJTEntity {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "id")
-    private int groupId;
-
-    @Column(name = "name")
-    private String content;
-    @Column(name = "level")
-    private int treeLevel;
+public class ZJTTimeLineNode extends ZJTSuperTimeLineNode {
 
     @ManyToOne
     @JoinColumn(name = "parent_id")
@@ -32,27 +20,6 @@ public class ZJTTimeLineNode implements ZJTEntity {
 
     @OneToMany(mappedBy = "group", cascade = CascadeType.ALL)
     private List<ZJTTimeLineItem> items;
-    private boolean visible = true;
-    private String className = "";
-    private String nestedGroups;
-
-    // getters
-
-    public int getGroupId() {
-        return groupId;
-    }
-
-    public void setGroupId(int groupId) {
-        this.groupId = groupId;
-    }
-
-    public int getTreeLevel() {
-        return treeLevel;
-    }
-
-    public void setTreeLevel(int treeLevel) {
-        this.treeLevel = treeLevel;
-    }
 
     public List<ZJTTimeLineNode> getChildren() {
         return children;
@@ -66,8 +33,6 @@ public class ZJTTimeLineNode implements ZJTEntity {
         return parent;
     }
 
-    // setters
-
     public void setParent(ZJTTimeLineNode parent) {
         this.parent = parent;
     }
@@ -80,21 +45,11 @@ public class ZJTTimeLineNode implements ZJTEntity {
         this.items = items;
     }
 
-    @Override
-    public String getName() {
-        return content;
-    }
-
-    @Override
-    public void setName(String content) {
-        this.content = content;
-    }
-
     @PostLoad
     public void updateNestedGroups() {
         StringBuilder temp = new StringBuilder();
         if (children != null) {
-            for (ZJTTimeLineNode node : children) {
+            for (ZJTSuperTimeLineNode node : children) {
                 temp.append(node.getGroupId()).append(",");
             }
             if (!temp.isEmpty()) {
@@ -105,9 +60,5 @@ public class ZJTTimeLineNode implements ZJTEntity {
             nestedGroups = null;
         else
             nestedGroups = temp.toString();
-    }
-
-    public String getNestedGroups() {
-        return nestedGroups;
     }
 }

@@ -1,9 +1,6 @@
 package com.aat.application.views;
 
-
 import com.aat.application.data.entity.*;
-import com.vaadin.flow.component.html.Div;
-import jakarta.websocket.OnOpen;
 import org.vaadin.lineawesome.LineAwesomeIcon;
 
 import com.aat.application.components.appnav.AppNav;
@@ -24,22 +21,13 @@ public class MainLayout extends CoreMainLayout {
 
     @Override
     protected AppNav getNavigation() {
-        // AppNav is not yet an official component.
-        // For documentation, visit https://github.com/vaadin/vcf-nav#readme
         nav = new AppNav();
         AppNavItem parent = new AppNavItem("Mini-Core");
         parent.setIcon(LineAwesomeIcon.FOLDER.create());
-        parent.setExpanded(true);
         nav.addItem(parent);
         parent.addItem(new AppNavItem("Tui Grid", StandardFormView.class, LineAwesomeIcon.PRODUCT_HUNT.create())
                 .withParameter(StandardFormView.class, "entityClass", ZJTPricingType.class.getName())
                 .withParameter(StandardFormView.class, "layout", this.getClass().getName()));
-//        parent.addItem(new AppNavItem("Trip Element", StandardFormView.class, LineAwesomeIcon.PRODUCT_HUNT.create())
-//                .withParameter(StandardFormView.class, "entityClass", ZJTElement.class.getSimpleName()));
-//        parent.addItem(new AppNavItem("Resource Category", StandardFormView.class, LineAwesomeIcon.PRODUCT_HUNT.create())
-//                .withParameter(StandardFormView.class, "entityClass", ZJTResourceCategory.class.getSimpleName()));
-//        parent.addItem(new AppNavItem("Resource Type", StandardFormView.class, LineAwesomeIcon.PRODUCT_HUNT.create())
-//                .withParameter(StandardFormView.class, "entityClass", ZJTResourceType.class.getSimpleName()));
         parent.addItem(new AppNavItem("Group TimeLine", TimeLineFormView.class, LineAwesomeIcon.PRODUCT_HUNT.create())
                 .withParameter(TimeLineFormView.class, "entityClass", ZJTTimeLineItem.class.getName())
                 .withParameter(TimeLineFormView.class, "layout", this.getClass().getName()));
