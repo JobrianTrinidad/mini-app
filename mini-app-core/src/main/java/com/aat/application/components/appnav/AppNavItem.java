@@ -174,6 +174,9 @@ public class AppNavItem extends Component {
      * @return this instance for chaining
      */
     public AppNavItem setPath(String path) {
+        if (this.parameters != null && this.parameters.size() == 2) {
+            VaadinSession.getCurrent().setAttribute("layout", this.parameters.get("layout"));
+        }
         getElement().setAttribute("path", path);
         return this;
     }
