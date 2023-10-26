@@ -28,15 +28,15 @@ public class MainLayout extends CoreMainLayout {
         parent.addItem(new AppNavItem("Tui Grid", StandardFormView.class, LineAwesomeIcon.PRODUCT_HUNT.create())
                 .withParameter(StandardFormView.class, "entityClass", ZJTPricingType.class.getName())
                 .withParameter(StandardFormView.class, "layout", this.getClass().getName()));
-        parent.addItem(new AppNavItem("Group TimeLine", GroupTimeLineView.class, LineAwesomeIcon.PRODUCT_HUNT.create())
-                .withParameter(GroupTimeLineView.class, "entityClass", ZJTTimeLineItem.class.getName())
-                .withParameter(GroupTimeLineView.class, "layout", this.getClass().getName()));
-        parent.addItem(new AppNavItem("Vehicle TimeLine", VehicleView.class, LineAwesomeIcon.PRODUCT_HUNT.create())
-                .withParameter(VehicleView.class, "entityClass", ZJTVehicleBooking.class.getName())
-                .withParameter(VehicleView.class, "layout", this.getClass().getName()));
-        parent.addItem(new AppNavItem("Driver TimeLine", DriverView.class, LineAwesomeIcon.PRODUCT_HUNT.create())
-                .withParameter(DriverView.class, "entityClass", ZJTVehicleBooking.class.getName())
-                .withParameter(DriverView.class, "layout", this.getClass().getName()));
+        parent.addItem(new AppNavItem("Group TimeLine", "group-timeline", LineAwesomeIcon.PRODUCT_HUNT.create())
+                .withParameter("group-timeline", "entityClass", ZJTTimeLineItem.class.getName())
+                .withParameter("group-timeline", "layout", this.getClass().getName()));
+        parent.addItem(new AppNavItem("Vehicle TimeLine", "vehicle-timeline", LineAwesomeIcon.PRODUCT_HUNT.create())
+                .withParameter("vehicle-timeline", "entityClass", ZJTVehicleBooking.class.getName())
+                .withParameter("vehicle-timeline", "layout", this.getClass().getName()));
+        parent.addItem(new AppNavItem("Driver TimeLine", "driver-timeline", LineAwesomeIcon.PRODUCT_HUNT.create())
+                .withParameter("driver-timeline", "entityClass", ZJTVehicleBooking.class.getName())
+                .withParameter("driver-timeline", "layout", this.getClass().getName()));
         return nav;
     }
 }
