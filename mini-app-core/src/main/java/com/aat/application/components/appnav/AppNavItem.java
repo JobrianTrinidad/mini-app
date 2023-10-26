@@ -264,12 +264,12 @@ public class AppNavItem extends Component {
      * @param parameterValue the parameter value
      * @return this instance for chaining
      */
-    public AppNavItem withParameter(Class<? extends Component> view, String parameterName, String parameterValue) {
+    public AppNavItem withParameter(String path, String parameterName, String parameterValue) {
         if (parameters == null) {
             parameters = new HashMap<>();
         }
         parameters.put(parameterName, parameterValue);
-        setPath(view);
+        setPath(path);
         return this;
     }
 
