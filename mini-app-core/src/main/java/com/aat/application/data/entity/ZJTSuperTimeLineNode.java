@@ -1,12 +1,13 @@
 package com.aat.application.data.entity;
 
 import com.aat.application.core.data.entity.ZJTEntity;
+import com.github.javaparser.quality.NotNull;
 import jakarta.persistence.*;
 
 import java.util.List;
 
 @MappedSuperclass
-public class ZJTSuperTimeLineNode implements ZJTEntity {
+public abstract class ZJTSuperTimeLineNode implements ZJTEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -16,7 +17,7 @@ public class ZJTSuperTimeLineNode implements ZJTEntity {
     @Column(name = "name")
     protected String content;
     @Column(name = "level")
-    protected int treeLevel;
+    protected int treeLevel = 0;
 
 
     protected boolean visible = true;

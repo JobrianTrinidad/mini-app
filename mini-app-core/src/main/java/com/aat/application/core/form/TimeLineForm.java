@@ -32,6 +32,8 @@ public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>>
     protected Button close;
     private Item newItem;
     private Button addItemButton;
+    private String groupName = "group";
+    private Class<? extends ZJTEntity> groupClass = null;
     Timeline timeline;
     protected S service;
     List<String> headers;
@@ -40,8 +42,10 @@ public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>>
 
     List<T> itemData = new ArrayList<>();
 
-    public TimeLineForm(Class<T> entityClass, S service) {
+    public TimeLineForm(Class<T> entityClass, S service, String groupName, Class<? extends ZJTEntity> groupClass) {
         addClassName("demo-app-form");
+        this.groupName = groupName;
+        this.groupClass = groupClass;
         this.service = service;
 
         save = new Button("Save");
@@ -81,7 +85,7 @@ public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>>
         timeline = new Timeline(items, groupItems);
 
         // setting timeline range
-        timeline.setTimelineRange(LocalDateTime.of(2023, 1, 1, 0, 0, 0), LocalDateTime.of(2023, 9, 25, 0, 0, 0));
+        timeline.setTimelineRange(LocalDateTime.of(2023, 1, 1, 0, 0, 0), LocalDateTime.of(2023, 12, 25, 0, 0, 0));
 
         timeline.setMultiselect(true);
         timeline.setWidthFull();
@@ -108,8 +112,7 @@ public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>>
                 itemData) {
             Item item = new Item();
 
-            for (int i = 0; i < headers.size(); i++) {
-                String header = headers.get(i);
+            for (String header : headers) {
                 try {
                     Field headerField = null;
                     Class<?> currentDataClass = data.getClass();
@@ -128,7 +131,15 @@ public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>>
                     }
                     headerField.setAccessible(true);
                     Object dataSel = headerField.get(data);
-                    Field itemHeaderField = item.getClass().getDeclaredField(header);
+                    Field itemHeaderField = null;
+                    try {
+                        itemHeaderField = item.getClass().getDeclaredField(header);
+                    } catch (NoSuchFieldException e) {
+                        if (header.equals(this.groupName))
+                            itemHeaderField = item.getClass().getDeclaredField("group");
+                        else
+                            continue;
+                    }
                     itemHeaderField.setAccessible(true);
                     switch (headerOptions.get(header)) {
                         case "input":
@@ -157,7 +168,7 @@ public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>>
 
                             String headerName = header.substring(0, 1).toUpperCase()
                                     + header.substring(1);
-                            GlobalData.addData(headerName);
+//                            GlobalData.addData(headerName);
                             break;
                         default:
                             break;
@@ -175,7 +186,8 @@ public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>>
 
     private List<GroupItem> getGroupItems() {
         List<GroupItem> groupItems = new ArrayList<>();
-        List<ZJTEntity> groupResults = GlobalData.listData.get("Group");
+        GlobalData.addData(groupName, groupClass);
+        List<ZJTEntity> groupResults = GlobalData.listData.get(groupName);
         for (Object groupResult :
                 groupResults) {
             GroupItem groupItem = new GroupItem();

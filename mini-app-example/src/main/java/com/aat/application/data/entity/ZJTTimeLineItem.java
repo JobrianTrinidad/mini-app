@@ -1,10 +1,7 @@
 package com.aat.application.data.entity;
 
-import com.aat.application.core.data.entity.ZJTEntity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.*;
-
-import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "zjt_timeline_item")

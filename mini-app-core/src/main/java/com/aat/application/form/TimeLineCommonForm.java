@@ -5,8 +5,8 @@ import com.aat.application.core.data.service.ZJTService;
 import com.aat.application.core.form.TimeLineForm;
 
 public class TimeLineCommonForm<T extends ZJTEntity> extends TimeLineForm<T, ZJTService<T>> {
-	public TimeLineCommonForm(Class<T> entityClass, ZJTService<T> service) {
-		super(entityClass, service);
+	public TimeLineCommonForm(Class<T> entityClass, ZJTService<T> service, String groupName, Class<? extends ZJTEntity> groupClass) {
+		super(entityClass, service, groupName, groupClass);
 		addClassName("demo-app-form");
 	}
 }
