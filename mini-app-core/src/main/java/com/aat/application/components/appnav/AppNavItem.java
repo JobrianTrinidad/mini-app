@@ -67,6 +67,10 @@ public class AppNavItem extends Component {
         setPath(path);
         setLabel(label);
         setIcon(icon);
+        getElement().addEventListener("click", event -> {
+            // Set session attribute here
+            VaadinSession.getCurrent().setAttribute("entityClass", this.parameters.get("entityClass"));
+        });
     }
 
     /**
