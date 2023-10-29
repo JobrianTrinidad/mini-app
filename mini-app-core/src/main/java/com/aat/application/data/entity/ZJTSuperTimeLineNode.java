@@ -53,4 +53,12 @@ public abstract class ZJTSuperTimeLineNode implements ZJTEntity {
     public String getNestedGroups() {
         return nestedGroups;
     }
+
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
+    }
 }

@@ -297,7 +297,7 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
                     column.setRoot(true);
                     column.setTarget("");
                     GlobalData.addData(headerName);
-                    List<ZJTEntity> results = GlobalData.listData.get(headerName);
+                    List<ZJTEntity> results = (List<ZJTEntity>) GlobalData.listData.get(headerName);
                     List<RelationOption> options = new ArrayList<>();
                     for (Object result : results) {
                         try {

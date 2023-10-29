@@ -8,7 +8,9 @@ import java.util.List;
 @Entity
 @Table(name = "zjt_vehicle")
 @PageTitle("TimeLine")
+@AttributeOverride(name = "content", column = @Column(name = "title"))
 public class ZJTVehicle extends ZJTSuperTimeLineNode {
+
     @OneToMany(mappedBy = "vehicle", cascade = CascadeType.ALL)
     private List<ZJTVehicleBooking> items;
 

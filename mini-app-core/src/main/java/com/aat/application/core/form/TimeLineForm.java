@@ -187,7 +187,7 @@ public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>>
     private List<ItemGroup> getGroupItems() {
         List<ItemGroup> itemGroups = new ArrayList<>();
         GlobalData.addData(groupName, groupClass);
-        List<ZJTEntity> groupResults = GlobalData.listData.get(groupName);
+        List<ZJTEntity> groupResults = (List<ZJTEntity>) GlobalData.listData.get(groupName);
         for (Object groupResult :
                 groupResults) {
             ItemGroup itemGroup = new ItemGroup();
