@@ -1,6 +1,7 @@
 package com.aat.application.views;
 
 import com.aat.application.data.entity.*;
+import com.vaadin.flow.component.dependency.CssImport;
 import org.vaadin.lineawesome.LineAwesomeIcon;
 
 import com.aat.application.components.appnav.AppNav;
@@ -13,6 +14,7 @@ import com.vaadin.flow.router.Route;
  */
 @PageTitle("Main")
 @Route(value = "")
+@CssImport(value = "./styles/timeline-items-style.css")
 public class MainLayout extends CoreMainLayout {
     public MainLayout() {
         super();

@@ -4,7 +4,7 @@ import com.aat.application.core.data.entity.ZJTEntity;
 import com.aat.application.core.data.service.ZJTService;
 import com.aat.application.util.GlobalData;
 import com.vaadin.componentfactory.timeline.Timeline;
-import com.vaadin.componentfactory.timeline.model.GroupItem;
+import com.vaadin.componentfactory.timeline.model.ItemGroup;
 import com.vaadin.componentfactory.timeline.model.Item;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.button.Button;
@@ -81,8 +81,8 @@ public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>>
 
     private void configureTimeLine() {
         List<Item> items = getItems();
-        List<GroupItem> groupItems = getGroupItems();
-        timeline = new Timeline(items, groupItems);
+        List<ItemGroup> itemGroups = getGroupItems();
+        timeline = new Timeline(items, itemGroups);
 
         // setting timeline range
         timeline.setTimelineRange(LocalDateTime.of(2023, 1, 1, 0, 0, 0), LocalDateTime.of(2023, 12, 25, 0, 0, 0));
@@ -94,7 +94,7 @@ public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>>
         // Select Item
         TextField tfSelected = new TextField();
 
-        VerticalLayout selectRangeLayout = getSelectRangeLayout(timeline, bAutoZoom, groupItems);
+        VerticalLayout selectRangeLayout = getSelectRangeLayout(timeline, bAutoZoom, itemGroups);
         HorizontalLayout zoomOptionsLayout = getSelectItemAndZoomOptionLayout(timeline, items, tfSelected, bAutoZoom);
 
 //        add(selectRangeLayout, zoomOptionsLayout, timeline);
@@ -184,15 +184,15 @@ public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>>
         return TableData;
     }
 
-    private List<GroupItem> getGroupItems() {
-        List<GroupItem> groupItems = new ArrayList<>();
+    private List<ItemGroup> getGroupItems() {
+        List<ItemGroup> itemGroups = new ArrayList<>();
         GlobalData.addData(groupName, groupClass);
         List<ZJTEntity> groupResults = GlobalData.listData.get(groupName);
         for (Object groupResult :
                 groupResults) {
-            GroupItem groupItem = new GroupItem();
+            ItemGroup itemGroup = new ItemGroup();
             for (Field field :
-                    groupItem.getClass().getDeclaredFields()) {
+                    itemGroup.getClass().getDeclaredFields()) {
                 try {
                     Field headerField = null;
                     Class<?> groupResultClass = groupResult.getClass();
@@ -211,27 +211,27 @@ public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>>
                     }
                     headerField.setAccessible(true);
                     field.setAccessible(true);
-                    field.set(groupItem, headerField.get(groupResult));
+                    field.set(itemGroup, headerField.get(groupResult));
                 } catch (IllegalAccessException ignored) {
                 }
             }
-            groupItems.add(groupItem);
+            itemGroups.add(itemGroup);
         }
-        return groupItems;
+        return itemGroups;
     }
 
-    private VerticalLayout getSelectRangeLayout(Timeline timeline, boolean bAutoZoom, List<GroupItem> groupItems) {
+    private VerticalLayout getSelectRangeLayout(Timeline timeline, boolean bAutoZoom, List<ItemGroup> itemGroups) {
         VerticalLayout selectRangeLayout = new VerticalLayout();
         selectRangeLayout.setSpacing(false);
         Paragraph p = new Paragraph("Select range for new item: ");
         p.getElement().getStyle().set("margin-bottom", "5px");
         selectRangeLayout.add(p);
 
-        ComboBox<GroupItem> comboBox = new ComboBox<>("Group Name");
-        comboBox.setItems(groupItems);
-        comboBox.setItemLabelGenerator(GroupItem::getContent);
+        ComboBox<ItemGroup> comboBox = new ComboBox<>("Group Name");
+        comboBox.setItems(itemGroups);
+        comboBox.setItemLabelGenerator(ItemGroup::getContent);
         comboBox.setRenderer(createRenderer());
-        comboBox.setValue(groupItems.get(0));
+        comboBox.setValue(itemGroups.get(0));
         comboBox.setAllowCustomValue(true);
 
         DateTimePicker datePicker1 = new DateTimePicker("Item start date: ");
@@ -243,16 +243,16 @@ public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>>
         datePicker2.setMax(LocalDateTime.of(2023, 8, 22, 0, 0, 0));
 
         datePicker1.addValueChangeListener(e -> {
-            GroupItem selectedGroupItem = comboBox.getValue();
+            ItemGroup selectedGroupItem = comboBox.getValue();
             newItem = createNewItem(datePicker1.getValue(), datePicker2.getValue(), selectedGroupItem.getGroupId());
         });
         datePicker2.addValueChangeListener(e -> {
-            GroupItem selectedGroupItem = comboBox.getValue();
+            ItemGroup selectedGroupItem = comboBox.getValue();
             newItem = createNewItem(datePicker1.getValue(), datePicker2.getValue(), selectedGroupItem.getGroupId());
         });
 
         comboBox.addValueChangeListener(e -> {
-            GroupItem selectedGroupItem = comboBox.getValue();
+            ItemGroup selectedGroupItem = comboBox.getValue();
             newItem = createNewItem(datePicker1.getValue(), datePicker2.getValue(), selectedGroupItem.getGroupId());
         });
 
@@ -321,17 +321,17 @@ public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>>
         }
     }
 
-    private Renderer<GroupItem> createRenderer() {
+    private Renderer<ItemGroup> createRenderer() {
 
-        return LitRenderer.<GroupItem>of("<span style= \"font-weight: ${item.width}; font-size: ${item.fontsize}\">${item.content}</span>").withProperty("width", groupItem -> {
-            if (groupItem.getTreeLevel() == 1) return "bolder";
-            else if (groupItem.getTreeLevel() == 2) return "bold";
+        return LitRenderer.<ItemGroup>of("<span style= \"font-weight: ${item.width}; font-size: ${item.fontsize}\">${item.content}</span>").withProperty("width", itemGroup -> {
+            if (itemGroup.getTreeLevel() == 1) return "bolder";
+            else if (itemGroup.getTreeLevel() == 2) return "bold";
             else return "normal";
-        }).withProperty("fontsize", groupItem -> {
-            if (groupItem.getTreeLevel() == 1) return "1rem";
-            else if (groupItem.getTreeLevel() == 2) return "0.9rem";
+        }).withProperty("fontsize", itemGroup -> {
+            if (itemGroup.getTreeLevel() == 1) return "1rem";
+            else if (itemGroup.getTreeLevel() == 2) return "0.9rem";
             else return "0.8rem";
-        }).withProperty("content", GroupItem::getContent);
+        }).withProperty("content", ItemGroup::getContent);
     }
 
     private HorizontalLayout getToolbar() {

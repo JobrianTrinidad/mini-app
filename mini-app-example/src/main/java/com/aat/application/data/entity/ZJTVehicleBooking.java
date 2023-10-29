@@ -15,6 +15,9 @@ public class ZJTVehicleBooking extends ZJTSuperTimeLineItem {
     @JoinColumn(name = "driver_id")
     private ZJTDriver driver;
 
+    @Column(name = "classname")
+    private String className;
+
     public ZJTVehicle getVehicle() {
         return vehicle;
     }
@@ -29,5 +32,13 @@ public class ZJTVehicleBooking extends ZJTSuperTimeLineItem {
 
     public void setDriver(ZJTDriver driver) {
         this.driver = driver;
+    }
+
+    public String getClassName() {
+        return className;
+    }
+
+    public void setClassName(String className) {
+        this.className = className;
     }
 }
