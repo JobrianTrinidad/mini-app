@@ -34,6 +34,26 @@ public class GlobalData {
         }
     }
 
+    public static List<?> getDataById(Class<?> entityClass, int id) {
+        EntityManagerFactory emf = Persistence.createEntityManagerFactory("aat_persistence_unit");
+        EntityManager em = emf.createEntityManager();
+        em.getTransaction().begin();
+        List<?> results = null;
+        try {
+            String queryString = "SELECT p FROM " + entityClass.getSimpleName() + " p WHERE p.id = :id";
+            TypedQuery<?> query = em.createQuery(queryString, entityClass);
+            query.setParameter("id", id);
+            results = query.getResultList();
+        } catch (Exception e) {
+            em.getTransaction().rollback();
+        } finally {
+            em.close();
+            emf.close();
+        }
+
+        return results;
+    }
+
     public static void addData(String headerName) {
         EntityManagerFactory emf = Persistence.createEntityManagerFactory("aat_persistence_unit");
         EntityManager em = emf.createEntityManager();
@@ -50,5 +70,25 @@ public class GlobalData {
             em.close();
             emf.close();
         }
+    }
+
+    public static Object initialize(Class<?> entityClass) {
+        EntityManagerFactory emf = Persistence.createEntityManagerFactory("aat_persistence_unit");
+        EntityManager em = emf.createEntityManager();
+        em.getTransaction().begin();
+        Object entityData = null;
+        try {
+            entityData = entityClass.getDeclaredConstructor().newInstance();
+            em.persist(entityData);
+            em.getTransaction().commit();
+        } catch (Exception e) {
+            em.getTransaction().rollback();
+            e.printStackTrace();
+//            throw e;
+        } finally {
+            em.close();
+            emf.close();
+        }
+        return entityData;
     }
 }

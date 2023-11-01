@@ -5,6 +5,7 @@ import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -60,7 +61,9 @@ public class BaseEntityRepository<T> {
     public T saveEntity(T entity) {
         try {
             entityManager.merge(entity);
+            entityManager.flush();
         } catch (RuntimeException e) {
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             e.printStackTrace();
         }
         return entity;

@@ -3,6 +3,10 @@ package com.aat.application.core.form;
 import com.aat.application.core.data.entity.ZJTEntity;
 import com.aat.application.core.data.service.ZJTService;
 import com.aat.application.util.GlobalData;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.vaadin.componentfactory.timeline.Timeline;
 import com.vaadin.componentfactory.timeline.model.ItemGroup;
 import com.vaadin.componentfactory.timeline.model.Item;
@@ -19,10 +23,15 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.renderer.LitRenderer;
 import com.vaadin.flow.data.renderer.Renderer;
 import com.vaadin.flow.data.value.ValueChangeMode;
+import org.hibernate.Hibernate;
+import org.hibernate.proxy.HibernateProxy;
 
+import java.io.*;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 
 public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>> extends VerticalLayout {
 
@@ -31,6 +40,8 @@ public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>>
     protected Button save;
     protected Button close;
     private Item newItem;
+    private Object entityData = null;
+
     private Button addItemButton;
     private String groupName = "group";
     private Class<? extends ZJTEntity> groupClass = null;
@@ -47,11 +58,20 @@ public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>>
         this.groupName = groupName;
         this.groupClass = groupClass;
         this.service = service;
+        try {
+            ClassLoader systemClassLoader = ClassLoader.getSystemClassLoader();
+            entityData = Class
+                    .forName(entityClass.getName(), true, systemClassLoader)
+                    .getDeclaredConstructor().newInstance();
+        } catch (InvocationTargetException | InstantiationException | IllegalAccessException | NoSuchMethodException |
+                 ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
 
         save = new Button("Save");
         close = new Button("Cancel");
         headers = configureHeader(entityClass);
-        configureTimeLine();
+        configureTimeLine(entityClass);
     }
 
     private List<String> configureHeader(Class<T> entityClass) {
@@ -72,6 +92,7 @@ public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>>
                 if (field.getAnnotation(jakarta.persistence.JoinColumn.class) != null) {
                     fieldNames.add(field.getName());
                     headerOptions.put(field.getName(), "select_class");
+                    GlobalData.addData(field.getName(), (Class<? extends ZJTEntity>) field.getType());
                 }
             }
             currentClass = currentClass.getSuperclass();
@@ -79,9 +100,9 @@ public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>>
         return fieldNames;
     }
 
-    private void configureTimeLine() {
+    private void configureTimeLine(Class<T> entityClass) {
         List<Item> items = getItems();
-        List<ItemGroup> itemGroups = getGroupItems();
+        List<ItemGroup> itemGroups = getGroupItems((List<ZJTEntity>) GlobalData.listData.get(groupName));
         timeline = new Timeline(items, itemGroups);
 
         // setting timeline range
@@ -94,11 +115,11 @@ public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>>
         // Select Item
         TextField tfSelected = new TextField();
 
-        VerticalLayout selectRangeLayout = getSelectRangeLayout(timeline, bAutoZoom, itemGroups);
+        VerticalLayout selectRangeLayout = getSelectRangeLayout(timeline, entityClass, bAutoZoom, itemGroups);
         HorizontalLayout zoomOptionsLayout = getSelectItemAndZoomOptionLayout(timeline, items, tfSelected, bAutoZoom);
 
-//        add(selectRangeLayout, zoomOptionsLayout, timeline);
-        add(timeline);
+        add(selectRangeLayout, zoomOptionsLayout, timeline);
+//        add(timeline);
     }
 
     private List<Item> getItems() {
@@ -153,9 +174,7 @@ public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>>
                             while (currentDataSelClass != null) {
                                 try {
                                     itemIdField = currentDataSelClass.getDeclaredField("groupId");
-                                    if (itemIdField != null) {
-                                        break;
-                                    }
+                                    break;
                                 } catch (NoSuchFieldException e) {
                                     currentDataSelClass = currentDataSelClass.getSuperclass();
                                 }
@@ -184,10 +203,10 @@ public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>>
         return TableData;
     }
 
-    private List<ItemGroup> getGroupItems() {
+    private List<ItemGroup> getGroupItems(List<ZJTEntity> groupResults) {
         List<ItemGroup> itemGroups = new ArrayList<>();
-        GlobalData.addData(groupName, groupClass);
-        List<ZJTEntity> groupResults = (List<ZJTEntity>) GlobalData.listData.get(groupName);
+//        GlobalData.addData(groupName, groupClass);
+//        List<ZJTEntity> groupResults = (List<ZJTEntity>) GlobalData.listData.get(groupName);
         for (Object groupResult :
                 groupResults) {
             ItemGroup itemGroup = new ItemGroup();
@@ -199,9 +218,7 @@ public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>>
                     while (groupResultClass != null) {
                         try {
                             headerField = groupResultClass.getDeclaredField(field.getName());
-                            if (headerField != null) {
-                                break;
-                            }
+                            break;
                         } catch (NoSuchFieldException e) {
                             groupResultClass = groupResultClass.getSuperclass();
                         }
@@ -220,19 +237,37 @@ public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>>
         return itemGroups;
     }
 
-    private VerticalLayout getSelectRangeLayout(Timeline timeline, boolean bAutoZoom, List<ItemGroup> itemGroups) {
+    private void setFieldData(Object entityData, String header, Object value) {
+        ClassLoader systemClassLoader = ClassLoader.getSystemClassLoader();
+        try {
+            Class<?> currentClass = Class.forName(entityData.getClass().getName(), true, systemClassLoader);
+            Field field = null;
+            while (currentClass != null) {
+                try {
+                    field = currentClass.getDeclaredField(header);
+                    field.setAccessible(true);
+                    try {
+                        Class<?> valueClass = Class.forName(value.getClass().getName(), true, systemClassLoader);
+                        Object castedValue = valueClass.cast(value);
+                        field.set(entityData, castedValue);
+                        break;
+                    } catch (ClassNotFoundException | ClassCastException ignored) {
+                    }
+                } catch (NoSuchFieldException | IllegalAccessException ex) {
+                    currentClass = currentClass.getSuperclass();
+                }
+            }
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private VerticalLayout getSelectRangeLayout(Timeline timeline, Class<T> entityClass, boolean bAutoZoom, List<ItemGroup> itemGroups) {
         VerticalLayout selectRangeLayout = new VerticalLayout();
         selectRangeLayout.setSpacing(false);
         Paragraph p = new Paragraph("Select range for new item: ");
         p.getElement().getStyle().set("margin-bottom", "5px");
         selectRangeLayout.add(p);
-
-        ComboBox<ItemGroup> comboBox = new ComboBox<>("Group Name");
-        comboBox.setItems(itemGroups);
-        comboBox.setItemLabelGenerator(ItemGroup::getContent);
-        comboBox.setRenderer(createRenderer());
-        comboBox.setValue(itemGroups.get(0));
-        comboBox.setAllowCustomValue(true);
 
         DateTimePicker datePicker1 = new DateTimePicker("Item start date: ");
         datePicker1.setMin(LocalDateTime.of(2023, 1, 10, 0, 0, 0));
@@ -241,12 +276,63 @@ public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>>
         DateTimePicker datePicker2 = new DateTimePicker("Item end date: ");
         datePicker2.setMin(LocalDateTime.of(2023, 1, 10, 0, 0, 0));
         datePicker2.setMax(LocalDateTime.of(2023, 8, 22, 0, 0, 0));
+        HorizontalLayout combLayout = new HorizontalLayout();
+        try {
+            for (String header :
+                    headers) {
+                if (headerOptions.get(header).equals("select_class")) {
+                    T itemObj = entityClass.getDeclaredConstructor().newInstance();
+                    Field field = itemObj.getClass().getDeclaredField(header);
+                    field.setAccessible(true);
+                    GlobalData.addData(header, (Class<? extends ZJTEntity>) field.getType());
+//                    String headerName = header;
+//                    if (header.equals(groupName))
+//                        headerName = "group";
+//                    Field itemField = null;
+                    ComboBox<ItemGroup> groupComboBox = new ComboBox<>("Group Name");
+                    List<ItemGroup> groupList = getGroupItems((List<ZJTEntity>) GlobalData.listData.get(header));
+                    groupComboBox.setItems(groupList);
+                    groupComboBox.setItemLabelGenerator(ItemGroup::getContent);
+                    groupComboBox.setRenderer(createRenderer());
+                    groupComboBox.setValue(groupList.get(0));
+                    groupComboBox.setAllowCustomValue(true);
+
+                    groupComboBox.addValueChangeListener(e -> {
+                        List<?> data = null;
+                        try {
+                            data = GlobalData.getDataById(entityData.getClass().getDeclaredField(header).getType(), groupComboBox.getValue().getGroupId());
+                        } catch (NoSuchFieldException ex) {
+                            throw new RuntimeException(ex);
+                        }
+                        setFieldData(entityData, header, data.get(0));
+
+                        ItemGroup selectedGroupItem = groupComboBox.getValue();
+                        newItem = createNewItem(datePicker1.getValue(), datePicker2.getValue(), selectedGroupItem.getGroupId());
+                    });
+
+                    combLayout.add(groupComboBox);
+                }
+            }
+        } catch (NoSuchMethodException | InvocationTargetException |
+                 InstantiationException | IllegalAccessException |
+                 NoSuchFieldException e) {
+            throw new RuntimeException(e);
+        }
+        ComboBox<ItemGroup> comboBox = new ComboBox<>("Group Name");
+        comboBox.setItems(itemGroups);
+        comboBox.setItemLabelGenerator(ItemGroup::getContent);
+        comboBox.setRenderer(createRenderer());
+        comboBox.setValue(itemGroups.get(0));
+        comboBox.setAllowCustomValue(true);
 
         datePicker1.addValueChangeListener(e -> {
+            setFieldData(entityData, "start", datePicker1.getValue());
+
             ItemGroup selectedGroupItem = comboBox.getValue();
             newItem = createNewItem(datePicker1.getValue(), datePicker2.getValue(), selectedGroupItem.getGroupId());
         });
         datePicker2.addValueChangeListener(e -> {
+            setFieldData(entityData, "end", datePicker2.getValue());
             ItemGroup selectedGroupItem = comboBox.getValue();
             newItem = createNewItem(datePicker1.getValue(), datePicker2.getValue(), selectedGroupItem.getGroupId());
         });
@@ -257,19 +343,42 @@ public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>>
         });
 
         HorizontalLayout horizontalLayout = new HorizontalLayout();
-        horizontalLayout.add(datePicker1, datePicker2, comboBox);
+        horizontalLayout.add(datePicker1, datePicker2, comboBox, combLayout);
 
         addItemButton = new Button("Add Item", e -> {
-            timeline.addItem(newItem, bAutoZoom);
-            newItem = null;
-            datePicker1.clear();
-            datePicker2.clear();
+            this.addItemAndSave(newItem, bAutoZoom, entityClass);
+//            newItem = null;
+//            datePicker1.clear();
+//            datePicker2.clear();
         });
         addItemButton.setDisableOnClick(true);
         addItemButton.setEnabled(false);
 
         selectRangeLayout.add(horizontalLayout, addItemButton);
         return selectRangeLayout;
+    }
+
+    void addItemAndSave(Item item, boolean bAutoZoom, Class<?> entityClass) {
+        timeline.addItem(item, bAutoZoom);
+        CompletableFuture.runAsync(() -> {
+            service.save(convertToZJTEntity(entityData, (Class<T>) entityClass));
+        });
+    }
+
+    public <T> T convertToZJTEntity(Object entityData, Class<T> zjtEntityClass) {
+        try {
+            if (entityData instanceof HibernateProxy) {
+                Hibernate.initialize(entityData);
+                entityData = ((HibernateProxy) entityData).getHibernateLazyInitializer().getImplementation();
+            }
+            ObjectMapper mapper = new ObjectMapper();
+            mapper.registerModule(new JavaTimeModule());
+            mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+            String json = mapper.writeValueAsString(entityData);
+            return mapper.readValue(json, zjtEntityClass);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private HorizontalLayout getSelectItemAndZoomOptionLayout(Timeline timeline, List<Item> items, TextField textField, boolean bAutoZoom) {
@@ -294,9 +403,8 @@ public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>>
             StringBuilder temp = new StringBuilder();
             for (Item item : items) {
                 if (Integer.parseInt(item.getGroup()) == Integer.parseInt(e.getGroupId())) {
-                    if (temp.length() > 0) temp.append(",").append(item.getId());
+                    if (!temp.isEmpty()) temp.append(",").append(item.getId());
                     else temp.append(item.getId());
-
                 }
             }
             e.getTimeline().onSelectItem(e.getTimeline(), temp.toString(), false);
