@@ -71,24 +71,4 @@ public class GlobalData {
             emf.close();
         }
     }
-
-    public static Object initialize(Class<?> entityClass) {
-        EntityManagerFactory emf = Persistence.createEntityManagerFactory("aat_persistence_unit");
-        EntityManager em = emf.createEntityManager();
-        em.getTransaction().begin();
-        Object entityData = null;
-        try {
-            entityData = entityClass.getDeclaredConstructor().newInstance();
-            em.persist(entityData);
-            em.getTransaction().commit();
-        } catch (Exception e) {
-            em.getTransaction().rollback();
-            e.printStackTrace();
-//            throw e;
-        } finally {
-            em.close();
-            emf.close();
-        }
-        return entityData;
-    }
 }
