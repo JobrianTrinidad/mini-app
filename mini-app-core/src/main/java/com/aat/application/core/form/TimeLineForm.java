@@ -4,7 +4,6 @@ import com.aat.application.core.data.entity.ZJTEntity;
 import com.aat.application.core.data.service.ZJTService;
 import com.aat.application.util.GlobalData;
 import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.vaadin.componentfactory.timeline.Timeline;
@@ -35,12 +34,13 @@ import java.util.concurrent.CompletableFuture;
 
 public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>> extends VerticalLayout {
 
+    @Serial
     private static final long serialVersionUID = -5183438338263448740L;
     protected TextField filterText = new TextField();
     protected Button save;
     protected Button close;
     private Item newItem;
-    private Object entityData = null;
+    private Object entityData;
 
     private Button addItemButton;
     private String groupName = "group";
@@ -128,7 +128,6 @@ public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>>
         if (filterText != null) itemData = service.findAll(filterText.getValue());
         else itemData = service.findAll(null);
 
-
         for (T data :
                 itemData) {
             Item item = new Item();
@@ -185,8 +184,8 @@ public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>>
                             itemIdField.setAccessible(true);
                             itemHeaderField.set(item, String.valueOf(itemIdField.get(dataSel)));
 
-                            String headerName = header.substring(0, 1).toUpperCase()
-                                    + header.substring(1);
+//                            String headerName = header.substring(0, 1).toUpperCase()
+//                                    + header.substring(1);
 //                            GlobalData.addData(headerName);
                             break;
                         default:
@@ -237,7 +236,8 @@ public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>>
         return itemGroups;
     }
 
-    private void setFieldData(Object entityData, String header, Object value) {
+    private void setFieldData(String header, Object value) {
+
         ClassLoader systemClassLoader = ClassLoader.getSystemClassLoader();
         try {
             Class<?> currentClass = Class.forName(entityData.getClass().getName(), true, systemClassLoader);
@@ -246,13 +246,16 @@ public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>>
                 try {
                     field = currentClass.getDeclaredField(header);
                     field.setAccessible(true);
-                    try {
-                        Class<?> valueClass = Class.forName(value.getClass().getName(), true, systemClassLoader);
-                        Object castedValue = valueClass.cast(value);
-                        field.set(entityData, castedValue);
-                        break;
-                    } catch (ClassNotFoundException | ClassCastException ignored) {
-                    }
+//                    convertToZJTEntity(value, field.getDeclaringClass());
+                    field.set(entityData, convertToZJTEntity(value, value.getClass()));
+                    break;
+//                    try {
+//                        Class<?> valueClass = Class.forName(value.getClass().getName(), true, systemClassLoader);
+//                        Object castedValue = valueClass.cast(value);
+//                        field.set(entityData, castedValue);
+//                        break;
+//                    } catch (ClassNotFoundException | ClassCastException ignored) {
+//                    }
                 } catch (NoSuchFieldException | IllegalAccessException ex) {
                     currentClass = currentClass.getSuperclass();
                 }
@@ -285,17 +288,15 @@ public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>>
                     Field field = itemObj.getClass().getDeclaredField(header);
                     field.setAccessible(true);
                     GlobalData.addData(header, (Class<? extends ZJTEntity>) field.getType());
-//                    String headerName = header;
-//                    if (header.equals(groupName))
-//                        headerName = "group";
-//                    Field itemField = null;
-                    ComboBox<ItemGroup> groupComboBox = new ComboBox<>("Group Name");
+
+                    ComboBox<ItemGroup> groupComboBox = new ComboBox<>(header + "Name");
                     List<ItemGroup> groupList = getGroupItems((List<ZJTEntity>) GlobalData.listData.get(header));
                     groupComboBox.setItems(groupList);
                     groupComboBox.setItemLabelGenerator(ItemGroup::getContent);
                     groupComboBox.setRenderer(createRenderer());
                     groupComboBox.setValue(groupList.get(0));
                     groupComboBox.setAllowCustomValue(true);
+                    setFieldData(header, GlobalData.listData.get(header).get(0));
 
                     groupComboBox.addValueChangeListener(e -> {
                         List<?> data = null;
@@ -304,10 +305,10 @@ public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>>
                         } catch (NoSuchFieldException ex) {
                             throw new RuntimeException(ex);
                         }
-                        setFieldData(entityData, header, data.get(0));
+                        setFieldData(header, data.get(0));
 
-                        ItemGroup selectedGroupItem = groupComboBox.getValue();
-                        newItem = createNewItem(datePicker1.getValue(), datePicker2.getValue(), selectedGroupItem.getGroupId());
+                        newItem = createNewItem(datePicker1.getValue(), datePicker2.getValue());
+                        newItem.setGroup(String.valueOf(groupComboBox.getValue().getGroupId()));
                     });
 
                     combLayout.add(groupComboBox);
@@ -318,38 +319,28 @@ public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>>
                  NoSuchFieldException e) {
             throw new RuntimeException(e);
         }
-        ComboBox<ItemGroup> comboBox = new ComboBox<>("Group Name");
-        comboBox.setItems(itemGroups);
-        comboBox.setItemLabelGenerator(ItemGroup::getContent);
-        comboBox.setRenderer(createRenderer());
-        comboBox.setValue(itemGroups.get(0));
-        comboBox.setAllowCustomValue(true);
 
         datePicker1.addValueChangeListener(e -> {
-            setFieldData(entityData, "start", datePicker1.getValue());
-
-            ItemGroup selectedGroupItem = comboBox.getValue();
-            newItem = createNewItem(datePicker1.getValue(), datePicker2.getValue(), selectedGroupItem.getGroupId());
+            if (datePicker1.getValue() == null)
+                return;
+            setFieldData("start", datePicker1.getValue());
+            newItem = createNewItem(datePicker1.getValue(), datePicker2.getValue());
         });
         datePicker2.addValueChangeListener(e -> {
-            setFieldData(entityData, "end", datePicker2.getValue());
-            ItemGroup selectedGroupItem = comboBox.getValue();
-            newItem = createNewItem(datePicker1.getValue(), datePicker2.getValue(), selectedGroupItem.getGroupId());
-        });
-
-        comboBox.addValueChangeListener(e -> {
-            ItemGroup selectedGroupItem = comboBox.getValue();
-            newItem = createNewItem(datePicker1.getValue(), datePicker2.getValue(), selectedGroupItem.getGroupId());
+            if (datePicker1.getValue() == null)
+                return;
+            setFieldData("end", datePicker2.getValue());
+            newItem = createNewItem(datePicker1.getValue(), datePicker2.getValue());
         });
 
         HorizontalLayout horizontalLayout = new HorizontalLayout();
-        horizontalLayout.add(datePicker1, datePicker2, comboBox, combLayout);
+        horizontalLayout.add(datePicker1, datePicker2, combLayout);
 
         addItemButton = new Button("Add Item", e -> {
             this.addItemAndSave(newItem, bAutoZoom, entityClass);
-//            newItem = null;
-//            datePicker1.clear();
-//            datePicker2.clear();
+            newItem = null;
+            datePicker1.clear();
+            datePicker2.clear();
         });
         addItemButton.setDisableOnClick(true);
         addItemButton.setEnabled(false);
@@ -359,13 +350,15 @@ public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>>
     }
 
     void addItemAndSave(Item item, boolean bAutoZoom, Class<?> entityClass) {
+        if (item.getGroup() == null)
+            item.setGroup("0");
         timeline.addItem(item, bAutoZoom);
         CompletableFuture.runAsync(() -> {
-            service.save(convertToZJTEntity(entityData, (Class<T>) entityClass));
+            service.save(convertToZJTEntity(entityData, entityClass));
         });
     }
 
-    public <T> T convertToZJTEntity(Object entityData, Class<T> zjtEntityClass) {
+    public <T> T convertToZJTEntity(Object entityData, Class<?> zjtEntityClass) {
         try {
             if (entityData instanceof HibernateProxy) {
                 Hibernate.initialize(entityData);
@@ -375,7 +368,7 @@ public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>>
             mapper.registerModule(new JavaTimeModule());
             mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
             String json = mapper.writeValueAsString(entityData);
-            return mapper.readValue(json, zjtEntityClass);
+            return (T) mapper.readValue(json, zjtEntityClass);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -409,16 +402,14 @@ public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>>
             }
             e.getTimeline().onSelectItem(e.getTimeline(), temp.toString(), false);
         });
-
-
         return zoomOptionsLayout;
     }
 
-    private Item createNewItem(LocalDateTime start, LocalDateTime end, int groupID) {
+    private Item createNewItem(LocalDateTime start, LocalDateTime end) {
         if (start != null && end != null) {
             if (start.isBefore(end)) {
                 addItemButton.setEnabled(true);
-                return new Item(start, end, groupID);
+                return new Item(start, end);
             } else {
                 Notification.show("End date should be after start date", 5000, Notification.Position.MIDDLE);
                 return null;

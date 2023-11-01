@@ -1,5 +1,6 @@
 package com.aat.application.data.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.vaadin.flow.router.PageTitle;
 import jakarta.persistence.*;
 
@@ -13,12 +14,15 @@ public class ZJTTimeLineNode extends ZJTSuperTimeLineNode {
 
     @ManyToOne
     @JoinColumn(name = "parent_id")
+    @JsonIgnore
     private ZJTTimeLineNode parent;
 
     @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JsonIgnore
     private List<ZJTTimeLineNode> children;
 
     @OneToMany(mappedBy = "group", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<ZJTTimeLineItem> items;
 
     public List<ZJTTimeLineNode> getChildren() {
