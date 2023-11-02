@@ -2,6 +2,7 @@ package com.aat.application.core.form;
 
 import com.aat.application.core.data.entity.ZJTEntity;
 import com.aat.application.core.data.service.ZJTService;
+import com.aat.application.data.entity.ZJTSuperTimeLineNode;
 import com.aat.application.util.GlobalData;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -14,6 +15,7 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.datetimepicker.DateTimePicker;
+import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.Paragraph;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -101,6 +103,7 @@ public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>>
             GlobalData.addData(field.getName(), (Class<? extends ZJTEntity>) field.getType());
         }
     }
+
     private void configureTimeLine(Class<T> entityClass) {
         List<Item> items = getItems();
         List<ItemGroup> itemGroups = getGroupItems((List<ZJTEntity>) GlobalData.listData.get(groupName));
@@ -116,10 +119,11 @@ public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>>
         // Select Item
         TextField tfSelected = new TextField();
 
-        VerticalLayout selectRangeLayout = getSelectRangeLayout(timeline, entityClass, bAutoZoom, itemGroups);
-        HorizontalLayout zoomOptionsLayout = getSelectItemAndZoomOptionLayout(timeline, items, tfSelected, bAutoZoom);
+        FormLayout formLayout = addForm(entityClass, bAutoZoom, itemGroups);
+//        HorizontalLayout zoomOptionsLayout = getSelectItemAndZoomOptionLayout(timeline, items, tfSelected, bAutoZoom);
 
-        add(selectRangeLayout, zoomOptionsLayout, timeline);
+//        add(selectRangeLayout, zoomOptionsLayout, timeline);
+        add(timeline, formLayout);
 //        add(timeline);
     }
 
@@ -140,9 +144,7 @@ public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>>
                     while (currentDataClass != null) {
                         try {
                             headerField = currentDataClass.getDeclaredField(header);
-                            if (headerField != null) {
-                                break;
-                            }
+                            break;
                         } catch (NoSuchFieldException e) {
                             currentDataClass = currentDataClass.getSuperclass();
                         }
@@ -152,6 +154,11 @@ public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>>
                     }
                     headerField.setAccessible(true);
                     Object dataSel = headerField.get(data);
+
+                    if (header.equals(groupName)) {
+                        item.setClassName(((ZJTSuperTimeLineNode) dataSel).getClassName());
+                    }
+
                     Field itemHeaderField = null;
                     try {
                         itemHeaderField = item.getClass().getDeclaredField(header);
@@ -265,21 +272,17 @@ public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>>
         }
     }
 
-    private VerticalLayout getSelectRangeLayout(Timeline timeline, Class<T> entityClass, boolean bAutoZoom, List<ItemGroup> itemGroups) {
-        VerticalLayout selectRangeLayout = new VerticalLayout();
-        selectRangeLayout.setSpacing(false);
-        Paragraph p = new Paragraph("Select range for new item: ");
-        p.getElement().getStyle().set("margin-bottom", "5px");
-        selectRangeLayout.add(p);
+    private FormLayout addForm(Class<T> entityClass, boolean bAutoZoom, List<ItemGroup> itemGroups) {
+        FormLayout formLayout = new FormLayout();
 
         DateTimePicker datePicker1 = new DateTimePicker("Item start date: ");
-        datePicker1.setMin(LocalDateTime.of(2023, 1, 10, 0, 0, 0));
-        datePicker1.setMax(LocalDateTime.of(2023, 8, 22, 0, 0, 0));
+//        datePicker1.setMin(LocalDateTime.of(2023, 1, 10, 0, 0, 0));
+//        datePicker1.setMax(LocalDateTime.of(2023, 8, 22, 0, 0, 0));
 
         DateTimePicker datePicker2 = new DateTimePicker("Item end date: ");
-        datePicker2.setMin(LocalDateTime.of(2023, 1, 10, 0, 0, 0));
-        datePicker2.setMax(LocalDateTime.of(2023, 8, 22, 0, 0, 0));
-        HorizontalLayout combLayout = new HorizontalLayout();
+//        datePicker2.setMin(LocalDateTime.of(2023, 1, 10, 0, 0, 0));
+//        datePicker2.setMax(LocalDateTime.of(2023, 8, 22, 0, 0, 0));
+        VerticalLayout combLayout = new VerticalLayout();
         try {
             for (String header :
                     headers) {
@@ -310,8 +313,8 @@ public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>>
                         newItem = createNewItem(datePicker1.getValue(), datePicker2.getValue());
                         if (newItem == null) {
                             newItem = new Item();
-                            newItem.setGroup(String.valueOf(groupComboBox.getValue().getGroupId()));
                         }
+                        newItem.setGroup(String.valueOf(groupComboBox.getValue().getGroupId()));
                     });
 
                     combLayout.add(groupComboBox);
@@ -336,8 +339,8 @@ public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>>
             newItem = createNewItem(datePicker1.getValue(), datePicker2.getValue());
         });
 
-        HorizontalLayout horizontalLayout = new HorizontalLayout();
-        horizontalLayout.add(datePicker1, datePicker2, combLayout);
+        VerticalLayout verticalLayout = new VerticalLayout();
+        verticalLayout.add(datePicker1, datePicker2);
 
         addItemButton = new Button("Add Item", e -> {
             this.addItemAndSave(newItem, bAutoZoom, entityClass);
@@ -348,8 +351,9 @@ public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>>
         addItemButton.setDisableOnClick(true);
         addItemButton.setEnabled(false);
 
-        selectRangeLayout.add(horizontalLayout, addItemButton);
-        return selectRangeLayout;
+        formLayout.add(verticalLayout, combLayout, addItemButton);
+
+        return formLayout;
     }
 
     void addItemAndSave(Item item, boolean bAutoZoom, Class<?> entityClass) {
@@ -377,42 +381,47 @@ public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>>
         }
     }
 
-    private HorizontalLayout getSelectItemAndZoomOptionLayout(Timeline timeline, List<Item> items, TextField textField, boolean bAutoZoom) {
-        VerticalLayout selectLayout = new VerticalLayout();
-        Button setSelectBtn = new Button("Select Item", e -> timeline.setSelectItem(textField.getValue()));
-        selectLayout.add(textField, setSelectBtn);
-
-        HorizontalLayout zoomOptionsLayout = new HorizontalLayout();
-        zoomOptionsLayout.setMargin(true);
-        Button oneDay = new Button("1 day", e -> timeline.setZoomOption(1));
-        Button threeDays = new Button("3 days", e -> timeline.setZoomOption(3));
-        Button fiveDays = new Button("5 days", e -> timeline.setZoomOption(5));
-
-        zoomOptionsLayout.add(oneDay, threeDays, fiveDays, selectLayout);
-
-        timeline.addItemSelectListener(e -> {
-            timeline.onSelectItem(e.getTimeline(), e.getItemId(), bAutoZoom);
-            textField.setValue(e.getItemId());
-        });
-
-        timeline.addGroupItemClickListener(e -> {
-            StringBuilder temp = new StringBuilder();
-            for (Item item : items) {
-                if (Integer.parseInt(item.getGroup()) == Integer.parseInt(e.getGroupId())) {
-                    if (!temp.isEmpty()) temp.append(",").append(item.getId());
-                    else temp.append(item.getId());
-                }
-            }
-            e.getTimeline().onSelectItem(e.getTimeline(), temp.toString(), false);
-        });
-        return zoomOptionsLayout;
-    }
+//    private HorizontalLayout getSelectItemAndZoomOptionLayout(Timeline timeline, List<Item> items, TextField textField, boolean bAutoZoom) {
+//        VerticalLayout selectLayout = new VerticalLayout();
+//        Button setSelectBtn = new Button("Select Item", e -> timeline.setSelectItem(textField.getValue()));
+//        selectLayout.add(textField, setSelectBtn);
+//
+//        HorizontalLayout zoomOptionsLayout = new HorizontalLayout();
+//        zoomOptionsLayout.setMargin(true);
+//        Button oneDay = new Button("1 day", e -> timeline.setZoomOption(1));
+//        Button threeDays = new Button("3 days", e -> timeline.setZoomOption(3));
+//        Button fiveDays = new Button("5 days", e -> timeline.setZoomOption(5));
+//
+//        zoomOptionsLayout.add(oneDay, threeDays, fiveDays, selectLayout);
+//
+//        timeline.addItemSelectListener(e -> {
+//            timeline.onSelectItem(e.getTimeline(), e.getItemId(), bAutoZoom);
+//            textField.setValue(e.getItemId());
+//        });
+//
+//        timeline.addGroupItemClickListener(e -> {
+//            StringBuilder temp = new StringBuilder();
+//            for (Item item : items) {
+//                if (Integer.parseInt(item.getGroup()) == Integer.parseInt(e.getGroupId())) {
+//                    if (!temp.isEmpty()) temp.append(",").append(item.getId());
+//                    else temp.append(item.getId());
+//                }
+//            }
+//            e.getTimeline().onSelectItem(e.getTimeline(), temp.toString(), false);
+//        });
+//        return zoomOptionsLayout;
+//    }
 
     private Item createNewItem(LocalDateTime start, LocalDateTime end) {
         if (start != null && end != null) {
             if (start.isBefore(end)) {
                 addItemButton.setEnabled(true);
-                return new Item(start, end);
+
+                if (newItem == null)
+                    newItem = new Item();
+                newItem.setStart(start);
+                newItem.setEnd(end);
+                return newItem;
             } else {
                 Notification.show("End date should be after start date", 5000, Notification.Position.MIDDLE);
                 return null;

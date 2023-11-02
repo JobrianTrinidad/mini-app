@@ -21,6 +21,7 @@ public abstract class ZJTSuperTimeLineNode implements ZJTEntity {
 
 
     protected boolean visible = true;
+    @Column(name = "classname")
     protected String className = "";
     protected String nestedGroups;
 
@@ -60,5 +61,13 @@ public abstract class ZJTSuperTimeLineNode implements ZJTEntity {
 
     public void setContent(String content) {
         this.content = content;
+    }
+
+    public String getClassName() {
+        return className;
+    }
+
+    public void setClassName(String className) {
+        this.className = className;
     }
 }
