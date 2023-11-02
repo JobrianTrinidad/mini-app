@@ -44,19 +44,16 @@ public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>>
 
     private Button addItemButton;
     private String groupName = "group";
-    private Class<? extends ZJTEntity> groupClass = null;
     Timeline timeline;
     protected S service;
     List<String> headers;
     Dictionary<String, String> headerOptions = new Hashtable<>();
     Dictionary<String, Class<?>> headerTypeOptions = new Hashtable<>();
-
     List<T> itemData = new ArrayList<>();
 
     public TimeLineForm(Class<T> entityClass, S service, String groupName, Class<? extends ZJTEntity> groupClass) {
         addClassName("demo-app-form");
         this.groupName = groupName;
-        this.groupClass = groupClass;
         this.service = service;
         try {
             ClassLoader systemClassLoader = ClassLoader.getSystemClassLoader();
@@ -76,30 +73,35 @@ public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>>
 
     private List<String> configureHeader(Class<T> entityClass) {
         List<String> fieldNames = new ArrayList<>();
+        Map<String, String> headerOptions = new HashMap<>();
+        Map<String, Class<?>> headerTypeOptions = new HashMap<>();
+
         Class<?> currentClass = entityClass;
         while (currentClass != null) {
-            Field[] fields = currentClass.getDeclaredFields();
-            for (Field field : fields) {
-                if (field.getAnnotation(jakarta.persistence.Column.class) != null) {
-                    fieldNames.add(field.getName());
-                    headerOptions.put(field.getName(), "input");
-                }
-                if (field.getAnnotation(jakarta.persistence.Enumerated.class) != null) {
-                    fieldNames.add(field.getName());
-                    headerTypeOptions.put(field.getName(), field.getType());
-                    headerOptions.put(field.getName(), "select_enum");
-                }
-                if (field.getAnnotation(jakarta.persistence.JoinColumn.class) != null) {
-                    fieldNames.add(field.getName());
-                    headerOptions.put(field.getName(), "select_class");
-                    GlobalData.addData(field.getName(), (Class<? extends ZJTEntity>) field.getType());
-                }
+            for (Field field : currentClass.getDeclaredFields()) {
+                processField(field, fieldNames, headerOptions, headerTypeOptions);
             }
             currentClass = currentClass.getSuperclass();
         }
         return fieldNames;
     }
 
+    private void processField(Field field, List<String> fieldNames, Map<String, String> headerOptions, Map<String, Class<?>> headerTypeOptions) {
+        if (field.getAnnotation(jakarta.persistence.Column.class) != null) {
+            fieldNames.add(field.getName());
+            headerOptions.put(field.getName(), "input");
+        }
+        if (field.getAnnotation(jakarta.persistence.Enumerated.class) != null) {
+            fieldNames.add(field.getName());
+            headerTypeOptions.put(field.getName(), field.getType());
+            headerOptions.put(field.getName(), "select_enum");
+        }
+        if (field.getAnnotation(jakarta.persistence.JoinColumn.class) != null) {
+            fieldNames.add(field.getName());
+            headerOptions.put(field.getName(), "select_class");
+            GlobalData.addData(field.getName(), (Class<? extends ZJTEntity>) field.getType());
+        }
+    }
     private void configureTimeLine(Class<T> entityClass) {
         List<Item> items = getItems();
         List<ItemGroup> itemGroups = getGroupItems((List<ZJTEntity>) GlobalData.listData.get(groupName));
@@ -197,7 +199,6 @@ public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>>
                 }
             }
             TableData.add(item);
-
         }
         return TableData;
     }
@@ -308,7 +309,10 @@ public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>>
                         setFieldData(header, data.get(0));
 
                         newItem = createNewItem(datePicker1.getValue(), datePicker2.getValue());
-                        newItem.setGroup(String.valueOf(groupComboBox.getValue().getGroupId()));
+                        if (newItem == null) {
+                            newItem = new Item();
+                            newItem.setGroup(String.valueOf(groupComboBox.getValue().getGroupId()));
+                        }
                     });
 
                     combLayout.add(groupComboBox);
