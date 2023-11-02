@@ -73,20 +73,19 @@ public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>>
 
     private List<String> configureHeader(Class<T> entityClass) {
         List<String> fieldNames = new ArrayList<>();
-        Map<String, String> headerOptions = new HashMap<>();
-        Map<String, Class<?>> headerTypeOptions = new HashMap<>();
+//        headerOptions = new HashMap<>();
 
         Class<?> currentClass = entityClass;
         while (currentClass != null) {
             for (Field field : currentClass.getDeclaredFields()) {
-                processField(field, fieldNames, headerOptions, headerTypeOptions);
+                processField(field, fieldNames);
             }
             currentClass = currentClass.getSuperclass();
         }
         return fieldNames;
     }
 
-    private void processField(Field field, List<String> fieldNames, Map<String, String> headerOptions, Map<String, Class<?>> headerTypeOptions) {
+    private void processField(Field field, List<String> fieldNames) {
         if (field.getAnnotation(jakarta.persistence.Column.class) != null) {
             fieldNames.add(field.getName());
             headerOptions.put(field.getName(), "input");
