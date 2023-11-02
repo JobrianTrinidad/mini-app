@@ -17,6 +17,7 @@ import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.datetimepicker.DateTimePicker;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.Paragraph;
+import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -27,11 +28,13 @@ import com.vaadin.flow.data.value.ValueChangeMode;
 import org.hibernate.Hibernate;
 import org.hibernate.proxy.HibernateProxy;
 
+import java.awt.*;
 import java.io.*;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>> extends VerticalLayout {
@@ -275,6 +278,10 @@ public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>>
     private FormLayout addForm(Class<T> entityClass, boolean bAutoZoom, List<ItemGroup> itemGroups) {
         FormLayout formLayout = new FormLayout();
 
+        VerticalLayout layout = new VerticalLayout();
+        TextField title = new TextField("Title");
+        layout.add(title);
+
         DateTimePicker datePicker1 = new DateTimePicker("Item start date: ");
 //        datePicker1.setMin(LocalDateTime.of(2023, 1, 10, 0, 0, 0));
 //        datePicker1.setMax(LocalDateTime.of(2023, 8, 22, 0, 0, 0));
@@ -282,7 +289,22 @@ public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>>
         DateTimePicker datePicker2 = new DateTimePicker("Item end date: ");
 //        datePicker2.setMin(LocalDateTime.of(2023, 1, 10, 0, 0, 0));
 //        datePicker2.setMax(LocalDateTime.of(2023, 8, 22, 0, 0, 0));
-        VerticalLayout combLayout = new VerticalLayout();
+
+        datePicker1.addValueChangeListener(e -> {
+            if (datePicker1.getValue() == null)
+                return;
+            setFieldData("start", datePicker1.getValue());
+            newItem = createNewItem(datePicker1.getValue(), datePicker2.getValue());
+        });
+        datePicker2.addValueChangeListener(e -> {
+            if (datePicker1.getValue() == null)
+                return;
+            setFieldData("end", datePicker2.getValue());
+            newItem = createNewItem(datePicker1.getValue(), datePicker2.getValue());
+        });
+
+        layout.add(datePicker1, datePicker2);
+
         try {
             for (String header :
                     headers) {
@@ -292,7 +314,7 @@ public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>>
                     field.setAccessible(true);
                     GlobalData.addData(header, (Class<? extends ZJTEntity>) field.getType());
 
-                    ComboBox<ItemGroup> groupComboBox = new ComboBox<>(header + "Name");
+                    ComboBox<ItemGroup> groupComboBox = new ComboBox<>(header + " Name");
                     List<ItemGroup> groupList = getGroupItems((List<ZJTEntity>) GlobalData.listData.get(header));
                     groupComboBox.setItems(groupList);
                     groupComboBox.setItemLabelGenerator(ItemGroup::getContent);
@@ -317,7 +339,7 @@ public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>>
                         newItem.setGroup(String.valueOf(groupComboBox.getValue().getGroupId()));
                     });
 
-                    combLayout.add(groupComboBox);
+                    layout.add(groupComboBox);
                 }
             }
         } catch (NoSuchMethodException | InvocationTargetException |
@@ -325,22 +347,6 @@ public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>>
                  NoSuchFieldException e) {
             throw new RuntimeException(e);
         }
-
-        datePicker1.addValueChangeListener(e -> {
-            if (datePicker1.getValue() == null)
-                return;
-            setFieldData("start", datePicker1.getValue());
-            newItem = createNewItem(datePicker1.getValue(), datePicker2.getValue());
-        });
-        datePicker2.addValueChangeListener(e -> {
-            if (datePicker1.getValue() == null)
-                return;
-            setFieldData("end", datePicker2.getValue());
-            newItem = createNewItem(datePicker1.getValue(), datePicker2.getValue());
-        });
-
-        VerticalLayout verticalLayout = new VerticalLayout();
-        verticalLayout.add(datePicker1, datePicker2);
 
         addItemButton = new Button("Add Item", e -> {
             this.addItemAndSave(newItem, bAutoZoom, entityClass);
@@ -351,7 +357,7 @@ public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>>
         addItemButton.setDisableOnClick(true);
         addItemButton.setEnabled(false);
 
-        formLayout.add(verticalLayout, combLayout, addItemButton);
+        formLayout.add(layout, addItemButton);
 
         return formLayout;
     }
