@@ -9,7 +9,7 @@ import com.vaadin.flow.router.*;
 
 import java.lang.reflect.InvocationTargetException;
 
-@Route(value = "commonview", layout = CoreMainLayout.class)
+//@Route(value = "commonview", layout = CoreMainLayout.class)
 public class StandardFormView<T extends ZJTEntity> extends CommonView<T> {
 
     protected GridCommonForm<T> form;

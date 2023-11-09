@@ -27,9 +27,9 @@ public class MainLayout extends CoreMainLayout {
         AppNavItem parent = new AppNavItem("Mini-Core");
         parent.setIcon(LineAwesomeIcon.FOLDER.create());
         nav.addItem(parent);
-        parent.addItem(new AppNavItem("Tui Grid", "commonview", LineAwesomeIcon.PRODUCT_HUNT.create())
-                .withParameter("commonview", "entityClass", ZJTPricingType.class.getName())
-                .withParameter("commonview", "layout", this.getClass().getName()));
+        parent.addItem(new AppNavItem("Tui Grid", "pricing-type", LineAwesomeIcon.PRODUCT_HUNT.create())
+                .withParameter("pricing-type", "entityClass", ZJTPricingType.class.getName())
+                .withParameter("pricing-type", "layout", this.getClass().getName()));
         parent.addItem(new AppNavItem("Group TimeLine", "group-timeline", LineAwesomeIcon.PRODUCT_HUNT.create())
                 .withParameter("group-timeline", "entityClass", ZJTTimeLineItem.class.getName())
                 .withParameter("group-timeline", "layout", this.getClass().getName()));

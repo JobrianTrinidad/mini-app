@@ -1,5 +1,6 @@
 package com.aat.application.data.entity;
 
+import com.aat.application.annotations.ShowField;
 import jakarta.persistence.Entity;
 import jakarta.persistence.*;
 
@@ -8,6 +9,7 @@ import jakarta.persistence.*;
 public class ZJTTimeLineItem extends ZJTSuperTimeLineItem {
     @ManyToOne
     @JoinColumn(name = "node_id")
+    @ShowField(show = true)
     private ZJTTimeLineNode group;
 
     public ZJTTimeLineNode getNode() {
