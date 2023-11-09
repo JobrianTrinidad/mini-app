@@ -189,7 +189,7 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
         grid.setAutoSave(true);
         grid.setSizeFull();
         grid.setHeaderHeight(50);
-        grid.setTableWidth(500);
+//        grid.setTableWidth(500);
 //        grid.setTableHeight(750);
     }
 
@@ -269,7 +269,7 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
             String headerName = header.substring(0, 1).toUpperCase()
                     + header.substring(1);
             ColumnBaseOption baseOption =
-                    new ColumnBaseOption(nId++, headerName, header, 250, "center", "");
+                    new ColumnBaseOption(nId++, headerName, header, 0, "center", "");
             com.vaadin.componentfactory.tuigrid.model.Column column =
                     new com.vaadin.componentfactory.tuigrid.model.Column(baseOption);
             column.setEditable(true);
