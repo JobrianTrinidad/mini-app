@@ -1,5 +1,7 @@
 package com.aat.application.core.form;
 
+import com.aat.application.annotations.DisplayName;
+import com.aat.application.annotations.ShowField;
 import com.aat.application.core.data.entity.ZJTEntity;
 import com.aat.application.core.data.service.ZJTService;
 import com.aat.application.util.GlobalData;
@@ -30,6 +32,7 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
     protected S service;
     List<String> headers;
     Dictionary<String, String> headerOptions = new Hashtable<>();
+    Dictionary<String, String> headerNames = new Hashtable<>();
     Dictionary<String, Class<?>> headerTypeOptions = new Hashtable<>();
     List<Item> items = new ArrayList<>();
     List<T> tableData = new ArrayList<>();
@@ -54,20 +57,25 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
         Field[] fields = entityClass.getDeclaredFields();
 
         List<String> fieldNames = new ArrayList<>();
-        for (int i = 1; i < fields.length; i++) {
-            if (fields[i].getAnnotation(jakarta.persistence.Column.class) != null) {
-
-                fieldNames.add(fields[i].getName());
-                headerOptions.put(fields[i].getName(), "input");
+        for (Field field : fields) {
+            if (field.getAnnotation(DisplayName.class) == null) {
+                continue;
             }
-            if (fields[i].getAnnotation(jakarta.persistence.Enumerated.class) != null) {
-                fieldNames.add(fields[i].getName());
-                headerTypeOptions.put(fields[i].getName(), fields[i].getType());
-                headerOptions.put(fields[i].getName(), "select_enum");
+            if (field.getAnnotation(jakarta.persistence.Column.class) != null) {
+                fieldNames.add(field.getName());
+                headerOptions.put(field.getName(), "input");
+                headerNames.put(field.getName(), field.getAnnotation(DisplayName.class).value());
             }
-            if (fields[i].getAnnotation(jakarta.persistence.JoinColumn.class) != null) {
-                fieldNames.add(fields[i].getName());
-                headerOptions.put(fields[i].getName(), "select_class");
+            if (field.getAnnotation(jakarta.persistence.Enumerated.class) != null) {
+                fieldNames.add(field.getName());
+                headerTypeOptions.put(field.getName(), field.getType());
+                headerNames.put(field.getName(), field.getAnnotation(DisplayName.class).value());
+                headerOptions.put(field.getName(), "select_enum");
+            }
+            if (field.getAnnotation(jakarta.persistence.JoinColumn.class) != null) {
+                fieldNames.add(field.getName());
+                headerNames.put(field.getName(), field.getAnnotation(DisplayName.class).value());
+                headerOptions.put(field.getName(), "select_class");
             }
         }
 
@@ -266,8 +274,7 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
         Enumeration<String> e = headerOptions.keys();
         while (e.hasMoreElements()) {
             String header = e.nextElement();
-            String headerName = header.substring(0, 1).toUpperCase()
-                    + header.substring(1);
+            String headerName = headerNames.get(header);
             ColumnBaseOption baseOption =
                     new ColumnBaseOption(nId++, headerName, header, 0, "center", "");
             com.vaadin.componentfactory.tuigrid.model.Column column =
