@@ -41,8 +41,8 @@ public class CoreMainLayout extends AppLayout{
         addToNavbar(true, toggle, viewTitle);
     }
 
-    private void addDrawerContent() {
-        H1 appName = new H1("JTT Scheduler");
+    private void addDrawerContent(String strAppName) {
+        H1 appName = new H1(strAppName);
         appName.addClassNames(LumoUtility.FontSize.LARGE, LumoUtility.Margin.NONE);
         Header header = new Header(appName);
 
@@ -55,14 +55,13 @@ public class CoreMainLayout extends AppLayout{
         return nav;
     }
 
-    protected void setNavigation(AppNav nav){
+    protected void setNavigation(AppNav nav, String strAppName){
         this.nav = nav;
-        addDrawerContent();
+        addDrawerContent(strAppName);
     }
 
     protected Footer createFooter() {
-        Footer layout = new Footer();
-        return layout;
+        return new Footer();
     }
 
     @Override

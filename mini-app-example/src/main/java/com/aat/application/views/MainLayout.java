@@ -18,7 +18,7 @@ import com.vaadin.flow.router.Route;
 public class MainLayout extends CoreMainLayout {
     public MainLayout() {
         super();
-        setNavigation(getNavigation());
+        setNavigation(getNavigation(), "Mini-App");
     }
 
     @Override
