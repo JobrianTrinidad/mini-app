@@ -28,17 +28,17 @@ public class MainLayout extends CoreMainLayout {
         parent.setIcon(LineAwesomeIcon.FOLDER.create());
         nav.addItem(parent);
         parent.addItem(new AppNavItem("Tui Grid", "pricing-type", LineAwesomeIcon.PRODUCT_HUNT.create())
-                .withParameter("pricing-type", "entityClass", ZJTPricingType.class.getName())
-                .withParameter("pricing-type", "layout", this.getClass().getName()));
+                .withParameter("entityClass", ZJTPricingType.class.getName())
+                .withParameter( "layout", this.getClass().getName()));
         parent.addItem(new AppNavItem("Group TimeLine", "group-timeline", LineAwesomeIcon.PRODUCT_HUNT.create())
-                .withParameter("group-timeline", "entityClass", ZJTTimeLineItem.class.getName())
-                .withParameter("group-timeline", "layout", this.getClass().getName()));
+                .withParameter( "entityClass", ZJTTimeLineItem.class.getName())
+                .withParameter( "layout", this.getClass().getName()));
         parent.addItem(new AppNavItem("Vehicle TimeLine", "vehicle-timeline", LineAwesomeIcon.PRODUCT_HUNT.create())
-                .withParameter("vehicle-timeline", "entityClass", ZJTVehicleBooking.class.getName())
-                .withParameter("vehicle-timeline", "layout", this.getClass().getName()));
+                .withParameter( "entityClass", ZJTVehicleBooking.class.getName())
+                .withParameter( "layout", this.getClass().getName()));
         parent.addItem(new AppNavItem("Driver TimeLine", "driver-timeline", LineAwesomeIcon.PRODUCT_HUNT.create())
-                .withParameter("driver-timeline", "entityClass", ZJTVehicleBooking.class.getName())
-                .withParameter("driver-timeline", "layout", this.getClass().getName()));
+                .withParameter( "entityClass", ZJTVehicleBooking.class.getName())
+                .withParameter( "layout", this.getClass().getName()));
         return nav;
     }
 }

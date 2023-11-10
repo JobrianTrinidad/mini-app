@@ -16,6 +16,7 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.value.ValueChangeMode;
 
+import java.io.Serial;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
@@ -23,6 +24,7 @@ import java.util.concurrent.CompletableFuture;
 
 public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>> extends VerticalLayout {
 
+    @Serial
     private static final long serialVersionUID = -5183438338263448739L;
 
     protected TextField filterText = new TextField();
@@ -94,9 +96,11 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
         grid.setItems(items);
 
         grid.setRowHeaders(List.of("checkbox"));
+        grid.sethScroll(true);
+        grid.setvScroll(true);
 
         Theme inputTheme = new Theme();
-        inputTheme.setMaxLength(10);
+//        inputTheme.setMaxLength(100);
         inputTheme.setBorder("1px solid #326f70");
         inputTheme.setBackgroundColor("#66878858");
         inputTheme.setOutline("none");

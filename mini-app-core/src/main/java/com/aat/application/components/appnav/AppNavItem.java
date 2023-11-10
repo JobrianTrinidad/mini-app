@@ -21,6 +21,7 @@ import java.util.*;
 public class AppNavItem extends Component {
 
     private Map<String, String> parameters;
+    private String routePath;
 
     /**
      * Creates a menu item which does not link to any view but only shows the given
@@ -66,6 +67,7 @@ public class AppNavItem extends Component {
     public AppNavItem(String label, String path, Component icon) {
         setPath(path);
         setLabel(label);
+        routePath = path;
         setIcon(icon);
         getElement().addEventListener("click", event -> {
             // Set session attribute here
@@ -267,12 +269,12 @@ public class AppNavItem extends Component {
      * @param parameterValue the parameter value
      * @return this instance for chaining
      */
-    public AppNavItem withParameter(String path, String parameterName, String parameterValue) {
+    public AppNavItem withParameter(String parameterName, String parameterValue) {
         if (parameters == null) {
             parameters = new HashMap<>();
         }
         parameters.put(parameterName, parameterValue);
-        setPath(path);
+        setPath(routePath);
         return this;
     }
 
