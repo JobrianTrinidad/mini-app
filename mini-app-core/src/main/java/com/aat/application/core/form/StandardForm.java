@@ -3,6 +3,8 @@ package com.aat.application.core.form;
 import com.aat.application.annotations.DisplayName;
 import com.aat.application.core.data.entity.ZJTEntity;
 import com.aat.application.core.data.service.ZJTService;
+import com.aat.application.data.entity.ZJTTableInfo;
+import com.aat.application.data.service.TableInfoService;
 import com.aat.application.util.GlobalData;
 import com.vaadin.componentfactory.tuigrid.TuiGrid;
 import com.vaadin.componentfactory.tuigrid.model.*;
@@ -14,6 +16,9 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.value.ValueChangeMode;
+import com.vaadin.flow.spring.annotation.SpringComponent;
+import com.vaadin.flow.spring.annotation.UIScope;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.vaadin.tatu.TwinColSelect;
 
 import java.io.Serial;
@@ -21,12 +26,14 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>> extends VerticalLayout {
 
     @Serial
     private static final long serialVersionUID = -5183438338263448739L;
 
+    protected TableInfoService tableInfoService;
     protected TextField filterText = new TextField();
     protected Button save;
     protected Button close;
@@ -43,9 +50,10 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
     List<Item> items = new ArrayList<>();
     List<T> tableData = new ArrayList<>();
 
-    public StandardForm(Class<T> entityClass, S service) {
+    public StandardForm(Class<T> entityClass, S service, TableInfoService tableInfoService) {
         addClassName("demo-app-form");
         this.service = service;
+        this.tableInfoService = tableInfoService;
 
 //        binder = new BeanValidationBinder<>(entityClass);
         save = new Button("Save");
@@ -73,15 +81,32 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
         twinColSelect.setItems(headers);
         twinColSelect.setLabel("Select Options");
 
+        ZJTTableInfo tableInfo = tableInfoService.findByTableName(entityClass.getSimpleName());
+        if (tableInfo == null) {
+            tableInfo = new ZJTTableInfo();
+            tableInfo.setTable_name(entityClass.getSimpleName());
+        }
+        String tempHeader = tableInfo.getHeaders();
+        headers = Arrays.stream(tempHeader.substring(1, tempHeader.length() - 1).split(","))
+                .map(String::trim)
+                .collect(Collectors.toList());
+        twinColSelect.select(headers);
+
         Button btnOk = new Button("OK");
         Button btnCancel = new Button("Cancel");
         HorizontalLayout btnPanel = new HorizontalLayout(btnCancel, btnOk);
 
+        ZJTTableInfo finalTableInfo = tableInfo;
         btnOk.addClickListener(e -> {
-            if (!twinColSelect.getSelectedItems().isEmpty())
+            headers = new ArrayList<>(twinColSelect.getSelectedItems());
+            if (!headers.isEmpty())
                 this.loadGrid(entityClass);
             else
                 grid.removeFromParent();
+
+            finalTableInfo.setHeaders(headers.toString());
+            tableInfoService.save(finalTableInfo);
+
             twinColSelDialog.close();
         });
 
@@ -90,7 +115,6 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
             twinColSelect.select(selectedItems);
             twinColSelDialog.close();
         });
-//        twinColSelect.select();
 
         twinColSelDialog = new Dialog();
         twinColSelDialog.add(new VerticalLayout(twinColSelect, btnPanel));
@@ -130,18 +154,12 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
     private void configureGrid(Class<T> entityClass) {
         grid = new TuiGrid();
         grid.addClassName("scheduler-grid");
-
-        headers = new ArrayList<>(twinColSelect.getSelectedItems());
         grid.setHeaders(headers);
-        LinkedHashMap<String, String> orderedHeaderOptions = new LinkedHashMap<>();
-        for (String header : headers) {
-            orderedHeaderOptions.put(header, headerOptions.get(header));
-        }
-        headerOptions = orderedHeaderOptions;
-        grid.setColumns(this.getColumns());
 
         items = this.getTableData();
         grid.setItems(items);
+
+        grid.setColumns(this.getColumns());
 
         grid.setRowHeaders(List.of("checkbox"));
         grid.sethScroll(true);
