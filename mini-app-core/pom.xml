@@ -132,6 +132,11 @@
             <version>6.0.11</version>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>org.vaadin.tatu</groupId>
+            <artifactId>twincolselect</artifactId>
+            <version>3.1.0</version>
+        </dependency>
         <!--
         <dependency>
             <groupId>com.github.JobrianTrinidad</groupId>

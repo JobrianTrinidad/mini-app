@@ -277,5 +277,4 @@ public class AppNavItem extends Component {
         setPath(routePath);
         return this;
     }
-
 }

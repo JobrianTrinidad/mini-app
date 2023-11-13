@@ -1,7 +1,6 @@
 package com.aat.application.core.form;
 
 import com.aat.application.annotations.DisplayName;
-import com.aat.application.annotations.ShowField;
 import com.aat.application.core.data.entity.ZJTEntity;
 import com.aat.application.core.data.service.ZJTService;
 import com.aat.application.util.GlobalData;
@@ -10,11 +9,12 @@ import com.vaadin.componentfactory.tuigrid.model.*;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.formlayout.FormLayout;
+import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.value.ValueChangeMode;
+import org.vaadin.tatu.TwinColSelect;
 
 import java.io.Serial;
 import java.lang.reflect.Field;
@@ -30,10 +30,14 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
     protected TextField filterText = new TextField();
     protected Button save;
     protected Button close;
+    protected Button columns;
+    private Dialog twinColSelDialog;
+    TwinColSelect<String> twinColSelect;
+    Set<String> selectedItems;
     protected TuiGrid grid;
     protected S service;
     List<String> headers;
-    Dictionary<String, String> headerOptions = new Hashtable<>();
+    LinkedHashMap<String, String> headerOptions = new LinkedHashMap<>();
     Dictionary<String, String> headerNames = new Hashtable<>();
     Dictionary<String, Class<?>> headerTypeOptions = new Hashtable<>();
     List<Item> items = new ArrayList<>();
@@ -48,11 +52,50 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
         close = new Button("Cancel");
 
         headers = configureHeader(entityClass);
-        configureGrid(entityClass);
 
-        add(new VerticalLayout(getToolbar(), grid));
+        initColSelDialog(entityClass);
 
-//        binder.bindInstanceFields(this);
+        loadGrid(entityClass);
+    }
+
+    private void loadGrid(Class<T> entityClass) {
+        removeAll();
+        if (!twinColSelect.getSelectedItems().isEmpty())
+            configureGrid(entityClass);
+        if (grid != null)
+            add(new VerticalLayout(getToolbar(entityClass), grid));
+        else
+            add(new VerticalLayout(getToolbar(entityClass)));
+    }
+
+    private void initColSelDialog(Class<T> entityClass) {
+        twinColSelect = new TwinColSelect<>();
+        twinColSelect.setItems(headers);
+        twinColSelect.setLabel("Select Options");
+
+        Button btnOk = new Button("OK");
+        Button btnCancel = new Button("Cancel");
+        HorizontalLayout btnPanel = new HorizontalLayout(btnCancel, btnOk);
+
+        btnOk.addClickListener(e -> {
+            if (!twinColSelect.getSelectedItems().isEmpty())
+                this.loadGrid(entityClass);
+            else
+                grid.removeFromParent();
+            twinColSelDialog.close();
+        });
+
+        btnCancel.addClickListener(e -> {
+            twinColSelect.deselectAll();
+            twinColSelect.select(selectedItems);
+            twinColSelDialog.close();
+        });
+//        twinColSelect.select();
+
+        twinColSelDialog = new Dialog();
+        twinColSelDialog.add(new VerticalLayout(twinColSelect, btnPanel));
+        twinColSelDialog.setCloseOnEsc(true);
+        twinColSelDialog.setCloseOnOutsideClick(true);
     }
 
     private List<String> configureHeader(Class<T> entityClass) {
@@ -88,8 +131,13 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
         grid = new TuiGrid();
         grid.addClassName("scheduler-grid");
 
+        headers = new ArrayList<>(twinColSelect.getSelectedItems());
         grid.setHeaders(headers);
-
+        LinkedHashMap<String, String> orderedHeaderOptions = new LinkedHashMap<>();
+        for (String header : headers) {
+            orderedHeaderOptions.put(header, headerOptions.get(header));
+        }
+        headerOptions = orderedHeaderOptions;
         grid.setColumns(this.getColumns());
 
         items = this.getTableData();
@@ -275,9 +323,9 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
         List<com.vaadin.componentfactory.tuigrid.model.Column> columns = new ArrayList<>();
         int nId = 0;
 
-        Enumeration<String> e = headerOptions.keys();
-        while (e.hasMoreElements()) {
-            String header = e.nextElement();
+        for (String header : headerOptions.keySet()) {
+            if (!headers.contains(header))
+                continue;
             String headerName = headerNames.get(header);
             ColumnBaseOption baseOption =
                     new ColumnBaseOption(nId++, headerName, header, 0, "center", "");
@@ -330,13 +378,20 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
         return columns;
     }
 
-    private HorizontalLayout getToolbar() {
+    private HorizontalLayout getToolbar(Class<T> entityClass) {
         filterText.setPlaceholder("Filter by name...");
         filterText.setClearButtonVisible(true);
         filterText.setValueChangeMode(ValueChangeMode.LAZY);
         filterText.addValueChangeListener(e -> updateList());
 
         HorizontalLayout toolbar = new HorizontalLayout(filterText);
+
+        columns = new Button("Columns");
+        columns.addClickListener(e -> {
+            selectedItems = twinColSelect.getSelectedItems();
+            twinColSelDialog.open();
+        });
+        toolbar.add(columns);
 
         toolbar.addClassName("toolbar");
 
