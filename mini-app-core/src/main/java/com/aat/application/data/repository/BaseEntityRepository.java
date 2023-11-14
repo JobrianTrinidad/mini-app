@@ -58,13 +58,31 @@ public class BaseEntityRepository<T> {
     }
 
     @Transactional
-    public T saveEntity(T entity) {
+    public <T> T saveEntity(T entity) {
         try {
-            entityManager.merge(entity);
+            // Check if the entity is already managed
+            if (!entityManager.contains(entity)) {
+                // If not managed, retrieve the managed entity from the database
+                Object entityId = entityManager.getEntityManagerFactory().getPersistenceUnitUtil().getIdentifier(entity);
+                T managedEntity = (T) entityManager.find(getEntityClass(), entityId);
+                if (managedEntity != null) {
+                    // Update the state of the managed entity with the new values
+                    // For example, if entity is a ZJTVehicleServiceType:
+                    // managedEntity.setName(entity.getName());
+                    // managedEntity.setDescription(entity.getDescription());
+                    // ... (update other fields as needed)
+                    entity = managedEntity; // Use the managed entity for further operations
+                } else {
+                    // If the entity is not found in the database, consider persisting it as a new entity
+                    entityManager.persist(entity);
+                }
+            }
+            // Perform the merge operation
+            entity = entityManager.merge(entity);
             entityManager.flush();
-        } catch (RuntimeException e) {
+        } catch (RuntimeException var3) {
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-            e.printStackTrace();
+            var3.printStackTrace();
         }
         return entity;
     }

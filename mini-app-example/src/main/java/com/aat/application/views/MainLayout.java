@@ -30,6 +30,9 @@ public class MainLayout extends CoreMainLayout {
         parent.addItem(new AppNavItem("Tui Grid", "pricing-type", LineAwesomeIcon.PRODUCT_HUNT.create())
                 .withParameter("entityClass", ZJTPricingType.class.getName())
                 .withParameter( "layout", this.getClass().getName()));
+        parent.addItem(new AppNavItem("Service Type", "servicetype", LineAwesomeIcon.PRODUCT_HUNT.create())
+                .withParameter("entityClass", ZJTVehicleServiceType.class.getName())
+                .withParameter("layout", this.getClass().getName()));
         parent.addItem(new AppNavItem("Group TimeLine", "group-timeline", LineAwesomeIcon.PRODUCT_HUNT.create())
                 .withParameter( "entityClass", ZJTTimeLineItem.class.getName())
                 .withParameter( "layout", this.getClass().getName()));
