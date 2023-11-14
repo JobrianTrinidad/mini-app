@@ -16,9 +16,6 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.value.ValueChangeMode;
-import com.vaadin.flow.spring.annotation.SpringComponent;
-import com.vaadin.flow.spring.annotation.UIScope;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.vaadin.tatu.TwinColSelect;
 
 import java.io.Serial;
@@ -166,7 +163,6 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
         grid.setvScroll(true);
 
         Theme inputTheme = new Theme();
-//        inputTheme.setMaxLength(100);
         inputTheme.setBorder("1px solid #326f70");
         inputTheme.setBackgroundColor("#66878858");
         inputTheme.setOutline("none");
@@ -259,7 +255,6 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
                 }
             }
 
-            // Asynchronously save the modified row
             CompletableFuture.runAsync(() -> service.save(row));
         });
         grid.addItemDeleteListener(listener -> delete());
@@ -341,7 +336,7 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
         List<com.vaadin.componentfactory.tuigrid.model.Column> columns = new ArrayList<>();
         int nId = 0;
 
-        for (String header : headerOptions.keySet()) {
+        for (String header : headers) {
             if (!headers.contains(header))
                 continue;
             String headerName = headerNames.get(header);
