@@ -87,9 +87,10 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
             tableInfo.setTable_name(entityClass.getSimpleName());
         }
         String tempHeader = tableInfo.getHeaders();
-        headers = Arrays.stream(tempHeader.substring(1, tempHeader.length() - 1).split(","))
-                .map(String::trim)
-                .collect(Collectors.toList());
+        if (tempHeader != null)
+            headers = Arrays.stream(tempHeader.substring(1, tempHeader.length() - 1).split(","))
+                    .map(String::trim)
+                    .collect(Collectors.toList());
         twinColSelect.select(headers);
 
         Checkbox autoWidthSave = new Checkbox("Save Column Width");
