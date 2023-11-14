@@ -61,7 +61,6 @@ public class BaseEntityRepository<T> {
     public <T> T saveEntity(T entity) {
         ClassLoader originalClassLoader = Thread.currentThread().getContextClassLoader();
         try {
-            Thread.currentThread().setContextClassLoader(entity.getClass().getClassLoader());
             Thread.currentThread().setContextClassLoader(this.entityManager.getClass().getClassLoader());
             entity = this.entityManager.merge(entity);
             this.entityManager.flush();
