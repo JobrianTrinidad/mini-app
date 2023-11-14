@@ -11,7 +11,9 @@ import com.vaadin.componentfactory.tuigrid.model.*;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.dialog.Dialog;
+import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
@@ -22,6 +24,7 @@ import java.io.Serial;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
@@ -89,9 +92,11 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
                 .collect(Collectors.toList());
         twinColSelect.select(headers);
 
+        Checkbox autoWidthSave = new Checkbox("Save Column Width");
         Button btnOk = new Button("OK");
         Button btnCancel = new Button("Cancel");
         HorizontalLayout btnPanel = new HorizontalLayout(btnCancel, btnOk);
+        btnPanel.setAlignItems(FlexComponent.Alignment.END);
 
         ZJTTableInfo finalTableInfo = tableInfo;
         btnOk.addClickListener(e -> {
@@ -114,7 +119,7 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
         });
 
         twinColSelDialog = new Dialog();
-        twinColSelDialog.add(new VerticalLayout(twinColSelect, btnPanel));
+        twinColSelDialog.add(autoWidthSave, new VerticalLayout(twinColSelect, btnPanel));
         twinColSelDialog.setCloseOnEsc(true);
         twinColSelDialog.setCloseOnOutsideClick(true);
     }
