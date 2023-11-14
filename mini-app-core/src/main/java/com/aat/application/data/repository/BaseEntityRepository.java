@@ -60,6 +60,8 @@ public class BaseEntityRepository<T> {
     @Transactional
     public <T> T saveEntity(T entity) {
         try {
+            entity.getClass().getClassLoader(); // Check the classloader for the entity
+            entityManager.getClass().getClassLoader();
             // Check if the entity is already managed
             if (!entityManager.contains(entity)) {
                 // If not managed, retrieve the managed entity from the database
