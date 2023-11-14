@@ -7,6 +7,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
+import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.List;
@@ -30,9 +31,9 @@ public class BaseEntityRepository<T> {
             Type genericSuperclass = getClass().getGenericSuperclass();
             if (genericSuperclass instanceof ParameterizedType) {
                 Type[] actualTypeArguments = ((ParameterizedType) genericSuperclass).getActualTypeArguments();
-                 @SuppressWarnings("unchecked")
+                @SuppressWarnings("unchecked")
                 Class<T> actualTypeArgument = (Class<T>) actualTypeArguments[0];
-            entityClass = actualTypeArgument;
+                entityClass = actualTypeArgument;
             } else {
                 throw new IllegalArgumentException("Unable to determine entity class type.");
             }
@@ -61,10 +62,21 @@ public class BaseEntityRepository<T> {
     public <T> T saveEntity(T entity) {
         ClassLoader originalClassLoader = Thread.currentThread().getContextClassLoader();
         try {
-            Thread.currentThread().setContextClassLoader(this.entityManager.getClass().getClassLoader());
-            entity = this.entityManager.merge(entity);
-            this.entityManager.flush();
+            // Get the ClassLoader of the entity
+            ClassLoader entityClassLoader = entity.getClass().getClassLoader();
+            Thread.currentThread().setContextClassLoader(entityClassLoader);
+
+            // Use reflection to call merge and flush
+            Method mergeMethod = entityManager.getClass().getMethod("merge", Object.class);
+            entity = (T) mergeMethod.invoke(entityManager, entity);
+
+            Method flushMethod = entityManager.getClass().getMethod("flush");
+            flushMethod.invoke(entityManager);
+        } catch (Exception e) {
+            // Handle reflection exceptions here
+            e.printStackTrace();
         } finally {
+            // Restore the original class loader
             Thread.currentThread().setContextClassLoader(originalClassLoader);
         }
         return entity;
