@@ -217,7 +217,19 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
                     field.setAccessible(true);
                     switch (headerOptions.get(header)) {
                         case "input":
-                            field.set(row, field.getType().cast(event.getColValue()));
+                            String colValue = event.getColValue();
+                            String fieldType = field.getType().getSimpleName();
+                            try {
+                                switch (fieldType) {
+                                    case "Integer" -> field.set(row, Integer.parseInt(colValue));
+                                    case "Double" -> field.set(row, Double.parseDouble(colValue));
+                                    case "Float" -> field.set(row, Float.parseFloat(colValue));
+                                    default -> field.set(row, colValue); // Fallback for String and other types
+                                }
+                            } catch (NumberFormatException e) {
+                                // Handle the case where the string does not contain a parsable number
+                                System.out.println("Cannot parse to " + fieldType + ": " + colValue);
+                            }
                             break;
                         case "select_enum":
                             Class<?> enumTypes = headerTypeOptions.get(header);
