@@ -42,7 +42,10 @@ public class ZJTVehicleServiceType implements ZJTEntity {
     public int getZjt_vehicleservicetype_id() {
         return zjt_vehicleservicetype_id;
     }
-
+    @Override
+    public int getId() {
+        return zjt_vehicleservicetype_id;
+    }
     public void setZjt_vehicleservicetype_id(int zjt_vehicleservicetype_id) {
         this.zjt_vehicleservicetype_id = zjt_vehicleservicetype_id;
     }

@@ -190,7 +190,7 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
             else
                 tableData = service.findAll(null);
 
-            Comparator<T> comparator = Comparator.comparing(ZJTEntity::getName);
+            Comparator<T> comparator = Comparator.comparing(ZJTEntity::getId);
             tableData.sort(comparator);
 
             GuiItem item = (GuiItem) items.get(event.getRow());
@@ -300,7 +300,7 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
         else
             tableData = service.findAll(null);
 
-        Comparator<T> comparator = Comparator.comparing(ZJTEntity::getName);
+        Comparator<T> comparator = Comparator.comparing(ZJTEntity::getId);
         tableData.sort(comparator);
 
         for (T data :

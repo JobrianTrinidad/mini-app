@@ -10,7 +10,7 @@ public abstract class ZJTSuperTimeLineItem implements ZJTEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    protected Long id;
+    protected int id;
     @Column(name = "name")
     protected String title;
     @Column(name = "description")
@@ -21,11 +21,12 @@ public abstract class ZJTSuperTimeLineItem implements ZJTEntity {
     @Column(name = "end_time")
     protected LocalDateTime end;
 
-    public Long getId() {
+    @Override
+    public int getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(int id) {
         this.id = id;
     }
 

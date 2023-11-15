@@ -31,6 +31,11 @@ public abstract class ZJTSuperTimeLineNode implements ZJTEntity {
         return groupId;
     }
 
+    @Override
+    public int getId() {
+        return groupId;
+    }
+
     public void setGroupId(int groupId) {
         this.groupId = groupId;
     }

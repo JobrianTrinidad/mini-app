@@ -34,13 +34,20 @@ public class ZJTPricingType implements ZJTEntity {
         return zjt_pricingtype_id;
     }
 
+    @Override
+    public int getId() {
+        return zjt_pricingtype_id;
+    }
+
     public void setZjt_pricingtype_id(int zjt_pricingtype_id) {
         this.zjt_pricingtype_id = zjt_pricingtype_id;
     }
+
     @Override
     public String getName() {
         return name;
     }
+
     @Override
     public void setName(String name) {
         this.name = name;

@@ -49,7 +49,10 @@ public class ZJTVehicleServiceSchedule implements ZJTEntity {
     public int getZjt_vehicleserviceschedule_id() {
         return zjt_vehicleserviceschedule_id;
     }
-
+    @Override
+    public int getId() {
+        return zjt_vehicleserviceschedule_id;
+    }
     public ZJTVehicle getVehicle() {
         return vehicle;
     }
