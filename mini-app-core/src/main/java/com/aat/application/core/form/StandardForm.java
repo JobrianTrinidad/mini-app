@@ -190,8 +190,8 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
             else
                 tableData = service.findAll(null);
 
-//            Comparator<T> comparator = Comparator.comparing(ZJTEntity::getName);
-//            tableData.sort(comparator);
+            Comparator<T> comparator = Comparator.comparing(ZJTEntity::getName);
+            tableData.sort(comparator);
 
             GuiItem item = (GuiItem) items.get(event.getRow());
             String colName = event.getColName();
@@ -300,8 +300,8 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
         else
             tableData = service.findAll(null);
 
-//        Comparator<T> comparator = Comparator.comparing(ZJTEntity::getName);
-//        tableData.sort(comparator);
+        Comparator<T> comparator = Comparator.comparing(ZJTEntity::getName);
+        tableData.sort(comparator);
 
         for (T data :
                 tableData) {
