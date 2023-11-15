@@ -1,10 +1,8 @@
 package com.aat.application.views;
 
-import com.aat.application.components.appnav.AppNav;
 import com.aat.application.core.data.entity.ZJTEntity;
 import com.aat.application.data.repository.BaseEntityRepository;
 import com.vaadin.flow.component.UI;
-import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.*;
 
@@ -29,7 +27,6 @@ public abstract class CommonView<T extends ZJTEntity> extends VerticalLayout imp
         try {
             CoreMainLayout layout = (CoreMainLayout) LayoutClass.getDeclaredConstructor().newInstance();
             layout.setContent(form);
-            UI.getCurrent().removeAll();
             UI.getCurrent().removeAll();
             UI.getCurrent().add(layout);
 
