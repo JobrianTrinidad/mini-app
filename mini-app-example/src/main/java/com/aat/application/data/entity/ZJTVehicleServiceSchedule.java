@@ -76,7 +76,10 @@ public class ZJTVehicleServiceSchedule implements ZJTEntity {
 
     @Override
     public String getName() {
-        return vehicle.getName() + "-" + serviceType.getName();
+        if (vehicle != null && serviceType != null)
+            return vehicle.getName() + "-" + serviceType.getName();
+        else
+            return "";
     }
 
     @Override

@@ -217,7 +217,7 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
                     field.setAccessible(true);
                     switch (headerOptions.get(header)) {
                         case "input":
-                            field.set(row, event.getColValue());
+                            field.set(row, field.getType().cast(event.getColValue()));
                             break;
                         case "select_enum":
                             Class<?> enumTypes = headerTypeOptions.get(header);

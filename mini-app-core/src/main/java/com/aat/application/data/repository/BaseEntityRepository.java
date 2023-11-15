@@ -1,5 +1,6 @@
 package com.aat.application.data.repository;
 
+import com.aat.application.util.GlobalData;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
@@ -63,17 +64,17 @@ public class BaseEntityRepository<T> {
         Object objEntity = entity;
         ClassLoader originalClassLoader = Thread.currentThread().getContextClassLoader();
         try {
-            // Get the ClassLoader of the entity
+
+            ClassLoader emClassLoader = entityManager.getClass().getClassLoader();
+            Class<?> entityClass = Class.forName(entity.getClass().getName(), true, emClassLoader);
+
             ClassLoader entityClassLoader = entity.getClass().getClassLoader();
             Thread.currentThread().setContextClassLoader(entityClassLoader);
 
+            entity = GlobalData.convertToZJTEntity(entity, entityClass);
+            entityManager.merge(entity);
+            entityManager.flush();
 
-            // Use reflection to call merge and flush
-            Method mergeMethod = entityManager.getClass().getMethod("merge", Object.class);
-            objEntity = (T) mergeMethod.invoke(entityManager, objEntity);
-
-            Method flushMethod = entityManager.getClass().getMethod("flush");
-            flushMethod.invoke(entityManager);
         } catch (Exception e) {
             // Handle reflection exceptions here
             e.printStackTrace();
