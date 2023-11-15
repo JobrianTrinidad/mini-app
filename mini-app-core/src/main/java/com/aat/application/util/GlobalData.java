@@ -4,9 +4,11 @@ import com.aat.application.core.data.entity.ZJTEntity;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fasterxml.jackson.datatype.hibernate5.Hibernate5Module;
 import jakarta.persistence.*;
 import org.hibernate.Hibernate;
 import org.hibernate.proxy.HibernateProxy;
+
 
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -65,6 +67,7 @@ public class GlobalData {
                 entityData = ((HibernateProxy) entityData).getHibernateLazyInitializer().getImplementation();
             }
             ObjectMapper mapper = new ObjectMapper();
+            mapper.registerModule(new Hibernate5Module());
             mapper.registerModule(new JavaTimeModule());
             mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
             String json = mapper.writeValueAsString(entityData);
