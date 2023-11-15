@@ -30,13 +30,13 @@ public abstract class ZJTSuperTimeLineItem implements ZJTEntity {
         this.id = id;
     }
 
-    @Override
-    public String getName() {
+
+    public String getTitle() {
         return title;
     }
 
-    @Override
-    public void setName(String title) {
+
+    public void setTitle(String title) {
         this.title = title;
     }
 

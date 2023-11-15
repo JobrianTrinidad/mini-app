@@ -48,16 +48,6 @@ public abstract class ZJTSuperTimeLineNode implements ZJTEntity {
         this.treeLevel = treeLevel;
     }
 
-    @Override
-    public String getName() {
-        return content;
-    }
-
-    @Override
-    public void setName(String content) {
-        this.content = content;
-    }
-
     public String getNestedGroups() {
         return nestedGroups;
     }

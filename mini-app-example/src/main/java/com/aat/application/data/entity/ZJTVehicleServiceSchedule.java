@@ -76,17 +76,4 @@ public class ZJTVehicleServiceSchedule implements ZJTEntity {
     public void setLastServiceKM(Integer lastServiceKM) {
         this.lastServiceKM = lastServiceKM;
     }
-
-    @Override
-    public String getName() {
-        if (vehicle != null && serviceType != null)
-            return vehicle.getName() + "-" + serviceType.getName();
-        else
-            return "";
-    }
-
-    @Override
-    public void setName(String s) {
-
-    }
 }

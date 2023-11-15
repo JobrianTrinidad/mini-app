@@ -58,12 +58,10 @@ public class ZJTVehicleServiceType implements ZJTEntity {
         this.value = value;
     }
 
-    @Override
     public String getName() {
         return name;
     }
 
-    @Override
     public void setName(String name) {
         this.name = name;
     }
