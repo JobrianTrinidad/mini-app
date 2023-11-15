@@ -221,10 +221,20 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
                             String fieldType = field.getType().getSimpleName();
                             try {
                                 switch (fieldType) {
-                                    case "Integer" -> field.set(row, Integer.parseInt(colValue));
-                                    case "Double" -> field.set(row, Double.parseDouble(colValue));
-                                    case "Float" -> field.set(row, Float.parseFloat(colValue));
-                                    default -> field.set(row, colValue); // Fallback for String and other types
+                                    case "Integer":
+                                    case "int":
+                                        field.set(row, Integer.parseInt(colValue));
+                                        break;
+                                    case "Double":
+                                    case "double":
+                                        field.set(row, Double.parseDouble(colValue));
+                                        break;
+                                    case "Float":
+                                    case "float":
+                                        field.set(row, Float.parseFloat(colValue));
+                                        break;
+                                    default:
+                                        field.set(row, colValue); // Fallback for String and other types
                                 }
                             } catch (NumberFormatException e) {
                                 // Handle the case where the string does not contain a parsable number
