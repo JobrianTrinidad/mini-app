@@ -1,5 +1,6 @@
 package com.aat.application.core.form;
 
+import com.aat.application.annotations.ContentDisplayedInSelect;
 import com.aat.application.annotations.DisplayName;
 import com.aat.application.core.data.entity.ZJTEntity;
 import com.aat.application.core.data.service.ZJTService;
@@ -18,9 +19,11 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.value.ValueChangeMode;
+import jakarta.persistence.Id;
 import org.vaadin.tatu.TwinColSelect;
 
 import java.io.Serial;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
@@ -148,6 +151,7 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
                 fieldNames.add(field.getName());
                 headerNames.put(field.getName(), field.getAnnotation(DisplayName.class).value());
                 headerOptions.put(field.getName(), "select_class");
+                GlobalData.addData(field.getName(), (Class<? extends ZJTEntity>) field.getType());
             }
         }
 
@@ -186,8 +190,8 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
             else
                 tableData = service.findAll(null);
 
-            Comparator<T> comparator = Comparator.comparing(ZJTEntity::getName);
-            tableData.sort(comparator);
+//            Comparator<T> comparator = Comparator.comparing(ZJTEntity::getName);
+//            tableData.sort(comparator);
 
             GuiItem item = (GuiItem) items.get(event.getRow());
             String colName = event.getColName();
@@ -227,28 +231,21 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
                             }
                             break;
                         case "select_class":
-                            String headerName = header.substring(0, 1).toUpperCase()
-                                    + header.substring(1);
                             int ordinal = Integer.parseInt(event.getColValue().substring(0, 1)) - 1;
 
                             Object dataSel = field.get(row);
                             if (dataSel == null)
                                 dataSel = field.getType().getDeclaredConstructor().newInstance();
-                            Field selField = dataSel.getClass().getDeclaredFields()[0];
-                            selField.setAccessible(true);
+
                             int index = 0;
 
-                            for (Object result : GlobalData.listData.get(headerName)) {
+                            for (Object result : GlobalData.listData.get(header)) {
                                 try {
-                                    Field idField = result.getClass().getDeclaredFields()[0];
-                                    idField.setAccessible(true);
-                                    Object idObj = idField.get(result);
                                     if (index++ == ordinal) {
-                                        selField.set(dataSel, idObj);
-                                        field.set(row, dataSel);
+                                        field.set(row, GlobalData.convertToZJTEntity(result, dataSel.getClass()));
                                         break;
                                     }
-                                } catch (RuntimeException | IllegalAccessException ignored) {
+                                } catch (RuntimeException ignored) {
                                 }
                             }
                             break;
@@ -257,6 +254,7 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
                     }
                 } catch (NoSuchFieldException | IllegalAccessException | InvocationTargetException |
                          InstantiationException | NoSuchMethodException e) {
+                    e.printStackTrace();
                     throw new RuntimeException(e);
                 }
             }
@@ -280,8 +278,8 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
         else
             tableData = service.findAll(null);
 
-        Comparator<T> comparator = Comparator.comparing(ZJTEntity::getName);
-        tableData.sort(comparator);
+//        Comparator<T> comparator = Comparator.comparing(ZJTEntity::getName);
+//        tableData.sort(comparator);
 
         for (T data :
                 tableData) {
@@ -302,19 +300,16 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
                             rowData.set(i, String.valueOf(((Enum<?>) dataSel).ordinal() + 1));
                             break;
                         case "select_class":
-                            headerName = header.substring(0, 1).toUpperCase()
-                                    + header.substring(1);
                             int index = 0;
                             if (dataSel == null)
                                 dataSel = headerField.getType().getDeclaredConstructor().newInstance();
-                            Field selField = dataSel.getClass().getDeclaredField("name");
-                            selField.setAccessible(true);
-                            String selName = (String) selField.get(dataSel);
-                            for (Object result : GlobalData.listData.get(headerName)) {
-                                Field nameField = result.getClass().getDeclaredField("name");
-                                nameField.setAccessible(true);
-                                String name = (String) nameField.get(GlobalData.listData.get(headerName).get(index++));
-                                if (selName.equals(name)) {
+                            Field pkFieldDataSel = GlobalData.getPrimaryKeyField(dataSel.getClass());
+                            pkFieldDataSel.setAccessible(true);
+                            for (Object result : GlobalData.listData.get(header)) {
+                                Field pkField = GlobalData.getPrimaryKeyField(result.getClass());
+                                pkField.setAccessible(true);
+                                index++;
+                                if ((int) pkFieldDataSel.get(dataSel) == (int) pkField.get(result)) {
                                     rowData.set(i, String.valueOf(index));
                                     break;
                                 }
@@ -374,17 +369,26 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
                     column.setType("select");
                     column.setRoot(true);
                     column.setTarget("");
-                    GlobalData.addData(headerName);
-                    List<ZJTEntity> results = (List<ZJTEntity>) GlobalData.listData.get(headerName);
+                    List<ZJTEntity> results = (List<ZJTEntity>) GlobalData.listData.get(header);
                     List<RelationOption> options = new ArrayList<>();
                     for (Object result : results) {
-                        try {
-                            Field nameField = result.getClass().getDeclaredField("name");
-                            nameField.setAccessible(true);
-                            String name = (String) nameField.get(result);
-                            RelationOption option = new RelationOption(name, String.valueOf(index++));
-                            options.add(option);
-                        } catch (NoSuchFieldException | IllegalAccessException ignored) {
+                        Class<?> currentClass = result.getClass();
+                        while (currentClass != null) {
+                            try {
+                                for (Field field :
+                                        currentClass.getDeclaredFields()) {
+                                    for (Annotation annotation : field.getAnnotations()) {
+                                        if (annotation.annotationType().getName().equals(ContentDisplayedInSelect.class.getName())) {
+                                            field.setAccessible(true);
+                                            String name = (String) field.get(result);
+                                            RelationOption option = new RelationOption(name, String.valueOf(index++));
+                                            options.add(option);
+                                        }
+                                    }
+                                }
+                            } catch (IllegalAccessException ignored) {
+                            }
+                            currentClass = currentClass.getSuperclass();
                         }
                     }
                     column.setRelationOptions(options);

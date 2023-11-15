@@ -1,5 +1,6 @@
 package com.aat.application.data.entity;
 
+import com.aat.application.annotations.ContentDisplayedInSelect;
 import com.aat.application.annotations.DisplayName;
 import com.aat.application.core.data.entity.ZJTEntity;
 import com.vaadin.flow.router.PageTitle;
@@ -11,6 +12,7 @@ import jakarta.persistence.*;
  */
 @Entity
 @Table(name = "zjt_vehicleservicetype")
+@NamedQuery(name = "findAllServiceType", query = "SELECT p FROM ZJTVehicleServiceType p")
 @PageTitle("Service Type")
 public class ZJTVehicleServiceType implements ZJTEntity {
 
@@ -24,16 +26,17 @@ public class ZJTVehicleServiceType implements ZJTEntity {
     @Column
     private String value = "";
     @Column
-    @DisplayName(value ="Name")
+    @DisplayName(value = "Name")
+    @ContentDisplayedInSelect(value = "name")
     private String name = "";
 
     @Column
-    @DisplayName(value ="Description")
+    @DisplayName(value = "Description")
     private String description = "";
 
 
     @Column
-    @DisplayName(value ="Interval (KM)")
+    @DisplayName(value = "Interval (KM)")
     private int km_interval;
 
     public int getZjt_vehicleservicetype_id() {
@@ -56,6 +59,7 @@ public class ZJTVehicleServiceType implements ZJTEntity {
     public String getName() {
         return name;
     }
+
     @Override
     public void setName(String name) {
         this.name = name;

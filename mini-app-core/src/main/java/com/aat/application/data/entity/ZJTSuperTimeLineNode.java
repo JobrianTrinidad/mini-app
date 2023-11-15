@@ -1,5 +1,6 @@
 package com.aat.application.data.entity;
 
+import com.aat.application.annotations.ContentDisplayedInSelect;
 import com.aat.application.core.data.entity.ZJTEntity;
 import com.github.javaparser.quality.NotNull;
 import jakarta.persistence.*;
@@ -15,6 +16,7 @@ public abstract class ZJTSuperTimeLineNode implements ZJTEntity {
     protected int groupId;
 
     @Column(name = "name")
+    @ContentDisplayedInSelect(value = "content")
     protected String content;
     @Column(name = "level")
     protected int treeLevel = 0;

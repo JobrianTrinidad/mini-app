@@ -60,15 +60,17 @@ public class BaseEntityRepository<T> {
 
     @Transactional
     public <T> T saveEntity(T entity) {
+        Object objEntity = entity;
         ClassLoader originalClassLoader = Thread.currentThread().getContextClassLoader();
         try {
             // Get the ClassLoader of the entity
             ClassLoader entityClassLoader = entity.getClass().getClassLoader();
             Thread.currentThread().setContextClassLoader(entityClassLoader);
 
+
             // Use reflection to call merge and flush
             Method mergeMethod = entityManager.getClass().getMethod("merge", Object.class);
-            entity = (T) mergeMethod.invoke(entityManager, entity);
+            objEntity = (T) mergeMethod.invoke(entityManager, objEntity);
 
             Method flushMethod = entityManager.getClass().getMethod("flush");
             flushMethod.invoke(entityManager);
@@ -79,7 +81,7 @@ public class BaseEntityRepository<T> {
             // Restore the original class loader
             Thread.currentThread().setContextClassLoader(originalClassLoader);
         }
-        return entity;
+        return (T) objEntity;
     }
 
     @Transactional

@@ -257,7 +257,7 @@ public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>>
                     field = currentClass.getDeclaredField(header);
                     field.setAccessible(true);
 //                    convertToZJTEntity(value, field.getDeclaringClass());
-                    field.set(entityData, convertToZJTEntity(value, value.getClass()));
+                    field.set(entityData, GlobalData.convertToZJTEntity(value, value.getClass()));
                     break;
 //                    try {
 //                        Class<?> valueClass = Class.forName(value.getClass().getName(), true, systemClassLoader);
@@ -367,25 +367,10 @@ public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>>
             item.setGroup("0");
         timeline.addItem(item, bAutoZoom);
         CompletableFuture.runAsync(() -> {
-            service.save(convertToZJTEntity(entityData, entityClass));
+            service.save(GlobalData.convertToZJTEntity(entityData, entityClass));
         });
     }
 
-    public <T> T convertToZJTEntity(Object entityData, Class<?> zjtEntityClass) {
-        try {
-            if (entityData instanceof HibernateProxy) {
-                Hibernate.initialize(entityData);
-                entityData = ((HibernateProxy) entityData).getHibernateLazyInitializer().getImplementation();
-            }
-            ObjectMapper mapper = new ObjectMapper();
-            mapper.registerModule(new JavaTimeModule());
-            mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-            String json = mapper.writeValueAsString(entityData);
-            return (T) mapper.readValue(json, zjtEntityClass);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
 
 //    private HorizontalLayout getSelectItemAndZoomOptionLayout(Timeline timeline, List<Item> items, TextField textField, boolean bAutoZoom) {
 //        VerticalLayout selectLayout = new VerticalLayout();

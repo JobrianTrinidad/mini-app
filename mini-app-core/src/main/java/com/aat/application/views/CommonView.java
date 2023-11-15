@@ -30,6 +30,7 @@ public abstract class CommonView<T extends ZJTEntity> extends VerticalLayout imp
             CoreMainLayout layout = (CoreMainLayout) LayoutClass.getDeclaredConstructor().newInstance();
             layout.setContent(form);
             UI.getCurrent().removeAll();
+            UI.getCurrent().removeAll();
             UI.getCurrent().add(layout);
 
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
