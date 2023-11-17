@@ -25,17 +25,17 @@ public class ZJTVehicleServiceType implements ZJTEntity {
     @Column
     private String value = "";
     @Column
-    @DisplayName(value ="Name")
+    @DisplayName(value = "Name")
     @ContentDisplayedInSelect(value = "Name")
     private String name = "";
 
     @Column
-    @DisplayName(value ="Description")
+    @DisplayName(value = "Description")
     private String description = "";
 
 
     @Column
-    @DisplayName(value ="Interval (KM)")
+    @DisplayName(value = "Interval (KM)")
     private int km_interval;
 
     public int getZjt_vehicleservicetype_id() {
@@ -46,9 +46,11 @@ public class ZJTVehicleServiceType implements ZJTEntity {
         this.zjt_vehicleservicetype_id = zjt_vehicleservicetype_id;
     }
 
+    @Override
     public int getId() {
         return zjt_vehicleservicetype_id;
     }
+
     public String getValue() {
         return value;
     }
@@ -57,11 +59,12 @@ public class ZJTVehicleServiceType implements ZJTEntity {
         this.value = value;
     }
 
-//    @Override
+    //    @Override
     public String getName() {
         return name;
     }
-//    @Override
+
+    //    @Override
     public void setName(String name) {
         this.name = name;
     }

@@ -184,7 +184,7 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
         grid.setSelectTheme(inputTheme);
 
         grid.addItemChangeListener(event -> {
-            items = grid.getItems();
+                items = grid.getItems();
             if (filterText != null)
                 tableData = service.findAll(filterText.getValue());
             else
@@ -393,10 +393,7 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
                     column.setType("select");
                     column.setTarget("");
                     List<ZJTEntity> results = (List<ZJTEntity>) GlobalData.listData.get(header);
-                    if (results.isEmpty())
-                        column.setRoot(false);
-                    else
-                        column.setRoot(true);
+                    column.setRoot(!results.isEmpty());
                     List<RelationOption> options = new ArrayList<>();
                     for (Object result : results) {
                         Class<?> currentClass = result.getClass();

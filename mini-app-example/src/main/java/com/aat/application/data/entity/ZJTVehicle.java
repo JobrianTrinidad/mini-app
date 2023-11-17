@@ -5,6 +5,7 @@ import com.aat.application.annotations.DisplayName;
 import com.aat.application.core.data.entity.ZJTEntity;
 import com.vaadin.flow.router.PageTitle;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -23,7 +24,6 @@ public class ZJTVehicle implements ZJTEntity {
     private int zjt_vehicle_id;
 
     @Column
-    @ContentDisplayedInSelect(value = "Chassis No")
     @DisplayName(value = "Chassis No")
     private String chassisno;
 
@@ -96,6 +96,8 @@ public class ZJTVehicle implements ZJTEntity {
     private String vehicleid;
 
     @Column
+    @ContentDisplayedInSelect(value = "Fleet ID")
+//    @NotNull
     @DisplayName(value = "Fleet ID")
     private String fleetid;
 
