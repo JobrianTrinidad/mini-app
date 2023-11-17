@@ -1,7 +1,6 @@
 package com.aat.application.data.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.vaadin.flow.router.PageTitle;
 import jakarta.persistence.*;
 
@@ -12,6 +11,11 @@ import java.util.List;
 @Table(name = "zjt_driver")
 @PageTitle("TimeLine")
 public class ZJTDriver extends ZJTSuperTimeLineNode implements Serializable {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "id")
+    protected int zjt_driver_id;
     @OneToMany(mappedBy = "driver", cascade = CascadeType.ALL)
     @JsonIgnore
     private List<ZJTVehicleBooking> items;
@@ -22,5 +26,14 @@ public class ZJTDriver extends ZJTSuperTimeLineNode implements Serializable {
 
     public void setItems(List<ZJTVehicleBooking> items) {
         this.items = items;
+    }
+
+    @Override
+    public int getId() {
+        return zjt_driver_id;
+    }
+
+    public void setZjt_driver_id(int zjt_driver_id) {
+        this.zjt_driver_id = zjt_driver_id;
     }
 }

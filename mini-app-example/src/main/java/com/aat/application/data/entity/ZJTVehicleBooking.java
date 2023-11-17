@@ -9,8 +9,6 @@ import java.io.Serializable;
 @Entity
 @Table(name = "zjt_vehiclebooking")
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-@NamedQuery(name = "findAllVehicle", query = "SELECT p FROM ZJTVehicle p")
-@NamedQuery(name = "findAllDriver", query = "SELECT p FROM ZJTDriver p")
 public class ZJTVehicleBooking extends ZJTSuperTimeLineItem implements Serializable {
     @ManyToOne
     @JoinColumn(name = "vehicle_id")

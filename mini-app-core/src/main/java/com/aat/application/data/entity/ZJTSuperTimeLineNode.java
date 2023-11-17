@@ -10,10 +10,10 @@ import java.util.List;
 @MappedSuperclass
 public abstract class ZJTSuperTimeLineNode implements ZJTEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "id")
-    protected int groupId;
+//    @Id
+//    @GeneratedValue(strategy = GenerationType.AUTO)
+//    @Column(name = "id")
+//    protected int groupId;
 
     @Column(name = "name")
     @ContentDisplayedInSelect(value = "content")
@@ -27,18 +27,18 @@ public abstract class ZJTSuperTimeLineNode implements ZJTEntity {
     protected String className = "";
     protected String nestedGroups;
 
-    public int getGroupId() {
-        return groupId;
-    }
-
-    @Override
-    public int getId() {
-        return groupId;
-    }
-
-    public void setGroupId(int groupId) {
-        this.groupId = groupId;
-    }
+//    public int getGroupId() {
+//        return groupId;
+//    }
+//
+//    @Override
+//    public int getId() {
+//        return groupId;
+//    }
+//
+//    public void setGroupId(int groupId) {
+//        this.groupId = groupId;
+//    }
 
     public int getTreeLevel() {
         return treeLevel;

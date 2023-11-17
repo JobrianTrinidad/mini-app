@@ -21,17 +21,6 @@ public class ZJTVehicleServiceSchedule implements ZJTEntity {
     private int zjt_vehicleserviceschedule_id;
 
 
-//    @Column
-//    private String value = "";
-//    @Column
-//    @DisplayName(value ="Name")
-//    private String name = "";
-//
-//    @Column
-//    @DisplayName(value ="Description")
-//    private String description = "";
-
-
     @ManyToOne
     @JoinColumn(name = "zjt_vehicle_id")
     @DisplayName(value = "Vehicle")

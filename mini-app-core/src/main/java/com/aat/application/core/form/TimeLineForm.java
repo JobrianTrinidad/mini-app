@@ -257,7 +257,10 @@ public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>>
                     field = currentClass.getDeclaredField(header);
                     field.setAccessible(true);
 //                    convertToZJTEntity(value, field.getDeclaringClass());
-                    field.set(entityData, GlobalData.convertToZJTEntity(value, value.getClass()));
+                    if (value != null)
+                        field.set(entityData, GlobalData.convertToZJTEntity(value, value.getClass()));
+                    else
+                        field.set(entityData, null);
                     break;
 //                    try {
 //                        Class<?> valueClass = Class.forName(value.getClass().getName(), true, systemClassLoader);
@@ -319,9 +322,13 @@ public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>>
                     groupComboBox.setItems(groupList);
                     groupComboBox.setItemLabelGenerator(ItemGroup::getContent);
                     groupComboBox.setRenderer(createRenderer());
-                    groupComboBox.setValue(groupList.get(0));
+                    if (!groupList.isEmpty())
+                        groupComboBox.setValue(groupList.get(0));
                     groupComboBox.setAllowCustomValue(true);
-                    setFieldData(header, GlobalData.listData.get(header).get(0));
+                    if (GlobalData.listData.get(header).isEmpty())
+                        setFieldData(header, null);
+                    else
+                        setFieldData(header, GlobalData.listData.get(header).get(0));
 
                     groupComboBox.addValueChangeListener(e -> {
                         List<?> data = null;

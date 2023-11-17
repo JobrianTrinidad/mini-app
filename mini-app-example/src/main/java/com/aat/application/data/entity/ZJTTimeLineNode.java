@@ -12,6 +12,10 @@ import java.util.List;
 @PageTitle("TimeLine")
 public class ZJTTimeLineNode extends ZJTSuperTimeLineNode {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "id")
+    protected int zjt_timelinenode_id;
     @ManyToOne
     @JoinColumn(name = "parent_id")
     @JsonIgnore
@@ -49,12 +53,21 @@ public class ZJTTimeLineNode extends ZJTSuperTimeLineNode {
         this.items = items;
     }
 
+    @Override
+    public int getId() {
+        return zjt_timelinenode_id;
+    }
+
+    public void setZjt_timelinenode_id(int zjt_timelinenode_id) {
+        this.zjt_timelinenode_id = zjt_timelinenode_id;
+    }
+
     @PostLoad
     public void updateNestedGroups() {
         StringBuilder temp = new StringBuilder();
         if (children != null) {
             for (ZJTSuperTimeLineNode node : children) {
-                temp.append(node.getGroupId()).append(",");
+                temp.append(node.getId()).append(",");
             }
             if (!temp.isEmpty()) {
                 temp.replace(temp.length() - 1, temp.length(), "");
