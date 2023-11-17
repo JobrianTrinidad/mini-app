@@ -1,26 +1,29 @@
 package com.aat.application.data.entity;
 
+import com.aat.application.annotations.ContentDisplayedInSelect;
 import com.aat.application.annotations.DisplayName;
 import com.aat.application.core.data.entity.ZJTEntity;
 import com.vaadin.flow.router.PageTitle;
 import jakarta.persistence.*;
 
-import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 
 @Entity
 @Table(name = "zjt_vehicle")
 @PageTitle("Vehicle")
-public class ZJTVehicle extends ZJTSuperTimeLineNode implements Serializable {
+public class ZJTVehicle implements ZJTEntity {
+
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue (strategy = GenerationType.SEQUENCE)
     @Column(name = "zjt_vehicle_id")
     private int zjt_vehicle_id;
 
     @Column
+    @ContentDisplayedInSelect(value = "Chassis No")
     @DisplayName(value = "Chassis No")
     private String chassisno;
 
@@ -96,6 +99,9 @@ public class ZJTVehicle extends ZJTSuperTimeLineNode implements Serializable {
     @DisplayName(value = "Fleet ID")
     private String fleetid;
 
+    @OneToMany(mappedBy = "vehicle", cascade = CascadeType.ALL)
+    private List<ZJTVehicleServiceSchedule> vehicleServiceSchedules;
+
     public int getZjt_vehicle_id() {
         return zjt_vehicle_id;
     }
@@ -104,7 +110,6 @@ public class ZJTVehicle extends ZJTSuperTimeLineNode implements Serializable {
     public int getId() {
         return zjt_vehicle_id;
     }
-
     public void setZjt_vehicle_id(int zjt_vehicle_id) {
         this.zjt_vehicle_id = zjt_vehicle_id;
     }

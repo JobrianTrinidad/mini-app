@@ -1,17 +1,24 @@
 package com.aat.application.views;
 
 import com.aat.application.data.entity.ZJTVehicle;
-import com.aat.application.data.entity.ZJTVehicleBooking;
 import com.aat.application.data.repository.BaseEntityRepository;
+import com.aat.application.data.service.TableInfoService;
 import com.vaadin.flow.router.Route;
 
-import java.lang.reflect.InvocationTargetException;
+@Route(value="vehicle")
+public class VehicleView extends  StandardFormView<ZJTVehicle> {
 
-@Route(value = "vehicle-timeline")
-public class VehicleView extends TimeLineFormView<ZJTVehicleBooking> {
-    public VehicleView(BaseEntityRepository<ZJTVehicleBooking> repository) {
-        super(repository);
-        super.setGroupName("vehicle");
-        super.setGroupClass(ZJTVehicle.class);
+    public VehicleView(BaseEntityRepository<ZJTVehicle> repository, TableInfoService tableInfoService){
+        super(repository, tableInfoService);
+
     }
+
+//    Override
+//    void initWindow()
+//    {
+//        .getColumn("column1").setHeaderName("Column 1").setWidth("200px");
+//        .getColumn("column2").setVisible(false);
+//        .getColumn("column3").setReadonly(true);
+//    }
+
 }

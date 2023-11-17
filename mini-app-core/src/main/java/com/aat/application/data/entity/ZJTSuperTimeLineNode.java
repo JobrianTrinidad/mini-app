@@ -21,7 +21,7 @@ public abstract class ZJTSuperTimeLineNode implements ZJTEntity {
     @Column(name = "level")
     protected int treeLevel = 0;
 
-
+    @Transient
     protected boolean visible = true;
     @Column(name = "classname")
     protected String className = "";

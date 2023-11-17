@@ -253,7 +253,9 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
                             }
                             break;
                         case "select_class":
-                            int ordinal = Integer.parseInt(event.getColValue().substring(0, 1)) - 1;
+                            int ordinal = -1;
+                            if (!event.getColValue().isEmpty())
+                                ordinal = Integer.parseInt(event.getColValue().substring(0, 1)) - 1;
 
                             Object dataSel = field.get(row);
                             if (dataSel == null)
@@ -389,9 +391,12 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
                     break;
                 case "select_class":
                     column.setType("select");
-                    column.setRoot(true);
                     column.setTarget("");
                     List<ZJTEntity> results = (List<ZJTEntity>) GlobalData.listData.get(header);
+                    if (results.isEmpty())
+                        column.setRoot(false);
+                    else
+                        column.setRoot(true);
                     List<RelationOption> options = new ArrayList<>();
                     for (Object result : results) {
                         Class<?> currentClass = result.getClass();
