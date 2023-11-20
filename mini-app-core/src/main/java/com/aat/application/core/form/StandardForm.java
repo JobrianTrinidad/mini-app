@@ -188,16 +188,15 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
         grid.setSelectTheme(inputTheme);
 
         grid.addColumnResizeListener(event -> {
+            int colWidth = event.getColWidth();
+            String colName = event.getColName();
+            List<Integer> colWidths = getColumnWidths();
+
+            for (String header : headers) {
+                if (header.equals(colName)) colWidths.set(headers.indexOf(header), colWidth);
+            }
+            tableInfo.setWidths(colWidths.toString());
             if (bSavedWidth) {
-                int colWidth = event.getColWidth();
-                String colName = event.getColName();
-                List<Integer> colWidths = getColumnWidths();
-
-                for (String header : headers) {
-                    if (header.equals(colName)) colWidths.set(headers.indexOf(header), colWidth);
-
-                }
-                tableInfo.setWidths(colWidths.toString());
                 tableInfoService.save(tableInfo);
             }
         });
