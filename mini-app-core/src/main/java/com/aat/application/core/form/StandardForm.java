@@ -19,7 +19,6 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.value.ValueChangeMode;
-import jakarta.persistence.Id;
 import org.vaadin.tatu.TwinColSelect;
 
 import java.io.Serial;
@@ -37,6 +36,7 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
     private static final long serialVersionUID = -5183438338263448739L;
 
     protected TableInfoService tableInfoService;
+    private ZJTTableInfo tableInfo;
     protected TextField filterText = new TextField();
     protected Button save;
     protected Button close;
@@ -52,6 +52,7 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
     Dictionary<String, Class<?>> headerTypeOptions = new Hashtable<>();
     List<Item> items = new ArrayList<>();
     List<T> tableData = new ArrayList<>();
+    private boolean bSavedWidth = false;
 
     public StandardForm(Class<T> entityClass, S service, TableInfoService tableInfoService) {
         addClassName("demo-app-form");
@@ -71,12 +72,9 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
 
     private void loadGrid(Class<T> entityClass) {
         removeAll();
-        if (!twinColSelect.getSelectedItems().isEmpty())
-            configureGrid(entityClass);
-        if (grid != null)
-            add(new VerticalLayout(getToolbar(entityClass), grid));
-        else
-            add(new VerticalLayout(getToolbar(entityClass)));
+        if (!twinColSelect.getSelectedItems().isEmpty()) configureGrid(entityClass);
+        if (grid != null) add(new VerticalLayout(getToolbar(entityClass), grid));
+        else add(new VerticalLayout(getToolbar(entityClass)));
     }
 
     private void initColSelDialog(Class<T> entityClass) {
@@ -84,19 +82,16 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
         twinColSelect.setItems(headers);
         twinColSelect.setLabel("Select Options");
 
-        ZJTTableInfo tableInfo = tableInfoService.findByTableName(entityClass.getSimpleName());
+        tableInfo = tableInfoService.findByTableName(entityClass.getSimpleName());
         if (tableInfo == null) {
             tableInfo = new ZJTTableInfo();
             tableInfo.setTable_name(entityClass.getSimpleName());
         }
         String tempHeader = tableInfo.getHeaders();
         if (tempHeader != null)
-            headers = Arrays.stream(tempHeader.substring(1, tempHeader.length() - 1).split(","))
-                    .map(String::trim)
-                    .collect(Collectors.toList());
+            headers = Arrays.stream(tempHeader.substring(1, tempHeader.length() - 1).split(",")).map(String::trim).collect(Collectors.toList());
         twinColSelect.select(headers);
 
-        Checkbox autoWidthSave = new Checkbox("Save Column Width");
         Button btnOk = new Button("OK");
         Button btnCancel = new Button("Cancel");
         HorizontalLayout btnPanel = new HorizontalLayout(btnCancel, btnOk);
@@ -105,10 +100,8 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
         ZJTTableInfo finalTableInfo = tableInfo;
         btnOk.addClickListener(e -> {
             headers = new ArrayList<>(twinColSelect.getSelectedItems());
-            if (!headers.isEmpty())
-                this.loadGrid(entityClass);
-            else
-                grid.removeFromParent();
+            if (!headers.isEmpty()) this.loadGrid(entityClass);
+            else grid.removeFromParent();
 
             finalTableInfo.setHeaders(headers.toString());
             tableInfoService.save(finalTableInfo);
@@ -123,7 +116,7 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
         });
 
         twinColSelDialog = new Dialog();
-        twinColSelDialog.add(autoWidthSave, new VerticalLayout(twinColSelect, btnPanel));
+        twinColSelDialog.add(new VerticalLayout(twinColSelect, btnPanel));
         twinColSelDialog.setCloseOnEsc(true);
         twinColSelDialog.setCloseOnOutsideClick(true);
     }
@@ -166,7 +159,8 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
         items = this.getTableData();
         grid.setItems(items);
 
-        grid.setColumns(this.getColumns());
+        List<Column> columns = this.getColumns();
+        grid.setColumns(columns);
 
         grid.setRowHeaders(List.of("checkbox"));
         grid.sethScroll(true);
@@ -183,12 +177,25 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
         grid.setInputTheme(inputTheme);
         grid.setSelectTheme(inputTheme);
 
+        grid.addColumnResizeListener(event -> {
+            if (bSavedWidth) {
+                int colWidth = event.getColWidth();
+                String colName = event.getColName();
+                List<Integer> colWidths = getColumnWidths();
+
+                for (String header : headers) {
+                    if (header.equals(colName)) colWidths.set(headers.indexOf(header), colWidth);
+
+                }
+                tableInfo.setWidths(colWidths.toString());
+                tableInfoService.save(tableInfo);
+            }
+        });
+
         grid.addItemChangeListener(event -> {
-                items = grid.getItems();
-            if (filterText != null)
-                tableData = service.findAll(filterText.getValue());
-            else
-                tableData = service.findAll(null);
+            items = grid.getItems();
+            if (filterText != null) tableData = service.findAll(filterText.getValue());
+            else tableData = service.findAll(null);
 
             Comparator<T> comparator = Comparator.comparing(ZJTEntity::getId);
             tableData.sort(comparator);
@@ -198,8 +205,7 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
             int columnIndex = item.getHeaders().indexOf(colName);
             if (event.getRow() >= tableData.size()) {
                 try {
-                    if (tableData.isEmpty())
-                        tableData.add(entityClass.getDeclaredConstructor().newInstance());
+                    if (tableData.isEmpty()) tableData.add(entityClass.getDeclaredConstructor().newInstance());
                     else {
                         T newRow = (T) tableData.get(0).getClass().getDeclaredConstructor().newInstance();
                         tableData.add(newRow);
@@ -258,8 +264,7 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
                                 ordinal = Integer.parseInt(event.getColValue().substring(0, 1)) - 1;
 
                             Object dataSel = field.get(row);
-                            if (dataSel == null)
-                                dataSel = field.getType().getDeclaredConstructor().newInstance();
+                            if (dataSel == null) dataSel = field.getType().getDeclaredConstructor().newInstance();
 
                             int index = 0;
 
@@ -297,22 +302,18 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
     private List<Item> getTableData() {
 
         List<Item> TableData = new ArrayList<>();
-        if (filterText != null)
-            tableData = service.findAll(filterText.getValue());
-        else
-            tableData = service.findAll(null);
+        if (filterText != null) tableData = service.findAll(filterText.getValue());
+        else tableData = service.findAll(null);
 
         Comparator<T> comparator = Comparator.comparing(ZJTEntity::getId);
         tableData.sort(comparator);
 
-        for (T data :
-                tableData) {
+        for (T data : tableData) {
             List<String> rowData = new ArrayList<>(Arrays.asList(new String[headers.size()]));
             for (int i = 0; i < headers.size(); i++) {
                 String header = headers.get(i);
                 try {
-                    String headerName = header.substring(0, 1).toLowerCase()
-                            + header.substring(1);
+                    String headerName = header.substring(0, 1).toLowerCase() + header.substring(1);
                     Field headerField = data.getClass().getDeclaredField(headerName);
                     headerField.setAccessible(true);
                     Object dataSel = headerField.get(data);
@@ -325,8 +326,7 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
                             break;
                         case "select_class":
                             int index = 0;
-                            if (dataSel == null)
-                                dataSel = headerField.getType().getDeclaredConstructor().newInstance();
+                            if (dataSel == null) dataSel = headerField.getType().getDeclaredConstructor().newInstance();
                             Field pkFieldDataSel = GlobalData.getPrimaryKeyField(dataSel.getClass());
                             pkFieldDataSel.setAccessible(true);
                             for (Object result : GlobalData.listData.get(header)) {
@@ -349,9 +349,7 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
                     throw new RuntimeException(e);
                 }
             }
-            TableData.add(new GuiItem(
-                    rowData,
-                    headers));
+            TableData.add(new GuiItem(rowData, headers));
 
         }
         return TableData;
@@ -361,14 +359,12 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
         List<com.vaadin.componentfactory.tuigrid.model.Column> columns = new ArrayList<>();
         int nId = 0;
 
+        List<Integer> colWidths = getColumnWidths();
+
         for (String header : headers) {
-            if (!headers.contains(header))
-                continue;
             String headerName = headerNames.get(header);
-            ColumnBaseOption baseOption =
-                    new ColumnBaseOption(nId++, headerName, header, 0, "center", "");
-            com.vaadin.componentfactory.tuigrid.model.Column column =
-                    new com.vaadin.componentfactory.tuigrid.model.Column(baseOption);
+            ColumnBaseOption baseOption = new ColumnBaseOption(nId++, headerName, header, colWidths.get(headers.indexOf(header)), "center", "");
+            com.vaadin.componentfactory.tuigrid.model.Column column = new com.vaadin.componentfactory.tuigrid.model.Column(baseOption);
             column.setEditable(true);
             column.setSortable(true);
             column.setSortingType("asc");
@@ -399,8 +395,7 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
                         Class<?> currentClass = result.getClass();
                         while (currentClass != null) {
                             try {
-                                for (Field field :
-                                        currentClass.getDeclaredFields()) {
+                                for (Field field : currentClass.getDeclaredFields()) {
                                     for (Annotation annotation : field.getAnnotations()) {
                                         if (annotation.annotationType().getName().equals(ContentDisplayedInSelect.class.getName())) {
                                             field.setAccessible(true);
@@ -430,19 +425,43 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
         filterText.setClearButtonVisible(true);
         filterText.setValueChangeMode(ValueChangeMode.LAZY);
         filterText.addValueChangeListener(e -> updateList());
-
-        HorizontalLayout toolbar = new HorizontalLayout(filterText);
-
         columns = new Button("Columns");
         columns.addClickListener(e -> {
             selectedItems = twinColSelect.getSelectedItems();
             twinColSelDialog.open();
         });
-        toolbar.add(columns);
+        Checkbox autoWidthSave = new Checkbox("Save Column Width");
+        autoWidthSave.setValue(bSavedWidth);
+        autoWidthSave.addValueChangeListener(e -> {
+            bSavedWidth = e.getValue();
+        });
+        HorizontalLayout columnToolbar = new HorizontalLayout(autoWidthSave, columns);
+        columnToolbar.setAlignItems(FlexComponent.Alignment.CENTER);
+        HorizontalLayout toolbar = new HorizontalLayout(filterText, columnToolbar);
+        toolbar.setWidthFull();
+        toolbar.setJustifyContentMode(FlexComponent.JustifyContentMode.BETWEEN);
 
         toolbar.addClassName("toolbar");
 
         return toolbar;
+    }
+
+    private List<Integer> getColumnWidths() {
+        String strWidths = tableInfo.getWidths();
+        List<Integer> colWidths = new ArrayList<>();
+
+        if (strWidths == null || strWidths.isEmpty()) {
+            for (String header : headers) {
+                colWidths.add(0);
+            }
+        } else {
+            String[] elements = strWidths.substring(1, strWidths.length() - 1).split(", ");
+            for (String element : elements) {
+                colWidths.add(Integer.parseInt(element));
+            }
+        }
+
+        return colWidths;
     }
 
     private void updateList() {

@@ -18,6 +18,9 @@ public class ZJTTableInfo {
     @Column(name = "column_name")
     private String headers;
 
+    @Column(name = "column_width")
+    private String widths;
+
     public String getTable_name() {
         return table_name;
     }
@@ -32,5 +35,13 @@ public class ZJTTableInfo {
 
     public void setHeaders(String headers) {
         this.headers = headers;
+    }
+
+    public String getWidths() {
+        return widths;
+    }
+
+    public void setWidths(String widths) {
+        this.widths = widths;
     }
 }
