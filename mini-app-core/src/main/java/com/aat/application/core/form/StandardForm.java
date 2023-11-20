@@ -99,10 +99,20 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
 
         ZJTTableInfo finalTableInfo = tableInfo;
         btnOk.addClickListener(e -> {
+            List<String> originHeaders = headers;
+            List<Integer> columnWidths = getColumnWidths();
+            List<Integer> allowedWidths = new ArrayList<>();
             headers = new ArrayList<>(twinColSelect.getSelectedItems());
             if (!headers.isEmpty()) this.loadGrid(entityClass);
             else grid.removeFromParent();
+            for (String allowedHeader :
+                    originHeaders) {
+                if (headers.contains(allowedHeader)) {
+                    allowedWidths.add(columnWidths.get(originHeaders.indexOf(allowedHeader)));
+                }
+            }
 
+            finalTableInfo.setWidths(allowedWidths.toString());
             finalTableInfo.setHeaders(headers.toString());
             tableInfoService.save(finalTableInfo);
 
