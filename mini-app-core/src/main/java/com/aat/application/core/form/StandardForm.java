@@ -117,12 +117,13 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
             List<Integer> columnWidths = getColumnWidths();
             List<Integer> allowedWidths = new ArrayList<>();
             List<String> tempTwinItems = new ArrayList<>(twinColSelect.getSelectedItems());
-            Enumeration<String> keys = headerNames.keys();
             List<String> tempHeaders = new ArrayList<>();
-            while (keys.hasMoreElements()) {
-                String key = keys.nextElement();
-                for (String desiredValue :
-                        tempTwinItems) {
+            for (String desiredValue :
+                    tempTwinItems) {
+                Enumeration<String> keys = headerNames.keys();
+                while (keys.hasMoreElements()) {
+                    String key = keys.nextElement();
+
                     if (headerNames.get(key).equals(desiredValue)) {
                         tempHeaders.add(key);
                         break;
