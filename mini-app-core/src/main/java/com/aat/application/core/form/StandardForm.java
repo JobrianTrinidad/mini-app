@@ -79,7 +79,13 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
 
     private void initColSelDialog(Class<T> entityClass) {
         twinColSelect = new TwinColSelect<>();
-        twinColSelect.setItems(headers);
+        List<String> tempHeaderNames = new ArrayList<>();
+        for (String header :
+                headers) {
+            tempHeaderNames.add(headerNames.get(header));
+        }
+
+        twinColSelect.setItems(tempHeaderNames);
         twinColSelect.setLabel("Select Options");
 
         tableInfo = tableInfoService.findByTableName(entityClass.getSimpleName());
@@ -88,9 +94,17 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
             tableInfo.setTable_name(entityClass.getSimpleName());
         }
         String tempHeader = tableInfo.getHeaders();
-        if (tempHeader != null)
+        List<String> tempDisplayedHeaderNames = tempHeaderNames;
+        if (tempHeader != null) {
             headers = Arrays.stream(tempHeader.substring(1, tempHeader.length() - 1).split(",")).map(String::trim).collect(Collectors.toList());
-        twinColSelect.select(headers);
+            tempDisplayedHeaderNames = new ArrayList<>();
+            for (String header :
+                    headers) {
+                tempDisplayedHeaderNames.add(headerNames.get(header));
+            }
+        }
+
+        twinColSelect.select(tempDisplayedHeaderNames);
 
         Button btnOk = new Button("OK");
         Button btnCancel = new Button("Cancel");
@@ -102,19 +116,36 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
             List<String> originHeaders = headers;
             List<Integer> columnWidths = getColumnWidths();
             List<Integer> allowedWidths = new ArrayList<>();
-            headers = new ArrayList<>(twinColSelect.getSelectedItems());
-            if (!headers.isEmpty()) this.loadGrid(entityClass);
-            else grid.removeFromParent();
-            for (String allowedHeader :
-                    originHeaders) {
-                if (headers.contains(allowedHeader)) {
-                    allowedWidths.add(columnWidths.get(originHeaders.indexOf(allowedHeader)));
+            List<String> tempTwinItems = new ArrayList<>(twinColSelect.getSelectedItems());
+            Enumeration<String> keys = headerNames.keys();
+            List<String> tempHeaders = new ArrayList<>();
+            while (keys.hasMoreElements()) {
+                String key = keys.nextElement();
+                for (String desiredValue :
+                        tempTwinItems) {
+                    if (headerNames.get(key).equals(desiredValue)) {
+                        tempHeaders.add(key);
+                        break;
+                    }
                 }
+            }
+            headers = tempHeaders;
+
+            for (String allowedHeader :
+                    headers) {
+                if (originHeaders.contains(allowedHeader)) {
+                    allowedWidths.add(columnWidths.get(originHeaders.indexOf(allowedHeader)));
+                } else
+                    allowedWidths.add(0);
             }
 
             finalTableInfo.setWidths(allowedWidths.toString());
             finalTableInfo.setHeaders(headers.toString());
             tableInfoService.save(finalTableInfo);
+            tableInfo = finalTableInfo;
+
+            if (!headers.isEmpty()) this.loadGrid(entityClass);
+            else grid.removeFromParent();
 
             twinColSelDialog.close();
         });
@@ -459,7 +490,7 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
         String strWidths = tableInfo.getWidths();
         List<Integer> colWidths = new ArrayList<>();
 
-        if (strWidths == null || strWidths.isEmpty()) {
+        if (strWidths == null || strWidths.isEmpty() || strWidths.equals("[]")) {
             for (String header : headers) {
                 colWidths.add(0);
             }
