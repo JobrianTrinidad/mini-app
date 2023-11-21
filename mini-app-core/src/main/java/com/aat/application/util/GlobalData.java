@@ -112,15 +112,15 @@ public class GlobalData {
         }
     }
 
-    public static List<Component> findComponentsWithAttribute(Component parent, String attributeName, String attributeValue) {
+    public static List<Component> findComponentsWithAttribute(Component parent, String attributeName) {
         List<Component> matchingComponents = new ArrayList<>();
 
         parent.getChildren().forEach(child -> {
-            if (attributeValue.equals(child.getElement().getAttribute(attributeName))) {
+            if (child.getElement().hasAttribute(attributeName)) {
                 matchingComponents.add(child);
             }
 
-            matchingComponents.addAll(findComponentsWithAttribute(child, attributeName, attributeValue));
+            matchingComponents.addAll(findComponentsWithAttribute(child, attributeName));
         });
 
         return matchingComponents;

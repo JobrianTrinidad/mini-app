@@ -20,9 +20,10 @@ public class AATTwinColSelect extends Div {
 
     private final HorizontalLayout parentLayout;
     private TwinColSelect<String> twinColSelect;
-    private List<Component> selectedChildren;
+    private List<Component> childrenDisplayed;
     private List<String> totalItems;
     private Set<String> orderedItems;
+    private int selectedItemCount = 0;
     private boolean bDrop = false;
 
     public AATTwinColSelect() {
@@ -41,6 +42,7 @@ public class AATTwinColSelect extends Div {
 
         add(parentLayout);
         addClickListener(this::handleClickEvent);
+        addDoubleClickListener(this::handleDbClickEvent);
     }
 
     private VerticalLayout moveToolbar() {
@@ -66,14 +68,18 @@ public class AATTwinColSelect extends Div {
     }
 
     public void select(Iterable<String> items) {
-        twinColSelect.select(items);
-        addEventInItems(twinColSelect);
+        if (items != null) {
+            twinColSelect.select(items);
+            selectedItemCount = twinColSelect.getSelectedItems().size();
+            addEventInItems(twinColSelect);
+        }
     }
 
     private void addEventInItems(TwinColSelect<String> twinColSelect) {
-        selectedChildren = GlobalData.findComponentsWithAttribute(twinColSelect, "aria-selected", "true");
+        List<Component> liveParent = GlobalData.findComponentsWithAttribute(twinColSelect, "aria-live");
+        childrenDisplayed = GlobalData.findComponentsWithAttribute(liveParent.get(0), "aria-selected");
 
-        for (Component child : selectedChildren) {
+        for (Component child : childrenDisplayed) {
             DropTarget<Component> dropTargetWrapper = DropTarget.create(child);
             dropTargetWrapper.addDropListener(this::onDrop);
         }
@@ -86,6 +92,15 @@ public class AATTwinColSelect extends Div {
     private void handleClickEvent(ClickEvent<Div> event) {
         Notification.show("Component clicked!");
     }
+
+    private void handleDbClickEvent(ClickEvent<Div> event) {
+        if(selectedItemCount < twinColSelect.getSelectedItems().size()){
+            addEventInItems(twinColSelect);
+        }
+        selectedItemCount = twinColSelect.getSelectedItems().size();
+        Notification.show("Component clicked!");
+    }
+
 
     public void deselectAll() {
         twinColSelect.deselectAll();
@@ -103,18 +118,17 @@ public class AATTwinColSelect extends Div {
     }
 
     private void onDrop(DropEvent<Component> event) {
-        List<Component> copiedSelectedChildren = new ArrayList<>(selectedChildren);
         Component droppedComponent = event.getDragSourceComponent().orElse(null);
         if (droppedComponent != null) {
-            int childIndex = copiedSelectedChildren.indexOf(event.getSource());
+            int childIndex = childrenDisplayed.indexOf(event.getSource());
             if (childIndex < 0)
                 return;
-            copiedSelectedChildren.remove(droppedComponent);
-            copiedSelectedChildren.add(childIndex, droppedComponent);
+            childrenDisplayed.remove(droppedComponent);
+            childrenDisplayed.add(childIndex, droppedComponent);
         }
         orderedItems = new LinkedHashSet<>();
         for (Component child :
-                copiedSelectedChildren) {
+                childrenDisplayed) {
             try {
                 Field itemField = child.getClass().getDeclaredField("item");
                 itemField.setAccessible(true);
@@ -143,5 +157,6 @@ public class AATTwinColSelect extends Div {
         parentLayout.removeAll();
         parentLayout.add(newTwinColSelect, moveToolbar());
         twinColSelect = newTwinColSelect;
+        twinColSelect.clearTicks(TwinColSelect.ColType.RIGHT);
     }
 }

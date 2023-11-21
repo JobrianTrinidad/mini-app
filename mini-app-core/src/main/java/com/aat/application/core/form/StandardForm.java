@@ -95,7 +95,7 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
         }
         String tempHeader = tableInfo.getHeaders();
         List<String> tempDisplayedHeaderNames = tempHeaderNames;
-        if (tempHeader != null) {
+        if (tempHeader != null && !tempHeader.equals("[]")) {
             headers = Arrays.stream(tempHeader.substring(1, tempHeader.length() - 1).split(",")).map(String::trim).collect(Collectors.toList());
             tempDisplayedHeaderNames = new ArrayList<>();
             for (String header :
