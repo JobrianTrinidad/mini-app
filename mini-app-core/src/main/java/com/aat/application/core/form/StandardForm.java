@@ -2,6 +2,7 @@ package com.aat.application.core.form;
 
 import com.aat.application.annotations.ContentDisplayedInSelect;
 import com.aat.application.annotations.DisplayName;
+import com.aat.application.core.component.AATTwinColSelect;
 import com.aat.application.core.data.entity.ZJTEntity;
 import com.aat.application.core.data.service.ZJTService;
 import com.aat.application.data.entity.ZJTTableInfo;
@@ -19,7 +20,6 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.value.ValueChangeMode;
-import org.vaadin.tatu.TwinColSelect;
 
 import java.io.Serial;
 import java.lang.annotation.Annotation;
@@ -42,7 +42,7 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
     protected Button close;
     protected Button columns;
     private Dialog twinColSelDialog;
-    TwinColSelect<String> twinColSelect;
+    AATTwinColSelect twinColSelect;
     Set<String> selectedItems;
     protected TuiGrid grid;
     protected S service;
@@ -78,7 +78,7 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
     }
 
     private void initColSelDialog(Class<T> entityClass) {
-        twinColSelect = new TwinColSelect<>();
+        twinColSelect = new AATTwinColSelect();
         List<String> tempHeaderNames = new ArrayList<>();
         for (String header :
                 headers) {
@@ -324,7 +324,6 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
                     }
                 } catch (NoSuchFieldException | IllegalAccessException | InvocationTargetException |
                          InstantiationException | NoSuchMethodException e) {
-                    e.printStackTrace();
                     throw new RuntimeException(e);
                 }
             }
@@ -473,9 +472,7 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
         });
         Checkbox autoWidthSave = new Checkbox("Save Column Width");
         autoWidthSave.setValue(bSavedWidth);
-        autoWidthSave.addValueChangeListener(e -> {
-            bSavedWidth = e.getValue();
-        });
+        autoWidthSave.addValueChangeListener(e -> bSavedWidth = e.getValue());
         HorizontalLayout columnToolbar = new HorizontalLayout(autoWidthSave, columns);
         columnToolbar.setAlignItems(FlexComponent.Alignment.CENTER);
         HorizontalLayout toolbar = new HorizontalLayout(filterText, columnToolbar);
@@ -492,7 +489,7 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
         List<Integer> colWidths = new ArrayList<>();
 
         if (strWidths == null || strWidths.isEmpty() || strWidths.equals("[]")) {
-            for (String header : headers) {
+            for (String ignored : headers) {
                 colWidths.add(0);
             }
         } else {
