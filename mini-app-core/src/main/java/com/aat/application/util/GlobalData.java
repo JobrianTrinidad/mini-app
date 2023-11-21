@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.datatype.hibernate5.Hibernate5Module;
+import com.vaadin.flow.component.Component;
 import jakarta.persistence.*;
 import org.hibernate.Hibernate;
 import org.hibernate.proxy.HibernateProxy;
@@ -12,6 +13,7 @@ import org.hibernate.proxy.HibernateProxy;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -89,6 +91,7 @@ public class GlobalData {
         // Check superclass if no field found
         return getPrimaryKeyField(clazz.getSuperclass());
     }
+
     public static void addData(String header) {
         String headerName = header.substring(0, 1).toUpperCase()
                 + header.substring(1);
@@ -109,5 +112,17 @@ public class GlobalData {
         }
     }
 
+    public static List<Component> findComponentsWithAttribute(Component parent, String attributeName, String attributeValue) {
+        List<Component> matchingComponents = new ArrayList<>();
 
+        parent.getChildren().forEach(child -> {
+            if (attributeValue.equals(child.getElement().getAttribute(attributeName))) {
+                matchingComponents.add(child);
+            }
+
+            matchingComponents.addAll(findComponentsWithAttribute(child, attributeName, attributeValue));
+        });
+
+        return matchingComponents;
+    }
 }

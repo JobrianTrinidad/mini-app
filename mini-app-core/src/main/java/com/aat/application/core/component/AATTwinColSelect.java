@@ -1,10 +1,15 @@
 package com.aat.application.core.component;
 
+import com.aat.application.util.GlobalData;
 import com.vaadin.flow.component.ClickEvent;
 import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dnd.*;
 import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.orderedlayout.FlexComponent;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import org.vaadin.tatu.TwinColSelect;
 
@@ -13,21 +18,38 @@ import java.util.*;
 
 public class AATTwinColSelect extends Div {
 
-    private final VerticalLayout parentLayout;
+    private final HorizontalLayout parentLayout;
     private TwinColSelect<String> twinColSelect;
     private List<Component> selectedChildren;
     private List<String> totalItems;
+    private Set<String> orderedItems;
+    private boolean bDrop = false;
 
     public AATTwinColSelect() {
-        VerticalLayout mainLayout = new VerticalLayout();
+        HorizontalLayout mainLayout = new HorizontalLayout();
         twinColSelect = new TwinColSelect<>();
-        twinColSelect.addValueChangeListener(event -> addEventInItems());
-        mainLayout.add(twinColSelect);
+        twinColSelect.addValueChangeListener(event -> addEventInItems(twinColSelect));
+
+        mainLayout.setAlignItems(FlexComponent.Alignment.CENTER);
+        mainLayout.add(twinColSelect, moveToolbar());
 
 // Now, parentLayout can be initialized as mainLayout
         parentLayout = mainLayout;
+        DragSource<Component> dragSourceWrapper = DragSource.create(parentLayout);
+        dragSourceWrapper.addDragStartListener(this::onDragStart);
+        dragSourceWrapper.addDragEndListener(this::onDragEnd);
+
         add(parentLayout);
         addClickListener(this::handleClickEvent);
+    }
+
+    private VerticalLayout moveToolbar() {
+        VerticalLayout updownLayout = new VerticalLayout();
+        updownLayout.setSizeFull();
+        Button upBtn = new Button(VaadinIcon.ARROW_UP.create());
+        Button downBtn = new Button(VaadinIcon.ARROW_DOWN.create());
+        updownLayout.add(upBtn, downBtn);
+        return updownLayout;
     }
 
     public Set getValue() {
@@ -45,33 +67,16 @@ public class AATTwinColSelect extends Div {
 
     public void select(Iterable<String> items) {
         twinColSelect.select(items);
-        addEventInItems();
+        addEventInItems(twinColSelect);
     }
 
-    private void addEventInItems() {
-        selectedChildren = findComponentsWithAttribute(twinColSelect, "aria-selected", "true");
+    private void addEventInItems(TwinColSelect<String> twinColSelect) {
+        selectedChildren = GlobalData.findComponentsWithAttribute(twinColSelect, "aria-selected", "true");
 
         for (Component child : selectedChildren) {
-            DragSource<Component> dragSourceWrapper = DragSource.create(child);
-            dragSourceWrapper.addDragStartListener(this::onDragStart);
-            dragSourceWrapper.addDragEndListener(this::onDragEnd);
             DropTarget<Component> dropTargetWrapper = DropTarget.create(child);
-            dropTargetWrapper.addDropListener(event -> onDrop(event, child));
+            dropTargetWrapper.addDropListener(this::onDrop);
         }
-    }
-
-    public static List<Component> findComponentsWithAttribute(Component parent, String attributeName, String attributeValue) {
-        List<Component> matchingComponents = new ArrayList<>();
-
-        parent.getChildren().forEach(child -> {
-            if (attributeValue.equals(child.getElement().getAttribute(attributeName))) {
-                matchingComponents.add(child);
-            }
-
-            matchingComponents.addAll(findComponentsWithAttribute(child, attributeName, attributeValue));
-        });
-
-        return matchingComponents;
     }
 
     public void setLabel(String label) {
@@ -90,29 +95,36 @@ public class AATTwinColSelect extends Div {
     }
 
     private void onDragEnd(DragEndEvent<Component> event) {
+        if (bDrop) {
+            bDrop = false;
+            List<String> itemsList = new ArrayList<>(orderedItems);
+            this.updateTwinColSelectOrder(itemsList);
+        }
     }
 
-    private void onDrop(DropEvent<Component> event, Component child) {
+    private void onDrop(DropEvent<Component> event) {
+        List<Component> copiedSelectedChildren = new ArrayList<>(selectedChildren);
         Component droppedComponent = event.getDragSourceComponent().orElse(null);
         if (droppedComponent != null) {
-            int childIndex = selectedChildren.indexOf(child);
-            selectedChildren.remove(droppedComponent);
-            selectedChildren.add(childIndex, droppedComponent);
+            int childIndex = copiedSelectedChildren.indexOf(event.getSource());
+            if (childIndex < 0)
+                return;
+            copiedSelectedChildren.remove(droppedComponent);
+            copiedSelectedChildren.add(childIndex, droppedComponent);
         }
-        Set<String> items = new LinkedHashSet<>();
-        for (Component selectedChildren :
-                selectedChildren) {
+        orderedItems = new LinkedHashSet<>();
+        for (Component child :
+                copiedSelectedChildren) {
             try {
-                Field itemField = selectedChildren.getClass().getDeclaredField("item");
+                Field itemField = child.getClass().getDeclaredField("item");
                 itemField.setAccessible(true);
-                items.add((String) itemField.get(selectedChildren));
+                orderedItems.add((String) itemField.get(child));
             } catch (NoSuchFieldException | IllegalAccessException e) {
                 throw new RuntimeException(e);
             }
         }
 
-        List<String> itemsList = new ArrayList<>(items);
-        updateTwinColSelectOrder(itemsList);
+        bDrop = true;
     }
 
     private void updateTwinColSelectOrder(List<String> newOrder) {
@@ -125,9 +137,11 @@ public class AATTwinColSelect extends Div {
         }
         tempTotalItems.addAll(newOrder);
         newTwinColSelect.setItems(tempTotalItems);
-        parentLayout.remove(twinColSelect);
-        parentLayout.add(newTwinColSelect);
+        newTwinColSelect.select(newOrder);
+        addEventInItems(newTwinColSelect);
+
+        parentLayout.removeAll();
+        parentLayout.add(newTwinColSelect, moveToolbar());
         twinColSelect = newTwinColSelect;
-        this.select(newOrder);
     }
 }
