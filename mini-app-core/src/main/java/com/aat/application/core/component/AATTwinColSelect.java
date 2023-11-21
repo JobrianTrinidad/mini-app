@@ -17,6 +17,17 @@ import java.lang.reflect.Field;
 import java.util.*;
 
 public class AATTwinColSelect extends Div {
+    public enum Direction {
+        Up, Down;
+
+        public int getCustomOrdinal() {
+            if (this == Up) {
+                return -1;
+            } else {
+                return 1;
+            }
+        }
+    }
 
     private final HorizontalLayout parentLayout;
     private TwinColSelect<String> twinColSelect;
@@ -45,15 +56,6 @@ public class AATTwinColSelect extends Div {
         addDoubleClickListener(this::handleDbClickEvent);
     }
 
-    private VerticalLayout moveToolbar() {
-        VerticalLayout updownLayout = new VerticalLayout();
-        updownLayout.setSizeFull();
-        Button upBtn = new Button(VaadinIcon.ARROW_UP.create());
-        Button downBtn = new Button(VaadinIcon.ARROW_DOWN.create());
-        updownLayout.add(upBtn, downBtn);
-        return updownLayout;
-    }
-
     public Set getValue() {
         return Collections.singleton(twinColSelect.getValue());
     }
@@ -70,9 +72,49 @@ public class AATTwinColSelect extends Div {
     public void select(Iterable<String> items) {
         if (items != null) {
             twinColSelect.select(items);
+            twinColSelect.clearTicks(TwinColSelect.ColType.RIGHT);
             selectedItemCount = twinColSelect.getSelectedItems().size();
             addEventInItems(twinColSelect);
         }
+    }
+
+    public void setLabel(String label) {
+        twinColSelect.setLabel(label);
+    }
+
+    public void deselectAll() {
+        twinColSelect.deselectAll();
+    }
+
+    private VerticalLayout moveToolbar() {
+        VerticalLayout uptownLayout = new VerticalLayout();
+        uptownLayout.setSizeFull();
+        Button upBtn = new Button(VaadinIcon.ARROW_UP.create());
+        upBtn.addClickListener(e -> moveItems(Direction.Up));
+        Button downBtn = new Button(VaadinIcon.ARROW_DOWN.create());
+        downBtn.addClickListener(e -> moveItems(Direction.Down));
+        uptownLayout.add(upBtn, downBtn);
+        return uptownLayout;
+    }
+
+    private void moveItems(Direction direction) {
+        List<Component> liveParent = GlobalData.findComponentsWithAttribute(twinColSelect, "aria-live");
+        List<Component> selectedComponents = GlobalData.findComponentsWithAttribute(liveParent.get(0), "aria-selected", "true");
+        Component endPoint;
+        if (direction == Direction.Up)
+            endPoint = childrenDisplayed.get(0);
+        else {
+            endPoint = childrenDisplayed.get(childrenDisplayed.size() - 1);
+            Collections.reverse(selectedComponents);
+        }
+        if (!selectedComponents.contains(endPoint))
+            for (Component droppedComponent :
+                    selectedComponents) {
+                int index = childrenDisplayed.indexOf(droppedComponent) + direction.getCustomOrdinal();
+                Component sourceComponent = childrenDisplayed.get(index);
+                setOrderedItemsFromComponent(droppedComponent, sourceComponent);
+            }
+        updateTwinColSelectOrder();
     }
 
     private void addEventInItems(TwinColSelect<String> twinColSelect) {
@@ -85,25 +127,16 @@ public class AATTwinColSelect extends Div {
         }
     }
 
-    public void setLabel(String label) {
-        twinColSelect.setLabel(label);
-    }
-
     private void handleClickEvent(ClickEvent<Div> event) {
-        Notification.show("Component clicked!");
+//        Notification.show("Component clicked!");
     }
 
     private void handleDbClickEvent(ClickEvent<Div> event) {
-        if(selectedItemCount < twinColSelect.getSelectedItems().size()){
+        if (selectedItemCount < twinColSelect.getSelectedItems().size()) {
             addEventInItems(twinColSelect);
         }
         selectedItemCount = twinColSelect.getSelectedItems().size();
-        Notification.show("Component clicked!");
-    }
-
-
-    public void deselectAll() {
-        twinColSelect.deselectAll();
+        twinColSelect.clearTicks(TwinColSelect.ColType.RIGHT);
     }
 
     private void onDragStart(DragStartEvent<Component> event) {
@@ -112,20 +145,40 @@ public class AATTwinColSelect extends Div {
     private void onDragEnd(DragEndEvent<Component> event) {
         if (bDrop) {
             bDrop = false;
-            List<String> itemsList = new ArrayList<>(orderedItems);
-            this.updateTwinColSelectOrder(itemsList);
+
+            this.updateTwinColSelectOrder();
         }
     }
 
     private void onDrop(DropEvent<Component> event) {
         Component droppedComponent = event.getDragSourceComponent().orElse(null);
+        setOrderedItemsFromComponent(droppedComponent, event.getSource());
+        bDrop = true;
+    }
+
+    private void updateTwinColSelectOrder() {
+        List<String> newOrder = new ArrayList<>(orderedItems);
+        TwinColSelect<String> newTwinColSelect = new TwinColSelect<>();
+
+        newTwinColSelect.setItems(getOrderedTotalItems(newOrder));
+        newTwinColSelect.select(newOrder);
+        addEventInItems(newTwinColSelect);
+
+        parentLayout.removeAll();
+        parentLayout.add(newTwinColSelect, moveToolbar());
+        twinColSelect = newTwinColSelect;
+        twinColSelect.clearTicks(TwinColSelect.ColType.RIGHT);
+    }
+
+    private void setOrderedItemsFromComponent(Component droppedComponent, Component sourceComponent) {
         if (droppedComponent != null) {
-            int childIndex = childrenDisplayed.indexOf(event.getSource());
+            int childIndex = childrenDisplayed.indexOf(sourceComponent);
             if (childIndex < 0)
                 return;
             childrenDisplayed.remove(droppedComponent);
             childrenDisplayed.add(childIndex, droppedComponent);
         }
+
         orderedItems = new LinkedHashSet<>();
         for (Component child :
                 childrenDisplayed) {
@@ -134,15 +187,13 @@ public class AATTwinColSelect extends Div {
                 itemField.setAccessible(true);
                 orderedItems.add((String) itemField.get(child));
             } catch (NoSuchFieldException | IllegalAccessException e) {
-                throw new RuntimeException(e);
+                continue;
+//                throw new RuntimeException(e);
             }
         }
-
-        bDrop = true;
     }
 
-    private void updateTwinColSelectOrder(List<String> newOrder) {
-        TwinColSelect<String> newTwinColSelect = new TwinColSelect<>();
+    private List<String> getOrderedTotalItems(List<String> newOrder) {
         List<String> tempTotalItems = new ArrayList<>();
         for (String item :
                 totalItems) {
@@ -150,13 +201,6 @@ public class AATTwinColSelect extends Div {
                 tempTotalItems.add(item);
         }
         tempTotalItems.addAll(newOrder);
-        newTwinColSelect.setItems(tempTotalItems);
-        newTwinColSelect.select(newOrder);
-        addEventInItems(newTwinColSelect);
-
-        parentLayout.removeAll();
-        parentLayout.add(newTwinColSelect, moveToolbar());
-        twinColSelect = newTwinColSelect;
-        twinColSelect.clearTicks(TwinColSelect.ColType.RIGHT);
+        return tempTotalItems;
     }
 }

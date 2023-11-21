@@ -106,6 +106,7 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
 
         twinColSelect.select(tempDisplayedHeaderNames);
 
+
         Button btnOk = new Button("OK");
         Button btnCancel = new Button("Cancel");
         HorizontalLayout btnPanel = new HorizontalLayout(btnCancel, btnOk);
@@ -152,8 +153,8 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
         });
 
         btnCancel.addClickListener(e -> {
-            twinColSelect.deselectAll();
-            twinColSelect.select(selectedItems);
+//            twinColSelect.deselectAll();
+//            twinColSelect.select(selectedItems);
             twinColSelDialog.close();
         });
 
