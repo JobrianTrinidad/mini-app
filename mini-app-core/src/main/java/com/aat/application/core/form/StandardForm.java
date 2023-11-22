@@ -86,7 +86,7 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
         }
 
         twinColSelect.setItems(tempHeaderNames);
-        twinColSelect.setLabel("Select Options");
+//        twinColSelect.setLabel("Select Options");
 
         tableInfo = tableInfoService.findByTableName(entityClass.getSimpleName());
         if (tableInfo == null) {
@@ -152,11 +152,7 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
             twinColSelDialog.close();
         });
 
-        btnCancel.addClickListener(e -> {
-//            twinColSelect.deselectAll();
-//            twinColSelect.select(selectedItems);
-            twinColSelDialog.close();
-        });
+        btnCancel.addClickListener(e -> twinColSelDialog.close());
 
         twinColSelDialog = new Dialog();
         twinColSelDialog.add(new VerticalLayout(twinColSelect, btnPanel));
