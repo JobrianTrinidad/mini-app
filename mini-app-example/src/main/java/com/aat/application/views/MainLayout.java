@@ -1,6 +1,8 @@
 package com.aat.application.views;
 
 import com.aat.application.data.entity.*;
+import com.aat.application.util.GlobalData;
+import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.dependency.CssImport;
 import org.vaadin.lineawesome.LineAwesomeIcon;
 
@@ -8,6 +10,8 @@ import com.aat.application.components.appnav.AppNav;
 import com.aat.application.components.appnav.AppNavItem;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+
+import java.util.List;
 
 /**
  * The main view is a top-level placeholder for other views.

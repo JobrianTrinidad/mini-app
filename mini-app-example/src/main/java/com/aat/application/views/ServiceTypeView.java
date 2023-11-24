@@ -11,6 +11,6 @@ public class ServiceTypeView extends  StandardFormView<ZJTVehicleServiceType> {
 
     public ServiceTypeView(BaseEntityRepository<ZJTVehicleServiceType> repository, TableInfoService tableInfoService){
         super(repository, tableInfoService);
-
+        this.getElement().getStyle().set("overflow-x", "hidden");
     }
 }

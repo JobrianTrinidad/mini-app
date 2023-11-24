@@ -5,6 +5,7 @@ import com.aat.application.annotations.DisplayName;
 import com.aat.application.core.component.AATTwinColSelect;
 import com.aat.application.core.data.entity.ZJTEntity;
 import com.aat.application.core.data.service.ZJTService;
+import com.aat.application.core.event.EventBus;
 import com.aat.application.data.entity.ZJTTableInfo;
 import com.aat.application.data.service.TableInfoService;
 import com.aat.application.util.GlobalData;
@@ -15,6 +16,7 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.dialog.Dialog;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -28,6 +30,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>> extends VerticalLayout {
@@ -68,10 +73,15 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
         initColSelDialog(entityClass);
 
         loadGrid(entityClass);
+        EventBus.getInstance().register(event -> {
+            if ("DrawerToggleClicked".equals(event)) {
+                    getUI().ifPresent(ui -> ui.access(grid::refreshGrid));
+            }
+        });
     }
 
     private void loadGrid(Class<T> entityClass) {
-        removeAll();
+//        removeAll();
         if (!twinColSelect.getSelectedItems().isEmpty()) configureGrid(entityClass);
         if (grid != null) add(new VerticalLayout(getToolbar(entityClass), grid));
         else add(new VerticalLayout(getToolbar(entityClass)));
@@ -476,7 +486,7 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
         toolbar.setWidthFull();
         toolbar.setJustifyContentMode(FlexComponent.JustifyContentMode.BETWEEN);
 
-        toolbar.addClassName("toolbar");
+        toolbar.addClassName("aat-toolbar");
 
         return toolbar;
     }

@@ -2,9 +2,13 @@ package com.aat.application.views;
 
 
 import com.aat.application.components.appnav.AppNav;
+import com.aat.application.core.event.EventBus;
+import com.vaadin.flow.component.AttachEvent;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.accordion.AccordionPanel;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
+import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.html.Footer;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.H2;
@@ -18,7 +22,8 @@ import com.vaadin.flow.theme.lumo.LumoUtility;
  */
 @PageTitle("Main")
 //@Route(value = "")
-public class CoreMainLayout extends AppLayout{
+@CssImport("./styles/styles.css")
+public class CoreMainLayout extends AppLayout {
     private H2 viewTitle;
     protected AppNav nav;
 
@@ -33,6 +38,9 @@ public class CoreMainLayout extends AppLayout{
 
     private void addHeaderContent() {
         DrawerToggle toggle = new DrawerToggle();
+        toggle.addClickListener(event -> {
+            EventBus.getInstance().post("DrawerToggleClicked");
+        });
         toggle.getElement().setAttribute("aria-label", "Menu toggle");
 
         viewTitle = new H2();
@@ -55,7 +63,7 @@ public class CoreMainLayout extends AppLayout{
         return nav;
     }
 
-    protected void setNavigation(AppNav nav, String strAppName){
+    protected void setNavigation(AppNav nav, String strAppName) {
         this.nav = nav;
         addDrawerContent(strAppName);
     }
@@ -73,6 +81,14 @@ public class CoreMainLayout extends AppLayout{
     private String getCurrentPageTitle() {
         PageTitle title = getContent().getClass().getAnnotation(PageTitle.class);
         return title == null ? "" : title.value();
+    }
+
+    @Override
+    protected void onAttach(AttachEvent attachEvent) {
+        super.onAttach(attachEvent);
+        UI.getCurrent().getPage().executeJs(
+                "var contentElement = document.querySelector('[content]');" +
+                        "contentElement.style.overflow = 'hidden';");
     }
 }
 
