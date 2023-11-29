@@ -16,7 +16,6 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.dialog.Dialog;
-import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -28,11 +27,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
-import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>> extends VerticalLayout {
@@ -265,85 +260,109 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
             }
             T row = tableData.get(event.getRow());
             if (columnIndex >= 0) {
-                String header = headers.get(columnIndex);
-                try {
-                    Field field = row.getClass().getDeclaredField(header);
-                    field.setAccessible(true);
-                    switch (headerOptions.get(header)) {
-                        case "input":
-                            String colValue = event.getColValue();
-                            String fieldType = field.getType().getSimpleName();
-                            try {
-                                switch (fieldType) {
-                                    case "Integer":
-                                    case "int":
-                                        field.set(row, Integer.parseInt(colValue));
-                                        break;
-                                    case "Double":
-                                    case "double":
-                                        field.set(row, Double.parseDouble(colValue));
-                                        break;
-                                    case "Float":
-                                    case "float":
-                                        field.set(row, Float.parseFloat(colValue));
-                                        break;
-                                    default:
-                                        field.set(row, colValue); // Fallback for String and other types
-                                }
-                            } catch (NumberFormatException e) {
-                                // Handle the case where the string does not contain a parsable number
-                                System.out.println("Cannot parse to " + fieldType + ": " + colValue);
-                            }
-                            break;
-                        case "select_enum":
-                            Class<?> enumTypes = headerTypeOptions.get(header);
-                            if (enumTypes.isEnum()) {
-                                Enum<?>[] enumConstants = getEnumConstants(enumTypes);
-                                int ordinal = Integer.parseInt(event.getColValue().substring(0, 1)) - 1;
-                                if (ordinal >= 0 && ordinal < enumConstants.length) {
-                                    Enum<?> enumValue = enumConstants[ordinal];
-                                    field.set(row, enumValue);
-                                }
-                            }
-                            break;
-                        case "select_class":
-                            int ordinal = -1;
-                            if (!event.getColValue().isEmpty())
-                                ordinal = Integer.parseInt(event.getColValue().substring(0, 1)) - 1;
-
-                            Object dataSel = field.get(row);
-                            if (dataSel == null) dataSel = field.getType().getDeclaredConstructor().newInstance();
-
-                            int index = 0;
-
-                            for (Object result : GlobalData.listData.get(header)) {
-                                try {
-                                    if (index++ == ordinal) {
-                                        field.set(row, GlobalData.convertToZJTEntity(result, dataSel.getClass()));
-                                        break;
-                                    }
-                                } catch (RuntimeException ignored) {
-                                }
-                            }
-                            break;
-                        default:
-                            break;
-                    }
-                } catch (NoSuchFieldException | IllegalAccessException | InvocationTargetException |
-                         InstantiationException | NoSuchMethodException e) {
-                    throw new RuntimeException(e);
-                }
+                this.save(row, colName, event.getColValue());
+                CompletableFuture.runAsync(() -> service.save(row));
             }
-
-            CompletableFuture.runAsync(() -> service.save(row));
         });
         grid.addItemDeleteListener(listener -> delete());
+        grid.addItemAddListener(event -> {
+            try {
+                T row = entityClass.getDeclaredConstructor().newInstance();
+                this.save(row, (GuiItem) event.getItem());
+            } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
+                     NoSuchMethodException e) {
+                throw new RuntimeException(e);
+            }
+        });
 
         grid.setAutoSave(true);
         grid.setSizeFull();
         grid.setHeaderHeight(50);
 //        grid.setTableWidth(500);
 //        grid.setTableHeight(750);
+    }
+
+    private void save(T row, String header, String colValue) {
+        try {
+            Field field = row.getClass().getDeclaredField(header);
+            field.setAccessible(true);
+            switch (headerOptions.get(header)) {
+                case "input":
+                    String fieldType = field.getType().getSimpleName();
+                    try {
+                        switch (fieldType) {
+                            case "Integer":
+                            case "int":
+                                field.set(row, Integer.parseInt(colValue));
+                                break;
+                            case "Double":
+                            case "double":
+                                field.set(row, Double.parseDouble(colValue));
+                                break;
+                            case "Float":
+                            case "float":
+                                field.set(row, Float.parseFloat(colValue));
+                                break;
+                            default:
+                                field.set(row, colValue); // Fallback for String and other types
+                        }
+                    } catch (NumberFormatException e) {
+                        // Handle the case where the string does not contain a parsable number
+                        System.out.println("Cannot parse to " + fieldType + ": " + colValue);
+                    }
+                    break;
+                case "select_enum":
+                    Class<?> enumTypes = headerTypeOptions.get(header);
+                    if (enumTypes.isEnum()) {
+                        Enum<?>[] enumConstants = getEnumConstants(enumTypes);
+                        int ordinal = Integer.parseInt(colValue.substring(0, 1)) - 1;
+                        if (ordinal >= 0 && ordinal < enumConstants.length) {
+                            Enum<?> enumValue = enumConstants[ordinal];
+                            field.set(row, enumValue);
+                        }
+                    }
+                    break;
+                case "select_class":
+                    if (colValue.equals("All"))
+                        break;
+
+                    int ordinal = -1;
+
+                    if (!colValue.isEmpty())
+                        ordinal = Integer.parseInt(colValue.substring(0, 1)) - 1;
+
+                    Object dataSel = field.get(row);
+                    if (dataSel == null) dataSel = field.getType().getDeclaredConstructor().newInstance();
+
+                    int index = 0;
+
+                    for (Object result : GlobalData.listData.get(header)) {
+                        try {
+                            if (index++ == ordinal) {
+                                field.set(row, GlobalData.convertToZJTEntity(result, dataSel.getClass()));
+                                break;
+                            }
+                        } catch (RuntimeException ignored) {
+                        }
+                    }
+                    break;
+                default:
+                    break;
+            }
+        } catch (NoSuchFieldException | IllegalAccessException | InvocationTargetException |
+                 InstantiationException | NoSuchMethodException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void save(T row, GuiItem item) {
+        for (String header :
+                item.getHeaders()) {
+            String colValue = item.getRecordData().get(item.getHeaders().indexOf(header));
+            this.save(row, header, colValue);
+        }
+
+        CompletableFuture.runAsync(() -> service.save(row));
     }
 
     private List<Item> getTableData() {
