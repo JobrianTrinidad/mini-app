@@ -88,8 +88,14 @@ public class BaseEntityRepository<T> {
     @Transactional
     public void deleteEntity(T entity) {
         try {
-            T mergedEntity = entityManager.merge(entity);
-            entityManager.remove(mergedEntity);
+//            T mergedEntity = entityManager.merge(entity);
+//            entityManager.remove(mergedEntity);
+
+            Object primaryKey = entityManager.getEntityManagerFactory().getPersistenceUnitUtil().getIdentifier(entity);
+            entity = entityManager.find(entityClass, primaryKey);
+            if (entity != null) {
+                entityManager.remove(entity);
+            }
         } catch (RuntimeException e) {
             e.printStackTrace();
         }

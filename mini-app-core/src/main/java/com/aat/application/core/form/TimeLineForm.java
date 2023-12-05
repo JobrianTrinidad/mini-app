@@ -4,20 +4,15 @@ import com.aat.application.core.data.entity.ZJTEntity;
 import com.aat.application.core.data.service.ZJTService;
 import com.aat.application.data.entity.ZJTSuperTimeLineNode;
 import com.aat.application.util.GlobalData;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.vaadin.componentfactory.timeline.Timeline;
-import com.vaadin.componentfactory.timeline.model.ItemGroup;
 import com.vaadin.componentfactory.timeline.model.Item;
+import com.vaadin.componentfactory.timeline.model.ItemGroup;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.datetimepicker.DateTimePicker;
 import com.vaadin.flow.component.formlayout.FormLayout;
-import com.vaadin.flow.component.html.Paragraph;
-import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -25,15 +20,14 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.renderer.LitRenderer;
 import com.vaadin.flow.data.renderer.Renderer;
 import com.vaadin.flow.data.value.ValueChangeMode;
-import org.hibernate.Hibernate;
-import org.hibernate.proxy.HibernateProxy;
 
-import java.awt.*;
-import java.io.*;
+import java.io.Serial;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Dictionary;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
@@ -179,16 +173,9 @@ public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>>
                         case "select_class":
                             if (dataSel == null)
                                 dataSel = data.getClass().getDeclaredField(header);
-                            Field itemIdField = null;
                             Class<?> currentDataSelClass = dataSel.getClass();
-                            while (currentDataSelClass != null) {
-                                try {
-                                    itemIdField = currentDataSelClass.getDeclaredField("groupId");
-                                    break;
-                                } catch (NoSuchFieldException e) {
-                                    currentDataSelClass = currentDataSelClass.getSuperclass();
-                                }
-                            }
+                            Field itemIdField = GlobalData.getPrimaryKeyField(currentDataSelClass);
+
                             if (itemIdField == null) {
                                 throw new RuntimeException("groupId field not found in class hierarchy");
                             }
@@ -224,12 +211,16 @@ public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>>
                 try {
                     Field headerField = null;
                     Class<?> groupResultClass = groupResult.getClass();
-                    while (groupResultClass != null) {
-                        try {
-                            headerField = groupResultClass.getDeclaredField(field.getName());
-                            break;
-                        } catch (NoSuchFieldException e) {
-                            groupResultClass = groupResultClass.getSuperclass();
+                    if (field.getName().equals("groupId"))
+                        headerField = GlobalData.getPrimaryKeyField(groupResultClass);
+                    else {
+                        while (groupResultClass != null) {
+                            try {
+                                headerField = groupResultClass.getDeclaredField(field.getName());
+                                break;
+                            } catch (NoSuchFieldException e) {
+                                groupResultClass = groupResultClass.getSuperclass();
+                            }
                         }
                     }
                     if (headerField == null) {

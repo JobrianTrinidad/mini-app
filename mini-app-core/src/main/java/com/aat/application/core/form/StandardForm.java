@@ -282,6 +282,10 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
 //        grid.setTableHeight(750);
     }
 
+    public void setContextMenu(AATContextMenu contextMenu) {
+        contextMenu.setTarget(grid);
+        grid.setContextMenu(contextMenu);
+    }
     private void save(T row, String header, String colValue) {
         try {
             Field field = row.getClass().getDeclaredField(header);
