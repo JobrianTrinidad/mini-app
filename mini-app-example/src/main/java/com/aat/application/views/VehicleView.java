@@ -1,6 +1,5 @@
 package com.aat.application.views;
 
-import com.aat.application.data.entity.ZJTTimeLineItem;
 import com.aat.application.data.entity.ZJTVehicle;
 import com.aat.application.data.entity.ZJTVehicleServiceSchedule;
 import com.aat.application.data.repository.BaseEntityRepository;
@@ -24,21 +23,23 @@ public class VehicleView extends  StandardFormView<ZJTVehicle> {
         AATContextMenu contextMenu = new AATContextMenu();
         contextMenu.setOpenOnClick(true);
 
-        MenuItem fileItem = contextMenu.addItem("File");
-        fileItem.addContextMenuClickListener(e -> Notification.show(fileItem.getCaption()));
+//        MenuItem fileItem = contextMenu.addItem("File");
+//        fileItem.addContextMenuClickListener(e -> Notification.show(fileItem.getCaption()));
 
         MenuItem editItem = contextMenu.addItem("Service Schedule");
-        editItem.addContextMenuClickListener(e -> Notification.show(fileItem.getCaption()));
+        editItem.addContextMenuClickListener(e -> Notification.show(editItem.getCaption()));
         MenuItem gridItem = editItem.addSubItem("Grid");
         gridItem.addContextMenuClickListener(e -> {
             Notification.show(gridItem.getCaption());
             VaadinSession.getCurrent().setAttribute("entityClass", ZJTVehicleServiceSchedule.class.getName());
-            UI.getCurrent().navigate(VehicleServiceScheduleView.class);
+            UI.getCurrent().navigate(StandardFormView.class);
         });
         MenuItem timelineItem = editItem.addSubItem("Timeline");
         timelineItem.addContextMenuClickListener(e -> {
-            VaadinSession.getCurrent().setAttribute("entityClass", ZJTTimeLineItem.class.getName());
-            UI.getCurrent().navigate(GroupTimeLineView.class);
+            VaadinSession.getCurrent().setAttribute("entityClass", ZJTVehicleServiceSchedule.class.getName());
+            VaadinSession.getCurrent().setAttribute("groupName", "vehicle");
+            VaadinSession.getCurrent().setAttribute("groupClass", ZJTVehicle.class.getName());
+            UI.getCurrent().navigate(TimeLineFormView.class);
         });
 
         this.setContextMenu(contextMenu);

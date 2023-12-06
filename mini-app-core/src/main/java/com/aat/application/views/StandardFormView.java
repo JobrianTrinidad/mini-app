@@ -7,8 +7,9 @@ import com.aat.application.data.service.TableInfoService;
 import com.aat.application.form.GridCommonForm;
 import com.vaadin.componentfactory.tuigrid.model.AATContextMenu;
 import com.vaadin.flow.router.BeforeEnterEvent;
+import com.vaadin.flow.router.Route;
 
-//@Route(value = "commonview", layout = CoreMainLayout.class)
+@Route(value = "commonview", layout = CoreMainLayout.class)
 public class StandardFormView<T extends ZJTEntity> extends CommonView<T> {
 
     protected GridCommonForm<T> form;

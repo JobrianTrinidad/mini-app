@@ -2,7 +2,7 @@ package com.aat.application.core.form;
 
 import com.aat.application.core.data.entity.ZJTEntity;
 import com.aat.application.core.data.service.ZJTService;
-import com.aat.application.data.entity.ZJTSuperTimeLineNode;
+import com.aat.application.data.entity.ZJTNode;
 import com.aat.application.util.GlobalData;
 import com.vaadin.componentfactory.timeline.Timeline;
 import com.vaadin.componentfactory.timeline.model.Item;
@@ -153,12 +153,17 @@ public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>>
                     Object dataSel = headerField.get(data);
 
                     if (header.equals(groupName)) {
-                        item.setClassName(((ZJTSuperTimeLineNode) dataSel).getClassName());
+                        item.setClassName(((ZJTNode) dataSel).getClassName());
                     }
 
                     Field itemHeaderField = null;
+
                     try {
-                        itemHeaderField = item.getClass().getDeclaredField(header);
+                        if (headerField.getAnnotation(jakarta.persistence.Id.class) != null) {
+                            itemHeaderField = item.getClass().getDeclaredField("id");
+                        } else {
+                            itemHeaderField = item.getClass().getDeclaredField(header);
+                        }
                     } catch (NoSuchFieldException e) {
                         if (header.equals(this.groupName))
                             itemHeaderField = item.getClass().getDeclaredField("group");
@@ -168,7 +173,11 @@ public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>>
                     itemHeaderField.setAccessible(true);
                     switch (headerOptions.get(header)) {
                         case "input":
-                            itemHeaderField.set(item, dataSel);
+                            if (headerField.getAnnotation(jakarta.persistence.Id.class) != null) {
+                                itemHeaderField.set(item, String.valueOf(dataSel));
+                            } else {
+                                itemHeaderField.set(item, dataSel);
+                            }
                             break;
                         case "select_class":
                             if (dataSel == null)
@@ -302,7 +311,7 @@ public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>>
         try {
             for (String header :
                     headers) {
-                if (headerOptions.get(header).equals("select_class")) {
+                if (headerOptions.get(header).equals("select_class") && header.equals(this.groupName)) {
                     T itemObj = entityClass.getDeclaredConstructor().newInstance();
                     Field field = itemObj.getClass().getDeclaredField(header);
                     field.setAccessible(true);

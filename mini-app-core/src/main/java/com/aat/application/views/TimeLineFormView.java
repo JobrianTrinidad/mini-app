@@ -8,12 +8,12 @@ import com.aat.application.util.GlobalData;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.Route;
 
-//@Route(value = "timeline")
+@Route(value = "timelineview")
 public class TimeLineFormView<T extends ZJTEntity> extends CommonView<T> {
 
     protected TimeLineCommonForm<T> form;
-    private String groupName = "group";
-    Class<? extends ZJTEntity> groupClass = null;
+//    private String groupName = "group";
+//    Class<? extends ZJTEntity> groupClass = null;
 
     public TimeLineFormView(BaseEntityRepository<T> repository) {
         super(repository);

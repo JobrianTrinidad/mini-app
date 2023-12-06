@@ -5,7 +5,6 @@ import com.aat.application.data.repository.BaseEntityRepository;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.*;
-
 import com.vaadin.flow.server.VaadinSession;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -17,6 +16,8 @@ public abstract class CommonView<T extends ZJTEntity> extends VerticalLayout imp
     protected final BaseEntityRepository<T> repository;
     protected Class<T> entityClass;
     protected Class<?> LayoutClass;
+    protected Class<? extends ZJTEntity> groupClass;
+    protected String groupName;
     private String title = "";
 
     public CommonView(BaseEntityRepository<T> repository) {
@@ -46,6 +47,15 @@ public abstract class CommonView<T extends ZJTEntity> extends VerticalLayout imp
         });
         String entityClassName = (String) VaadinSession.getCurrent().getAttribute("entityClass");
         String layoutClassName = (String) VaadinSession.getCurrent().getAttribute("layout");
+        groupName = (String) VaadinSession.getCurrent().getAttribute("groupName");
+        String groupClassName = (String) VaadinSession.getCurrent().getAttribute("groupClass");
+        if(groupClassName != null){
+            try {
+                groupClass = (Class<? extends ZJTEntity>) Class.forName(groupClassName);
+            } catch (ClassNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+        }
 
         if (entityClassName != null && layoutClassName != null) {
             try {

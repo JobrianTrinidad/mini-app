@@ -4,13 +4,12 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.vaadin.flow.router.PageTitle;
 import jakarta.persistence.*;
 
-import java.io.Serializable;
 import java.util.List;
 
 @Entity
 @Table(name = "zjt_driver")
 @PageTitle("TimeLine")
-public class ZJTDriver extends ZJTSuperTimeLineNode implements Serializable {
+public class ZJTDriver extends ZJTNode {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

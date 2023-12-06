@@ -1,16 +1,17 @@
 package com.aat.application.data.entity;
 
 import com.aat.application.core.data.entity.ZJTEntity;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.MappedSuperclass;
 
 import java.time.LocalDateTime;
 
 @MappedSuperclass
-public abstract class ZJTSuperTimeLineItem implements ZJTEntity {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    protected int id;
+public abstract class ZJTItem implements ZJTEntity {
+    //
+//    @Id
+//    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+//    protected int id;
     @Column(name = "name")
     protected String title;
     @Column(name = "description")
@@ -21,14 +22,19 @@ public abstract class ZJTSuperTimeLineItem implements ZJTEntity {
     @Column(name = "end_time")
     protected LocalDateTime end;
 
-    @Override
-    public int getId() {
-        return id;
+    public ZJTItem() {
+        this.start = LocalDateTime.now(); // Set start time to current time
+        this.end = LocalDateTime.now(); // Set end time to current time
     }
 
-    public void setId(int id) {
-        this.id = id;
-    }
+//    @Override
+//    public int getId() {
+//        return id;
+//    }
+//
+//    public void setId(int id) {
+//        this.id = id;
+//    }
 
 
     public String getTitle() {

@@ -1,6 +1,5 @@
 package com.aat.application.data.entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 
@@ -9,7 +8,11 @@ import java.io.Serializable;
 @Entity
 @Table(name = "zjt_vehiclebooking")
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-public class ZJTVehicleBooking extends ZJTSuperTimeLineItem implements Serializable {
+public class ZJTVehicleBooking extends ZJTItem implements Serializable {
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @Column(name = "zjt_vehiclebooking_id")
+    private int zjt_vehiclebooking_id;
     @ManyToOne
     @JoinColumn(name = "vehicle_id")
     private ZJTVehicle vehicle;
@@ -34,4 +37,8 @@ public class ZJTVehicleBooking extends ZJTSuperTimeLineItem implements Serializa
         this.driver = driver;
     }
 
+    @Override
+    public int getId() {
+        return zjt_vehiclebooking_id;
+    }
 }

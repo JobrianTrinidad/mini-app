@@ -2,13 +2,12 @@ package com.aat.application.data.entity;
 
 import com.aat.application.annotations.ContentDisplayedInSelect;
 import com.aat.application.core.data.entity.ZJTEntity;
-import com.github.javaparser.quality.NotNull;
 import jakarta.persistence.*;
 
-import java.util.List;
+import java.io.Serializable;
 
 @MappedSuperclass
-public abstract class ZJTSuperTimeLineNode implements ZJTEntity {
+public abstract class ZJTNode implements Serializable, ZJTEntity {
 
 //    @Id
 //    @GeneratedValue(strategy = GenerationType.AUTO)

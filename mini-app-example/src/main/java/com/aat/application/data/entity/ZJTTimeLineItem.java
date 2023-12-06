@@ -6,7 +6,11 @@ import jakarta.persistence.*;
 
 @Entity
 @Table(name = "zjt_timeline_item")
-public class ZJTTimeLineItem extends ZJTSuperTimeLineItem {
+public class ZJTTimeLineItem extends ZJTItem {
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @Column(name = "zjt_timelineitem_id")
+    private int zjt_timelineitem_id;
     @ManyToOne
     @JoinColumn(name = "node_id")
     @ShowField(show = true)
@@ -18,5 +22,10 @@ public class ZJTTimeLineItem extends ZJTSuperTimeLineItem {
 
     public void setNode(ZJTTimeLineNode group) {
         this.group = group;
+    }
+
+    @Override
+    public int getId() {
+        return zjt_timelineitem_id;
     }
 }

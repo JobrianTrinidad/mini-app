@@ -10,7 +10,7 @@ import java.util.List;
 @Table(name = "zjt_timeline_node")
 @NamedQuery(name = "findAllGroup", query = "SELECT p FROM ZJTTimeLineNode p")
 @PageTitle("TimeLine")
-public class ZJTTimeLineNode extends ZJTSuperTimeLineNode {
+public class ZJTTimeLineNode extends ZJTNode {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -66,7 +66,7 @@ public class ZJTTimeLineNode extends ZJTSuperTimeLineNode {
     public void updateNestedGroups() {
         StringBuilder temp = new StringBuilder();
         if (children != null) {
-            for (ZJTSuperTimeLineNode node : children) {
+            for (ZJTNode node : children) {
                 temp.append(node.getId()).append(",");
             }
             if (!temp.isEmpty()) {
