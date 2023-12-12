@@ -6,8 +6,8 @@ import com.aat.application.core.data.service.ZJTService;
 import com.aat.application.data.service.TableInfoService;
 
 public class GridCommonForm<T extends ZJTEntity> extends StandardForm<T, ZJTService<T>> {
-	public GridCommonForm(Class<T> entityClass, ZJTService<T> service, TableInfoService tableInfoService) {
-		super(entityClass, service, tableInfoService);
+	public GridCommonForm(Class<T> entityClass, ZJTService<T> service, TableInfoService tableInfoService, boolean isFilter) {
+		super(entityClass, service, tableInfoService, isFilter);
 		addClassName("demo-app-form");
 	}
 }

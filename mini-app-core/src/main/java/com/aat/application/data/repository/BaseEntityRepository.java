@@ -55,6 +55,14 @@ public class BaseEntityRepository<T> {
         }
     }
 
+    public <T> List<T> findRecordsByField(String fieldName, Object fieldValue) {
+        TypedQuery<T> query = (TypedQuery<T>) entityManager.createQuery(
+                "SELECT e FROM " + entityClass.getSimpleName() + " e WHERE e." + fieldName + " = :fieldValue",
+                entityClass);
+        query.setParameter("fieldValue", fieldValue);
+        return query.getResultList();
+    }
+
     private String getEntityClassName() {
         return getEntityClass().getSimpleName();
     }

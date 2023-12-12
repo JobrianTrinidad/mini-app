@@ -7,14 +7,16 @@ import com.aat.application.data.service.TableInfoService;
 import com.aat.application.form.GridCommonForm;
 import com.vaadin.componentfactory.tuigrid.model.AATContextMenu;
 import com.vaadin.flow.router.BeforeEnterEvent;
-import com.vaadin.flow.router.Route;
 
-@Route(value = "commonview", layout = CoreMainLayout.class)
+import java.lang.reflect.Field;
+
+//@Route(value = "common-view/:name", layout = CoreMainLayout.class)
 public class StandardFormView<T extends ZJTEntity> extends CommonView<T> {
 
     protected GridCommonForm<T> form;
     private final TableInfoService tableInfoService;
     protected AATContextMenu contextMenu;
+    private String name;
 
     public StandardFormView(BaseEntityRepository<T> repository, TableInfoService tableInfoService) {
         super(repository);
@@ -22,9 +24,23 @@ public class StandardFormView<T extends ZJTEntity> extends CommonView<T> {
     }
 
     private void configureForm() {
-        form = new GridCommonForm<>(entityClass, new BaseEntityService<>(repository), tableInfoService);
+        form = new GridCommonForm<>(entityClass, new BaseEntityService<>(repository), tableInfoService, bFilter);
         if (this.contextMenu != null)
             form.setContextMenu(this.contextMenu);
+        if (this.filterTemp != null) {
+//            String[] arrayFilterTemp = this.filterTemp.split("-");
+//            if (arrayFilterTemp.length > 1) {
+                String fieldName = "";
+                for (Field field :
+                        entityClass.getDeclaredFields()) {
+                    if (field.getType().getName().equals(filtedEntityClass.getTypeName())) {
+//                        fieldName = field.getName() + "." + arrayFilterTemp[0];
+                        form.setFilter(filtedEntityClass, field.getName(), this.filterTemp);
+                        break;
+                    }
+                }
+//            }
+        }
         setForm(form);
     }
 

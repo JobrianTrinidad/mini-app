@@ -1,5 +1,6 @@
 package com.aat.application.data.entity;
 
+import com.aat.application.annotations.BaseItems;
 import com.aat.application.annotations.ContentDisplayedInSelect;
 import com.aat.application.annotations.DisplayName;
 import com.vaadin.flow.router.PageTitle;
@@ -8,7 +9,6 @@ import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-
 
 @Entity
 @Table(name = "zjt_vehicle")
@@ -100,8 +100,8 @@ public class ZJTVehicle extends ZJTNode {
     private String fleetid;
 
     @OneToMany(mappedBy = "vehicle", cascade = CascadeType.ALL)
+    @BaseItems
     private List<ZJTVehicleServiceSchedule> vehicleServiceSchedules;
-
 
     public int getZjt_vehicle_id() {
         return zjt_vehicle_id;

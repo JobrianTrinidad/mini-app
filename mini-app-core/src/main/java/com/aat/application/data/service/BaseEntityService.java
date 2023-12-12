@@ -23,6 +23,21 @@ public class BaseEntityService<T> implements ZJTService<T> {
     }
 
     @Override
+    public <T1> List<T1> findRecordsByField(String fieldName, Object fieldValue) {
+        if (fieldValue instanceof String) {
+            return generalRepository.findRecordsByField(fieldName, (String) fieldValue);
+        } else if (fieldValue instanceof Boolean) {
+            return generalRepository.findRecordsByField(fieldName, (Boolean) fieldValue);
+        } else if (fieldValue instanceof Integer) {
+            return generalRepository.findRecordsByField(fieldName, (Integer) fieldValue);
+        }
+        // Handle other types as needed
+        else {
+            throw new IllegalArgumentException("Unsupported field value type: " + fieldValue.getClass());
+        }
+    }
+
+    @Override
     public void save(T record) {
         generalRepository.saveEntity(record);
     }
@@ -31,5 +46,4 @@ public class BaseEntityService<T> implements ZJTService<T> {
     public void delete(T record) {
         generalRepository.deleteEntity(record);
     }
-
 }

@@ -10,7 +10,7 @@ import com.vaadin.flow.router.Route;
 public class DriverView extends TimeLineFormView<ZJTVehicleBooking> {
     public DriverView(BaseEntityRepository<ZJTVehicleBooking> repository) {
         super(repository);
-        super.setGroupName("driver");
-        super.setGroupClass(ZJTDriver.class);
+//        super.setGroupName("driver");
+//        super.setGroupClass(ZJTDriver.class);
     }
 }

@@ -10,14 +10,18 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 
 public abstract class CommonView<T extends ZJTEntity> extends VerticalLayout implements RouterLayout, BeforeEnterObserver, HasDynamicTitle {
 
     protected final BaseEntityRepository<T> repository;
     protected Class<T> entityClass;
+    protected Class<T> filtedEntityClass;
     protected Class<?> LayoutClass;
     protected Class<? extends ZJTEntity> groupClass;
     protected String groupName;
+    protected ArrayList<String> filterTemp;
+    protected boolean bFilter = false;
     private String title = "";
 
     public CommonView(BaseEntityRepository<T> repository) {
@@ -46,7 +50,9 @@ public abstract class CommonView<T extends ZJTEntity> extends VerticalLayout imp
             values.forEach(value -> parameters.add(key, value));
         });
         String entityClassName = (String) VaadinSession.getCurrent().getAttribute("entityClass");
+        String filteredEntityClassName = (String) VaadinSession.getCurrent().getAttribute("filteredEntityClass");
         String layoutClassName = (String) VaadinSession.getCurrent().getAttribute("layout");
+        filterTemp = (ArrayList<String>) VaadinSession.getCurrent().getAttribute("filter");
         groupName = (String) VaadinSession.getCurrent().getAttribute("groupName");
         String groupClassName = (String) VaadinSession.getCurrent().getAttribute("groupClass");
         if(groupClassName != null){
@@ -56,6 +62,15 @@ public abstract class CommonView<T extends ZJTEntity> extends VerticalLayout imp
                 throw new RuntimeException(e);
             }
         }
+        if (filteredEntityClassName != null && !filteredEntityClassName.isEmpty())
+            try {
+                bFilter = true;
+                filtedEntityClass = (Class<T>) Class.forName(filteredEntityClassName);
+            } catch (ClassNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+        else
+            bFilter = false;
 
         if (entityClassName != null && layoutClassName != null) {
             try {
@@ -75,6 +90,14 @@ public abstract class CommonView<T extends ZJTEntity> extends VerticalLayout imp
         } else {
             repository.setEntityClass(entityClass);
         }
+
+        // Remove session data
+        VaadinSession.getCurrent().setAttribute("entityClass", null);
+        VaadinSession.getCurrent().setAttribute("filteredEntityClass", null);
+        VaadinSession.getCurrent().setAttribute("layout", null);
+        VaadinSession.getCurrent().setAttribute("filter", null);
+        VaadinSession.getCurrent().setAttribute("groupName", null);
+        VaadinSession.getCurrent().setAttribute("groupClass", null);
     }
 
     @Override

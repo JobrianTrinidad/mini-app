@@ -14,7 +14,10 @@ import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.Header;
 import com.vaadin.flow.component.orderedlayout.Scroller;
+import com.vaadin.flow.router.BeforeEnterEvent;
+import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.PageTitle;
+import com.vaadin.flow.router.RouterLayout;
 import com.vaadin.flow.theme.lumo.LumoUtility;
 
 /**
@@ -23,7 +26,7 @@ import com.vaadin.flow.theme.lumo.LumoUtility;
 @PageTitle("Main")
 //@Route(value = "")
 @CssImport("./styles/styles.css")
-public class CoreMainLayout extends AppLayout {
+public class CoreMainLayout extends AppLayout implements RouterLayout, BeforeEnterObserver {
     private H2 viewTitle;
     protected AppNav nav;
 
@@ -90,5 +93,19 @@ public class CoreMainLayout extends AppLayout {
                 "var contentElement = document.querySelector('[content]');" +
                         "contentElement.style.overflow = 'hidden';");
     }
+
+    @Override
+    public void beforeEnter(BeforeEnterEvent event) {
+        // Get the navigation target
+        Class<?> navigationTarget = event.getNavigationTarget();
+
+        // Update styles based on the navigation target
+        if (navigationTarget.equals(StandardFormView.class)) {
+            // Apply styles for TimelineView
+        } else if (navigationTarget.equals(TimeLineFormView.class)) {
+            // Apply styles for SpecificEntityGridView
+        }
+    }
+
 }
 
