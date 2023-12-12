@@ -299,9 +299,9 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
         grid.setContextMenu(contextMenu);
     }
 
-    public void setFilter(Class<T> filteredEntityClass, String fieldName, List<String> filter) {
+    public void setFilter(Class<T> filteredEntityClass, String fieldName, List<Cell> filter) {
         this.filteredEntityClass = filteredEntityClass;
-        grid.setItems(this.getTableData(filteredEntityClass, fieldName, filter.get(0)));
+        grid.setItems(this.getTableData(filteredEntityClass, fieldName, filter.get(0).getCellValue()));
         grid.refreshGrid();
 //        List<T> filteredData = service.findRecordsByField(colName, filter);
 //        grid.setItems(filteredData);

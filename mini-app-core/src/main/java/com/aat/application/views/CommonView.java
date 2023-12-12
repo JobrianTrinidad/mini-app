@@ -2,6 +2,7 @@ package com.aat.application.views;
 
 import com.aat.application.core.data.entity.ZJTEntity;
 import com.aat.application.data.repository.BaseEntityRepository;
+import com.vaadin.componentfactory.tuigrid.model.Cell;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.*;
@@ -20,7 +21,7 @@ public abstract class CommonView<T extends ZJTEntity> extends VerticalLayout imp
     protected Class<?> LayoutClass;
     protected Class<? extends ZJTEntity> groupClass;
     protected String groupName;
-    protected ArrayList<String> filterTemp;
+    protected ArrayList<Cell> filterTemp;
     protected boolean bFilter = false;
     private String title = "";
 
@@ -52,7 +53,7 @@ public abstract class CommonView<T extends ZJTEntity> extends VerticalLayout imp
         String entityClassName = (String) VaadinSession.getCurrent().getAttribute("entityClass");
         String filteredEntityClassName = (String) VaadinSession.getCurrent().getAttribute("filteredEntityClass");
         String layoutClassName = (String) VaadinSession.getCurrent().getAttribute("layout");
-        filterTemp = (ArrayList<String>) VaadinSession.getCurrent().getAttribute("filter");
+        filterTemp = (ArrayList<Cell>) VaadinSession.getCurrent().getAttribute("filter");
         groupName = (String) VaadinSession.getCurrent().getAttribute("groupName");
         String groupClassName = (String) VaadinSession.getCurrent().getAttribute("groupClass");
         if(groupClassName != null){
