@@ -58,6 +58,8 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
     List<Item> items = new ArrayList<>();
     List<T> tableData = new ArrayList<>();
     private boolean bSavedWidth = false;
+    private VerticalLayout verticalLayout;
+    private HorizontalLayout toolbar;
 
     public StandardForm(Class<T> entityClass, S service, TableInfoService tableInfoService, boolean isFilter) {
         addClassName("demo-app-form");
@@ -84,8 +86,10 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
     private void loadGrid(Class<T> entityClass, boolean isFilter) {
 //        removeAll();
         if (!twinColSelect.getSelectedItems().isEmpty()) configureGrid(entityClass);
-        if (grid != null) add(new VerticalLayout(getToolbar(entityClass, isFilter), grid));
-        else add(new VerticalLayout(getToolbar(entityClass, isFilter)));
+        toolbar = getToolbar(entityClass, isFilter);
+        verticalLayout = new VerticalLayout(toolbar);
+        if (grid != null) add(verticalLayout, grid);
+        else add(new VerticalLayout(verticalLayout));
     }
 
     private void initColSelDialog(Class<T> entityClass, boolean isFilter) {
@@ -307,6 +311,7 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
                 grid.setItems(this.getTableData(filteredEntityClass, fieldName + "." + cell.getColName(), cell.getCellValue()));
             }
         }
+
         grid.refreshGrid();
 //        List<T> filteredData = service.findRecordsByField(colName, filter);
 //        grid.setItems(filteredData);

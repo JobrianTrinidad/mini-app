@@ -17,7 +17,7 @@ public abstract class CommonView<T extends ZJTEntity> extends VerticalLayout imp
 
     protected final BaseEntityRepository<T> repository;
     protected Class<T> entityClass;
-    protected Class<T> filtedEntityClass;
+    protected Class<T> filteredEntityClass;
     protected Class<?> LayoutClass;
     protected Class<? extends ZJTEntity> groupClass;
     protected String groupName;
@@ -66,7 +66,7 @@ public abstract class CommonView<T extends ZJTEntity> extends VerticalLayout imp
         if (filteredEntityClassName != null && !filteredEntityClassName.isEmpty())
             try {
                 bFilter = true;
-                filtedEntityClass = (Class<T>) Class.forName(filteredEntityClassName);
+                filteredEntityClass = (Class<T>) Class.forName(filteredEntityClassName);
             } catch (ClassNotFoundException e) {
                 throw new RuntimeException(e);
             }

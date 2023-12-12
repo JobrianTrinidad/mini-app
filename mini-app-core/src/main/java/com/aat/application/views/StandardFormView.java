@@ -33,9 +33,9 @@ public class StandardFormView<T extends ZJTEntity> extends CommonView<T> {
                 String fieldName = "";
                 for (Field field :
                         entityClass.getDeclaredFields()) {
-                    if (field.getType().getName().equals(filtedEntityClass.getTypeName())) {
+                    if (field.getType().getName().equals(filteredEntityClass.getTypeName())) {
 //                        fieldName = field.getName() + "." + arrayFilterTemp[0];
-                        form.setFilter(filtedEntityClass, field.getName(), this.filterTemp);
+                        form.setFilter(filteredEntityClass, field.getName(), this.filterTemp);
                         break;
                     }
                 }
