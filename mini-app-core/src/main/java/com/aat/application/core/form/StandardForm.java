@@ -76,7 +76,7 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
         loadGrid(entityClass, isFilter);
         EventBus.getInstance().register(event -> {
             if ("DrawerToggleClicked".equals(event)) {
-                    getUI().ifPresent(ui -> ui.access(grid::refreshGrid));
+                getUI().ifPresent(ui -> ui.access(grid::refreshGrid));
             }
         });
     }
@@ -183,7 +183,7 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
                 continue;
             }
             if (field.getAnnotation(ContentDisplayedInSelect.class) != null) {
-                fieldDisplayedInSelect = field.getAnnotation(ContentDisplayedInSelect.class).value();
+                fieldDisplayedInSelect = field.getName();
             }
             if (field.getAnnotation(jakarta.persistence.Column.class) != null) {
                 fieldNames.add(field.getName());
@@ -301,11 +301,17 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
 
     public void setFilter(Class<T> filteredEntityClass, String fieldName, List<Cell> filter) {
         this.filteredEntityClass = filteredEntityClass;
-        grid.setItems(this.getTableData(filteredEntityClass, fieldName, filter.get(0).getCellValue()));
+        configureHeader(filteredEntityClass);
+        for (Cell cell : filter) {
+            if (cell.getColName().equals(this.fieldDisplayedInSelect)) {
+                grid.setItems(this.getTableData(filteredEntityClass, fieldName + "." + cell.getColName(), cell.getCellValue()));
+            }
+        }
         grid.refreshGrid();
 //        List<T> filteredData = service.findRecordsByField(colName, filter);
 //        grid.setItems(filteredData);
     }
+
     private void save(T row, String header, String colValue) {
         try {
             Field field = row.getClass().getDeclaredField(header);
@@ -578,6 +584,7 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
 
         return toolbar;
     }
+
     private List<Integer> getColumnWidths() {
         String strWidths = tableInfo.getWidths();
         List<Integer> colWidths = new ArrayList<>();
