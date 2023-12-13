@@ -13,7 +13,7 @@ import jakarta.persistence.*;
 @Entity
 @Table(name = "zjt_vehicleservicetype")
 @PageTitle("Service Type")
-public class ZJTVehicleServiceType implements ZJTEntity {
+public class ZJTVehicleServiceType extends ZJTNode {
 
 
     @Id
@@ -24,7 +24,7 @@ public class ZJTVehicleServiceType implements ZJTEntity {
 
     @Column
     private String value = "";
-    @Column
+    @Column(name = "name", insertable = false, updatable = false)
     @DisplayName(value = "Name")
     @ContentDisplayedInSelect(value = "Name")
     private String name = "";

@@ -16,12 +16,12 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.VaadinSession;
 
 //@Route(value="vehicle")
-@Route(value = "view", layout = CoreMainLayout.class)
-public class SpecificEntityGridView extends StandardFormView<ZJTNode> implements HasUrlParameter<String> {
+@Route(value = "vehicle", layout = CoreMainLayout.class)
+public class VehicleView extends StandardFormView<ZJTNode> implements HasUrlParameter<String> {
 
     private String name;
 
-    public SpecificEntityGridView(BaseEntityRepository<ZJTNode> repository, TableInfoService tableInfoService) {
+    public VehicleView(BaseEntityRepository<ZJTNode> repository, TableInfoService tableInfoService) {
         super(repository, tableInfoService);
         addMenu();
     }
@@ -44,18 +44,17 @@ public class SpecificEntityGridView extends StandardFormView<ZJTNode> implements
         editItem.addContextMenuClickListener(e -> Notification.show(editItem.getCaption()));
         MenuItem gridItem = editItem.addSubItem("Grid");
         gridItem.addContextMenuClickListener(e -> {
-            Notification.show(e.getRow().get(12).getCellValue());
             VaadinSession.getCurrent().setAttribute("filteredEntityClass", this.entityClass.getName());
-            VaadinSession.getCurrent().setAttribute("entityClass", ZJTVehicleServiceSchedule.class.getName());
             VaadinSession.getCurrent().setAttribute("filter", e.getRow());
-            UI.getCurrent().navigate("view/" + this.name + "-grid");
+            VaadinSession.getCurrent().setAttribute("entityClass", ZJTVehicleServiceSchedule.class.getName());
+            UI.getCurrent().navigate("vehicle/serviceschedule");
         });
         MenuItem timelineItem = editItem.addSubItem("Timeline");
         timelineItem.addContextMenuClickListener(e -> {
             VaadinSession.getCurrent().setAttribute("entityClass", ZJTVehicleServiceSchedule.class.getName());
             VaadinSession.getCurrent().setAttribute("groupName", "vehicle");
             VaadinSession.getCurrent().setAttribute("groupClass", ZJTVehicle.class.getName());
-            UI.getCurrent().navigate("view/timeline");
+            UI.getCurrent().navigate("timeline/vehicle/serviceschedule");
         });
 
         this.setContextMenu(contextMenu);

@@ -95,7 +95,7 @@ public abstract class CommonView<T extends ZJTEntity> extends VerticalLayout imp
         // Remove session data
         VaadinSession.getCurrent().setAttribute("entityClass", null);
         VaadinSession.getCurrent().setAttribute("filteredEntityClass", null);
-        VaadinSession.getCurrent().setAttribute("layout", null);
+//        VaadinSession.getCurrent().setAttribute("layout", null);
         VaadinSession.getCurrent().setAttribute("filter", null);
         VaadinSession.getCurrent().setAttribute("groupName", null);
         VaadinSession.getCurrent().setAttribute("groupClass", null);

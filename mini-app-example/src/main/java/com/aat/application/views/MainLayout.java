@@ -32,25 +32,25 @@ public class MainLayout extends CoreMainLayout {
         AppNavItem parent = new AppNavItem("Data");
         parent.setIcon(LineAwesomeIcon.FOLDER.create());
         nav.addItem(parent);
-        parent.addItem(new AppNavItem("Pricing Type", "view/pricing-type", LineAwesomeIcon.PRODUCT_HUNT.create())
+        parent.addItem(new AppNavItem("Pricing Type", "pricing-type", LineAwesomeIcon.PRODUCT_HUNT.create())
                 .withParameter("entityClass", ZJTPricingType.class.getName())
                 .withParameter("layout", this.getClass().getName()));
-        parent.addItem(new AppNavItem("Service Type", "view/servicetype", LineAwesomeIcon.PRODUCT_HUNT.create())
+        parent.addItem(new AppNavItem("Service Type", "service-type", LineAwesomeIcon.PRODUCT_HUNT.create())
                 .withParameter("entityClass", ZJTVehicleServiceType.class.getName())
                 .withParameter("layout", this.getClass().getName()));
 
-        parent.addItem(new AppNavItem("Vehicle", "view/vehicle", LineAwesomeIcon.PRODUCT_HUNT.create())
+        parent.addItem(new AppNavItem("Vehicle", "vehicle", LineAwesomeIcon.PRODUCT_HUNT.create())
                 .withParameter("entityClass", ZJTVehicle.class.getName())
                 .withParameter("layout", this.getClass().getName()));
 
-        parent.addItem(new AppNavItem("Vehicle Part", "view/vehicleparts", LineAwesomeIcon.PRODUCT_HUNT.create())
+        parent.addItem(new AppNavItem("Vehicle Part", "vehicle-parts", LineAwesomeIcon.PRODUCT_HUNT.create())
                 .withParameter("entityClass", ZJTVehiclePart.class.getName())
                 .withParameter("layout", this.getClass().getName()));
 
 
         parent = new AppNavItem("Transaction");
         parent.setIcon(LineAwesomeIcon.FOLDER.create());
-        parent.addItem(new AppNavItem("Service Schedule", "view/serviceschedule", LineAwesomeIcon.PRODUCT_HUNT.create())
+        parent.addItem(new AppNavItem("Service Schedule", "service-schedule", LineAwesomeIcon.PRODUCT_HUNT.create())
                 .withParameter("entityClass", ZJTVehicleServiceSchedule.class.getName())
                 .withParameter("layout", this.getClass().getName()));
 

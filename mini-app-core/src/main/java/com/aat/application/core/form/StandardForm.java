@@ -17,6 +17,7 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.dialog.Dialog;
+import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -86,7 +87,7 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
     private void loadGrid(Class<T> entityClass, boolean isFilter) {
 //        removeAll();
         if (!twinColSelect.getSelectedItems().isEmpty()) configureGrid(entityClass);
-        toolbar = getToolbar(entityClass, isFilter);
+        toolbar = getToolbar(entityClass, "", "", isFilter);
         verticalLayout = new VerticalLayout(toolbar);
         if (grid != null) add(verticalLayout, grid);
         else add(new VerticalLayout(verticalLayout));
@@ -306,11 +307,23 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
     public void setFilter(Class<T> filteredEntityClass, String fieldName, List<Cell> filter) {
         this.filteredEntityClass = filteredEntityClass;
         configureHeader(filteredEntityClass);
-        for (Cell cell : filter) {
-            if (cell.getColName().equals(this.fieldDisplayedInSelect)) {
-                grid.setItems(this.getTableData(filteredEntityClass, fieldName + "." + cell.getColName(), cell.getCellValue()));
+        String beforeRouteName = "";
+        for (Field field : this.entityClass.getDeclaredFields()) {
+            if (field.getType().getSimpleName().equals(filteredEntityClass.getSimpleName())) {
+                beforeRouteName = field.getAnnotation(DisplayName.class).value();
+                break;
             }
         }
+        String filteredValue = "";
+        for (Cell cell : filter) {
+            if (cell.getColName().equals(this.fieldDisplayedInSelect)) {
+                filteredValue = cell.getCellValue();
+                grid.setItems(this.getTableData(filteredEntityClass, fieldName + "." + cell.getColName(), filteredValue));
+            }
+        }
+
+        verticalLayout.replace(toolbar, this.getToolbar(this.entityClass, beforeRouteName, filteredValue, true));
+        toolbar = this.getToolbar(this.entityClass, beforeRouteName, filteredValue, true);
 
         grid.refreshGrid();
 //        List<T> filteredData = service.findRecordsByField(colName, filter);
@@ -555,21 +568,27 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
         return columns;
     }
 
-    private HorizontalLayout getToolbar(Class<T> entityClass, boolean isFilter) {
+    private HorizontalLayout getToolbar(Class<T> entityClass, String beforeRouteName, String filteredValue, boolean isFilter) {
         filterText.setPlaceholder("Filter by name...");
         filterText.setClearButtonVisible(true);
         filterText.setValueChangeMode(ValueChangeMode.LAZY);
         filterText.addValueChangeListener(e -> updateList());
 
-        Button btnGoOriginView = new Button("Vehicle");
+        Span sp = new Span(">> " + filteredValue);
+        Button btnGoOriginView = new Button(beforeRouteName);
+        HorizontalLayout routeLayout = new HorizontalLayout(btnGoOriginView, sp);
+        routeLayout.setAlignItems(FlexComponent.Alignment.CENTER);
+
         btnGoOriginView.addClickListener(e -> {
             VaadinSession.getCurrent().setAttribute("entityClass", this.filteredEntityClass.getName());
             UI.getCurrent().navigate("view/");
         });
+        btnGoOriginView.getElement().setAttribute("theme", "tertiary-inline");
+        btnGoOriginView.addClassName("link-button");
 
         // Set visibility based on isVehicle
         filterText.setVisible(!isFilter);
-        btnGoOriginView.setVisible(isFilter);
+        routeLayout.setVisible(isFilter);
 
         columns = new Button("Columns");
         columns.addClickListener(e -> {
@@ -581,7 +600,7 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
         autoWidthSave.addValueChangeListener(e -> bSavedWidth = e.getValue());
         HorizontalLayout columnToolbar = new HorizontalLayout(autoWidthSave, columns);
         columnToolbar.setAlignItems(FlexComponent.Alignment.CENTER);
-        HorizontalLayout toolbar = new HorizontalLayout(filterText, btnGoOriginView, columnToolbar);
+        HorizontalLayout toolbar = new HorizontalLayout(filterText, routeLayout, columnToolbar);
         toolbar.setWidthFull();
         toolbar.setJustifyContentMode(FlexComponent.JustifyContentMode.BETWEEN);
 

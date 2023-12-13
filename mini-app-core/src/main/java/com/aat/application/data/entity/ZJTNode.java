@@ -17,7 +17,7 @@ public abstract class ZJTNode implements Serializable, ZJTEntity {
     @Column(name = "name")
     @ContentDisplayedInSelect(value = "content")
     protected String content;
-    @Column(name = "level")
+    @Column(name = "level", columnDefinition = "int default 0")
     protected int treeLevel = 0;
 
     @Transient

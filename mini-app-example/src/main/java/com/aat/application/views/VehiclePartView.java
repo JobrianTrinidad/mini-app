@@ -6,7 +6,7 @@ import com.aat.application.data.repository.BaseEntityRepository;
 import com.aat.application.data.service.TableInfoService;
 import com.vaadin.flow.router.Route;
 
-@Route(value="vehicleparts")
+@Route(value="vehicle-parts")
 public class VehiclePartView extends  StandardFormView<ZJTVehiclePart> {
 
     public VehiclePartView(BaseEntityRepository<ZJTVehiclePart> repository, TableInfoService tableInfoService){
