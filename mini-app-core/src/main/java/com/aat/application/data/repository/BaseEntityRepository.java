@@ -4,6 +4,9 @@ import com.aat.application.util.GlobalData;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Root;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
@@ -62,6 +65,12 @@ public class BaseEntityRepository<T> {
         query.setParameter("fieldValue", fieldValue);
         return query.getResultList();
     }
+    public <T> List<T> findRecordsByFieldId(String fieldName, int fieldId) {
+        TypedQuery<T> query = (TypedQuery<T>) entityManager.createQuery(
+                "SELECT e FROM " + getEntityClassName() + " e WHERE e." + fieldName + " = :fieldId", entityClass);
+        query.setParameter("fieldId", fieldId);
+        return query.getResultList();
+    }
 
     private String getEntityClassName() {
         return getEntityClass().getSimpleName();
@@ -108,4 +117,6 @@ public class BaseEntityRepository<T> {
             e.printStackTrace();
         }
     }
+
+
 }

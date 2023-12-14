@@ -44,12 +44,6 @@ public abstract class CommonView<T extends ZJTEntity> extends VerticalLayout imp
 
     @Override
     public void beforeEnter(BeforeEnterEvent event) {
-        QueryParameters queryParameters = event.getLocation().getQueryParameters();
-        MultiValueMap<String, String> parameters = new LinkedMultiValueMap<>();
-
-        queryParameters.getParameters().forEach((key, values) -> {
-            values.forEach(value -> parameters.add(key, value));
-        });
         String entityClassName = (String) VaadinSession.getCurrent().getAttribute("entityClass");
         String filteredEntityClassName = (String) VaadinSession.getCurrent().getAttribute("filteredEntityClass");
         String layoutClassName = (String) VaadinSession.getCurrent().getAttribute("layout");

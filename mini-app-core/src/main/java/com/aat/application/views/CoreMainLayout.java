@@ -96,15 +96,7 @@ public class CoreMainLayout extends AppLayout implements RouterLayout, BeforeEnt
 
     @Override
     public void beforeEnter(BeforeEnterEvent event) {
-        // Get the navigation target
-        Class<?> navigationTarget = event.getNavigationTarget();
 
-        // Update styles based on the navigation target
-        if (navigationTarget.equals(StandardFormView.class)) {
-            // Apply styles for TimelineView
-        } else if (navigationTarget.equals(TimeLineFormView.class)) {
-            // Apply styles for SpecificEntityGridView
-        }
     }
 
 }

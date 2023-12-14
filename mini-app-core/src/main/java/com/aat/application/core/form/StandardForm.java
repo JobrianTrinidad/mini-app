@@ -24,6 +24,7 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.server.VaadinSession;
+import jakarta.persistence.Id;
 
 import java.io.Serial;
 import java.lang.annotation.Annotation;
@@ -184,6 +185,10 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
 
         List<String> fieldNames = new ArrayList<>();
         for (Field field : fields) {
+            if (field.getAnnotation(Id.class) != null) {
+                fieldNames.add("id");
+                headerNames.put("id", "ID");
+            }
             if (field.getAnnotation(DisplayName.class) == null) {
                 continue;
             }
@@ -217,7 +222,7 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
         grid.addClassName("scheduler-grid");
         grid.setHeaders(headers);
 
-        items = this.getTableData(null, "", "");
+        items = this.getTableData("", -1);
         grid.setItems(items);
 
         List<Column> columns = this.getColumns();
@@ -308,19 +313,29 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
         this.filteredEntityClass = filteredEntityClass;
         configureHeader(filteredEntityClass);
         String beforeRouteName = "";
+        String filteredValue = "";
+        String tempFieldName = fieldName;
+
         for (Field field : this.entityClass.getDeclaredFields()) {
             if (field.getType().getSimpleName().equals(filteredEntityClass.getSimpleName())) {
                 beforeRouteName = field.getAnnotation(DisplayName.class).value();
                 break;
             }
         }
-        String filteredValue = "";
+
+        for (Field field : this.filteredEntityClass.getDeclaredFields()) {
+            if (field.getAnnotation(Id.class) != null) {
+                tempFieldName += "."+field.getName();
+                break;
+            }
+        }
         for (Cell cell : filter) {
             if (cell.getColName().equals(this.fieldDisplayedInSelect)) {
                 filteredValue = cell.getCellValue();
-                grid.setItems(this.getTableData(filteredEntityClass, fieldName + "." + cell.getColName(), filteredValue));
             }
         }
+//        List<T> filteredData = service.findRecordsByFieldId(fieldName, Integer.parseInt(filterID));
+        grid.setItems(this.getTableData(tempFieldName, filter.get(0).getRowKey()));
 
         verticalLayout.replace(toolbar, this.getToolbar(this.entityClass, beforeRouteName, filteredValue, true));
         toolbar = this.getToolbar(this.entityClass, beforeRouteName, filteredValue, true);
@@ -328,6 +343,7 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
         grid.refreshGrid();
 //        List<T> filteredData = service.findRecordsByField(colName, filter);
 //        grid.setItems(filteredData);
+
     }
 
     private void save(T row, String header, String colValue) {
@@ -413,14 +429,14 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
         CompletableFuture.runAsync(() -> service.save(row));
     }
 
-    private List<Item> getTableData(Class<T> filterEntityClass, String fieldName, String filter) {
+    private List<Item> getTableData(String fieldName, int filterId) {
 
         List<Item> TableData = new ArrayList<>();
-        if (fieldName.isEmpty()) {
+        if (filterId == -1) {
             if (filterText != null) tableData = service.findAll(filterText.getValue());
             else tableData = service.findAll(null);
         } else
-            tableData = findRecordsByField(filterEntityClass, fieldName, filter);
+            tableData = findRecordsByField(fieldName, filterId);
 
         Comparator<T> comparator = Comparator.comparing(ZJTEntity::getId);
         tableData.sort(comparator);
@@ -466,41 +482,54 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
                     throw new RuntimeException(e);
                 }
             }
-            TableData.add(new GuiItem(rowData, headers));
+
+            try {
+                for (Field field : data.getClass().getDeclaredFields()) {
+                    field.setAccessible(true);
+                    if (field.getAnnotation(Id.class) != null) {
+                        TableData.add(new GuiItem((Integer) field.get(data), rowData, headers));
+//                        rowData.add(String.valueOf(field.get(data)));
+                    }
+                }
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
+            }
+
 
         }
         return TableData;
     }
 
-    public <T> List<T> findRecordsByField(Class<T> filterEntityClass, String fieldName, String filter) {
+    public <T> List<T> findRecordsByField(String fieldName, int filterId) {
         // Split the fieldName
-        String[] fieldNames = fieldName.split("\\.");
-
-        // Get the type of fieldName
-        Class<?> fieldType = filterEntityClass;
-        try {
-            Field field = fieldType.getDeclaredField(fieldNames[1]);
-            fieldType = field.getType();
-        } catch (NoSuchFieldException e) {
-            throw new RuntimeException(e);
-        }
+//        String[] fieldNames = fieldName.split("\\.");
+//
+//        // Get the type of fieldName
+//        Class<?> fieldType = filterEntityClass;
+//        try {
+//            Field field = fieldType.getDeclaredField(fieldNames[1]);
+//            fieldType = field.getType();
+//        } catch (NoSuchFieldException e) {
+//            throw new RuntimeException(e);
+//        }
 
         // Convert filter to the type of fieldName
-        Object convertedFilter;
-        if (fieldType == String.class) {
-            convertedFilter = filter;
-        } else if (fieldType == Integer.class || fieldType == int.class) {
-            convertedFilter = Integer.parseInt(filter);
-        } else if (fieldType == Boolean.class || fieldType == boolean.class) {
-            convertedFilter = Boolean.parseBoolean(filter);
-        } else if (fieldType == Double.class || fieldType == double.class) {
-            convertedFilter = Double.parseDouble(filter);
-        } else {
-            throw new IllegalArgumentException("Unsupported field type: " + fieldType);
-        }
+//        Object convertedFilter;
+//        if (fieldType == String.class) {
+//            convertedFilter = filter;
+//        } else if (fieldType == Integer.class || fieldType == int.class) {
+//            convertedFilter = Integer.parseInt(filter);
+//        } else if (fieldType == Boolean.class || fieldType == boolean.class) {
+//            convertedFilter = Boolean.parseBoolean(filter);
+//        } else if (fieldType == Double.class || fieldType == double.class) {
+//            convertedFilter = Double.parseDouble(filter);
+//        } else {
+//            throw new IllegalArgumentException("Unsupported field type: " + fieldType);
+//        }
 
         // Call the method with the converted filter
-        return service.findRecordsByField(fieldName, convertedFilter);
+//        return service.findRecordsByField(fieldName, convertedFilter);
+        return service.findRecordsByFieldId(fieldName, filterId);
     }
 
     private List<com.vaadin.componentfactory.tuigrid.model.Column> getColumns() {
@@ -581,7 +610,10 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
 
         btnGoOriginView.addClickListener(e -> {
             VaadinSession.getCurrent().setAttribute("entityClass", this.filteredEntityClass.getName());
-            UI.getCurrent().navigate("view/");
+            String previousView = (String) VaadinSession.getCurrent().getAttribute("previousView");
+            if (previousView != null) {
+                UI.getCurrent().navigate(previousView);
+            }
         });
         btnGoOriginView.getElement().setAttribute("theme", "tertiary-inline");
         btnGoOriginView.addClassName("link-button");
@@ -628,7 +660,7 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
     }
 
     private void updateList() {
-        grid.setItems(this.getTableData(null, "", ""));
+        grid.setItems(this.getTableData("", -1));
         add(grid);
     }
 

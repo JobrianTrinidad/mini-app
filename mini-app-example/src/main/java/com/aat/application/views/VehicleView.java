@@ -47,7 +47,8 @@ public class VehicleView extends StandardFormView<ZJTNode> implements HasUrlPara
             VaadinSession.getCurrent().setAttribute("filteredEntityClass", this.entityClass.getName());
             VaadinSession.getCurrent().setAttribute("filter", e.getRow());
             VaadinSession.getCurrent().setAttribute("entityClass", ZJTVehicleServiceSchedule.class.getName());
-            UI.getCurrent().navigate("vehicle/serviceschedule");
+            VaadinSession.getCurrent().setAttribute("previousView", "vehicle");
+            UI.getCurrent().navigate("vehicle/serviceschedule?vehicle_id=" + e.getRow().get(0).getRowKey());
         });
         MenuItem timelineItem = editItem.addSubItem("Timeline");
         timelineItem.addContextMenuClickListener(e -> {

@@ -39,10 +39,10 @@ public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>>
     protected Button save;
     protected Button close;
     private Item newItem;
-    private Object entityData;
+    private final Object entityData;
 
     private Button addItemButton;
-    private String groupName = "group";
+    private final String groupName;
     Timeline timeline;
     protected S service;
     List<String> headers;
@@ -156,7 +156,7 @@ public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>>
                         item.setClassName(((ZJTNode) dataSel).getClassName());
                     }
 
-                    Field itemHeaderField = null;
+                    Field itemHeaderField;
 
                     try {
                         if (headerField.getAnnotation(jakarta.persistence.Id.class) != null) {
@@ -251,7 +251,7 @@ public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>>
         ClassLoader systemClassLoader = ClassLoader.getSystemClassLoader();
         try {
             Class<?> currentClass = Class.forName(entityData.getClass().getName(), true, systemClassLoader);
-            Field field = null;
+            Field field;
             while (currentClass != null) {
                 try {
                     field = currentClass.getDeclaredField(header);
@@ -331,7 +331,7 @@ public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>>
                         setFieldData(header, GlobalData.listData.get(header).get(0));
 
                     groupComboBox.addValueChangeListener(e -> {
-                        List<?> data = null;
+                        List<?> data;
                         try {
                             data = GlobalData.getDataById(entityData.getClass().getDeclaredField(header).getType(), groupComboBox.getValue().getGroupId());
                         } catch (NoSuchFieldException ex) {

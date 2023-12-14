@@ -190,12 +190,11 @@ public class AppNavItem extends Component {
      * @return this instance for chaining
      */
     public AppNavItem setPath(Class<? extends Component> view) {
-        String url = "";
 
         if (this.parameters != null && this.parameters.size() == 2) {
             VaadinSession.getCurrent().setAttribute("layout", this.parameters.get("layout"));
         }
-        url = RouteConfiguration.forRegistry(getRouter().getRegistry()).getUrl(view);
+        String url = RouteConfiguration.forRegistry(getRouter().getRegistry()).getUrl(view);
         setPath(url);
         return this;
     }

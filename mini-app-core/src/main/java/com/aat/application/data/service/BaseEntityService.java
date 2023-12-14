@@ -46,4 +46,9 @@ public class BaseEntityService<T> implements ZJTService<T> {
     public void delete(T record) {
         generalRepository.deleteEntity(record);
     }
+
+    @Override
+    public <T1> List<T1> findRecordsByFieldId(String fieldName, int filterId) {
+        return generalRepository.findRecordsByFieldId(fieldName, filterId);
+    }
 }
