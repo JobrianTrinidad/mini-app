@@ -2,18 +2,17 @@ package com.aat.application.views;
 
 import com.aat.application.data.entity.ZJTItem;
 import com.aat.application.data.repository.BaseEntityRepository;
+import com.aat.application.data.repository.TimelineRepository;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.router.*;
 
 
 @Route(value = "timeline/:category?/:subcategory?")
-public class SpecificEntityTimelineView extends TimeLineFormView<ZJTItem> implements HasUrlParameter<String>, BeforeEnterObserver {
+public class SpecificEntityTimelineView extends TimeLineFormView implements HasUrlParameter<String>, BeforeEnterObserver {
     private String name;
 
-    public SpecificEntityTimelineView(BaseEntityRepository<ZJTItem> repository) {
+    public SpecificEntityTimelineView(TimelineRepository repository) {
         super(repository);
-//        super.setGroupName("group");
-//        super.setGroupClass(ZJTTimeLineNode.class);
     }
 
     @Override

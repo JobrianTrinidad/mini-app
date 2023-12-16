@@ -1,6 +1,7 @@
 package com.aat.application.data.entity;
 
 import com.aat.application.annotations.DisplayName;
+import com.aat.application.core.data.entity.ZJTEntity;
 import com.vaadin.flow.router.PageTitle;
 import jakarta.persistence.*;
 
@@ -11,7 +12,7 @@ import jakarta.persistence.*;
 @Entity
 @Table(name = "zjt_vehicleserviceschedule")
 @PageTitle("Vehicle Service Schedule")
-public class ZJTVehicleServiceSchedule extends ZJTItem {
+public class ZJTVehicleServiceSchedule implements ZJTEntity {
 
 
     @Id
@@ -37,7 +38,6 @@ public class ZJTVehicleServiceSchedule extends ZJTItem {
     public int getZjt_vehicleserviceschedule_id() {
         return zjt_vehicleserviceschedule_id;
     }
-    @Override
     public int getId() {
         return zjt_vehicleserviceschedule_id;
     }

@@ -1,5 +1,6 @@
 package com.aat.application.data.entity;
 
+import com.aat.application.core.data.entity.ZJTEntity;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 
@@ -8,7 +9,7 @@ import java.io.Serializable;
 @Entity
 @Table(name = "zjt_vehiclebooking")
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-public class ZJTVehicleBooking extends ZJTItem implements Serializable {
+public class ZJTVehicleBooking implements ZJTEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     @Column(name = "zjt_vehiclebooking_id")

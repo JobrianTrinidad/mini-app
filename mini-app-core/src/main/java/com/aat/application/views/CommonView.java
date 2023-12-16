@@ -50,7 +50,7 @@ public abstract class CommonView<T extends ZJTEntity> extends VerticalLayout imp
         filterTemp = (ArrayList<Cell>) VaadinSession.getCurrent().getAttribute("filter");
         groupName = (String) VaadinSession.getCurrent().getAttribute("groupName");
         String groupClassName = (String) VaadinSession.getCurrent().getAttribute("groupClass");
-        if(groupClassName != null){
+        if (groupClassName != null) {
             try {
                 groupClass = (Class<? extends ZJTEntity>) Class.forName(groupClassName);
             } catch (ClassNotFoundException e) {
@@ -83,7 +83,8 @@ public abstract class CommonView<T extends ZJTEntity> extends VerticalLayout imp
         if (entityClass == null) {
             event.rerouteToError(NotFoundException.class);
         } else {
-            repository.setEntityClass(entityClass);
+            if (repository != null)
+                repository.setEntityClass(entityClass);
         }
 
         // Remove session data
