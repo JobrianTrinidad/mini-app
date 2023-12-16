@@ -1,8 +1,6 @@
 package com.aat.application.data.entity;
 
-import com.aat.application.core.data.entity.ZJTEntity;
 import jakarta.persistence.*;
-
 import java.time.LocalDateTime;
 
 @Entity
@@ -19,10 +17,7 @@ public class ZJTItem {
     @Column(name = "end")
     private LocalDateTime end;
     @Column
-    private String tablename;
-    @Column
-    private int groupId;
-
+    private String groupId;
 
     public ZJTItem() {
         this.start = LocalDateTime.now(); // Set start time to current time
@@ -32,7 +27,6 @@ public class ZJTItem {
     public String getTitle() {
         return title;
     }
-
 
     public void setTitle(String title) {
         this.title = title;
@@ -70,19 +64,11 @@ public class ZJTItem {
         this.end = end;
     }
 
-    public String getTablename() {
-        return tablename;
-    }
-
-    public void setTablename(String tablename) {
-        this.tablename = tablename;
-    }
-
-    public int getGroupId() {
+    public String getGroupId() {
         return groupId;
     }
 
-    public void setGroupId(int groupId) {
+    public void setGroupId(String groupId) {
         this.groupId = groupId;
     }
 }
