@@ -19,7 +19,11 @@ public class TimelineService {
         this.generalRepository = generalRepository;
     }
 
-    public List<ZJTItem> findAllByFilter(String filter) {
+    public List<ZJTItem> findAllByFilter(String groupId) {
+        return generalRepository.findByGroupId(groupId);
+    }
+
+    public List<ZJTItem> findAll() {
         return generalRepository.findAll();
     }
 

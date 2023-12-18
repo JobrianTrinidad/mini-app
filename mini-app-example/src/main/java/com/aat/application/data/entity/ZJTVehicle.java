@@ -15,7 +15,6 @@ import java.util.List;
 @PageTitle("Vehicle")
 public class ZJTVehicle extends ZJTNode {
 
-
     @Id
     @GeneratedValue (strategy = GenerationType.SEQUENCE)
     @Column(name = "zjt_vehicle_id")

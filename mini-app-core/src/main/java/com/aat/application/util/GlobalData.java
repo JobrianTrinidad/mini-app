@@ -34,8 +34,6 @@ public class GlobalData {
             em.getTransaction().commit();
         } catch (Exception e) {
             em.getTransaction().rollback();
-            e.printStackTrace();
-//            throw e;
         } finally {
             em.close();
             emf.close();

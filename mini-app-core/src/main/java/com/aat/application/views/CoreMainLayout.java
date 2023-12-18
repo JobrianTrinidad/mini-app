@@ -9,11 +9,9 @@ import com.vaadin.flow.component.accordion.AccordionPanel;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
 import com.vaadin.flow.component.dependency.CssImport;
-import com.vaadin.flow.component.html.Footer;
-import com.vaadin.flow.component.html.H1;
-import com.vaadin.flow.component.html.H2;
-import com.vaadin.flow.component.html.Header;
+import com.vaadin.flow.component.html.*;
 import com.vaadin.flow.component.orderedlayout.Scroller;
+import com.vaadin.flow.dom.Element;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.PageTitle;
@@ -29,10 +27,12 @@ import com.vaadin.flow.theme.lumo.LumoUtility;
 public class CoreMainLayout extends AppLayout implements RouterLayout, BeforeEnterObserver {
     private H2 viewTitle;
     protected AppNav nav;
+    private Div content;
 
     public CoreMainLayout() {
         setPrimarySection(Section.DRAWER);
         addHeaderContent();
+
     }
 
     protected AppNav getNavigation() {
@@ -49,7 +49,11 @@ public class CoreMainLayout extends AppLayout implements RouterLayout, BeforeEnt
         viewTitle = new H2();
         viewTitle.addClassNames(LumoUtility.FontSize.LARGE, LumoUtility.Margin.NONE);
 
+        content = new Div();
+        content.setId("content");
         addToNavbar(true, toggle, viewTitle);
+
+        setContent(content);
     }
 
     private void addDrawerContent(String strAppName) {
@@ -98,6 +102,4 @@ public class CoreMainLayout extends AppLayout implements RouterLayout, BeforeEnt
     public void beforeEnter(BeforeEnterEvent event) {
 
     }
-
 }
-

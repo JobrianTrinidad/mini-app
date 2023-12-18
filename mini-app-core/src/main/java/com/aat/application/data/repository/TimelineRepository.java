@@ -9,5 +9,5 @@ import java.util.List;
 @Repository
 public interface TimelineRepository extends JpaRepository<ZJTItem, Long> {
 
-    List<ZJTItem> findAll();
+    List<ZJTItem> findByGroupId(String groupId);
 }

@@ -16,7 +16,7 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.VaadinSession;
 
 //@Route(value="vehicle")
-@Route(value = "vehicle", layout = CoreMainLayout.class)
+@Route(value = "vehicle", layout = MainLayout.class)
 public class VehicleView extends StandardFormView<ZJTNode> implements HasUrlParameter<String> {
 
     private String name;

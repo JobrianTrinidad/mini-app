@@ -4,6 +4,7 @@ import com.aat.application.core.data.entity.ZJTEntity;
 import com.aat.application.data.repository.BaseEntityRepository;
 import com.vaadin.componentfactory.tuigrid.model.Cell;
 import com.vaadin.flow.component.UI;
+import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.*;
 import com.vaadin.flow.server.VaadinSession;
@@ -33,9 +34,14 @@ public abstract class CommonView<T extends ZJTEntity> extends VerticalLayout imp
         try {
             CoreMainLayout layout = (CoreMainLayout) LayoutClass.getDeclaredConstructor().newInstance();
             layout.setContent(form);
+            Div outlet = new Div();
+            outlet.setId("outlet");
+            outlet.add(layout);
+            Div selection = new Div();
+            selection.setId("selection");
             UI.getCurrent().removeAll();
-            UI.getCurrent().add(layout);
-
+            UI.getCurrent().add(outlet);
+            UI.getCurrent().add(selection);
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
                  NoSuchMethodException e) {
             throw new RuntimeException(e);

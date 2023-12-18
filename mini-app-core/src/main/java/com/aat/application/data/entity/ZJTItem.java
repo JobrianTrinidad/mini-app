@@ -1,27 +1,31 @@
 package com.aat.application.data.entity;
 
 import jakarta.persistence.*;
+
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "zjt_timeline")
 public class ZJTItem {
     @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
     @Column
     private String title;
     @Column
     private String content;
-    @Column(name = "start")
-    private LocalDateTime start;
-    @Column(name = "end")
-    private LocalDateTime end;
+    @Column
+    private LocalDateTime startTime;
+    @Column
+    private LocalDateTime endTime;
     @Column
     private String groupId;
+    @Column
+    private String className;
 
     public ZJTItem() {
-        this.start = LocalDateTime.now(); // Set start time to current time
-        this.end = LocalDateTime.now(); // Set end time to current time
+        this.startTime = LocalDateTime.now(); // Set start time to current time
+        this.endTime = LocalDateTime.now(); // Set end time to current time
     }
 
     public String getTitle() {
@@ -48,20 +52,20 @@ public class ZJTItem {
         return id;
     }
 
-    public LocalDateTime getStart() {
-        return start;
+    public LocalDateTime getStartTime() {
+        return startTime;
     }
 
-    public void setStart(LocalDateTime start) {
-        this.start = start;
+    public void setStartTime(LocalDateTime startTime) {
+        this.startTime = startTime;
     }
 
-    public LocalDateTime getEnd() {
-        return end;
+    public LocalDateTime getEndTime() {
+        return endTime;
     }
 
-    public void setEnd(LocalDateTime end) {
-        this.end = end;
+    public void setEndTime(LocalDateTime endTime) {
+        this.endTime = endTime;
     }
 
     public String getGroupId() {
@@ -70,5 +74,13 @@ public class ZJTItem {
 
     public void setGroupId(String groupId) {
         this.groupId = groupId;
+    }
+
+    public String getClassName() {
+        return className;
+    }
+
+    public void setClassName(String className) {
+        this.className = className;
     }
 }
