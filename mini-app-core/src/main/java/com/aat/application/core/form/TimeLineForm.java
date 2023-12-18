@@ -7,9 +7,15 @@ import com.aat.application.util.GlobalData;
 import com.vaadin.componentfactory.timeline.Timeline;
 import com.vaadin.componentfactory.timeline.model.Item;
 import com.vaadin.componentfactory.timeline.model.ItemGroup;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.orderedlayout.FlexComponent;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.data.value.ValueChangeMode;
+import com.vaadin.flow.server.VaadinSession;
 
 import java.io.Serial;
 import java.lang.annotation.Annotation;
@@ -29,7 +35,8 @@ public abstract class TimeLineForm<T extends ZJTEntity> extends VerticalLayout {
     Timeline timeline;
     List<ZJTItem> itemData;
     private final TimelineService timelineService;
-    private Class<T> groupClass;
+    private final Class<T> groupClass;
+    private Class<T> filteredEntityClass;
 
     public TimeLineForm(Class<T> groupClass, TimelineService timelineService, String groupName) {
         this.groupClass = groupClass;
@@ -43,19 +50,36 @@ public abstract class TimeLineForm<T extends ZJTEntity> extends VerticalLayout {
         configureTimeLine();
     }
 
-    private List<String> configureGroup() {
-        List<String> fieldNames = new ArrayList<>();
+    private HorizontalLayout getToolbar() {
+//        Span sp = new Span(">> " + filteredValue);
+        Button btnGoOriginView = new Button(this.groupName);
+        HorizontalLayout routeLayout = new HorizontalLayout(btnGoOriginView);
+        routeLayout.setAlignItems(FlexComponent.Alignment.CENTER);
 
+        btnGoOriginView.addClickListener(e -> {
+            VaadinSession.getCurrent().setAttribute("entityClass", this.filteredEntityClass.getName());
+            String previousView = (String) VaadinSession.getCurrent().getAttribute("previousView");
+            if (previousView != null) {
+                UI.getCurrent().navigate(previousView);
+            }
+        });
+        btnGoOriginView.getElement().setAttribute("theme", "tertiary-inline");
+        btnGoOriginView.addClassName("link-button");
+        return routeLayout;
+    }
+
+    private void configureGroup() {
         Class<?> currentClass = this.groupClass;
         while (currentClass != null) {
             for (Field field : currentClass.getDeclaredFields()) {
                 if (field.getAnnotation(jakarta.persistence.JoinColumn.class) != null) {
                     GlobalData.addData(field.getName(), (Class<? extends ZJTEntity>) field.getType());
+                    if (field.getName().equals(this.groupName))
+                        this.filteredEntityClass = (Class<T>) field.getType();
                 }
             }
             currentClass = currentClass.getSuperclass();
         }
-        return fieldNames;
     }
 
     private void configureTimeLine() {
@@ -83,7 +107,12 @@ public abstract class TimeLineForm<T extends ZJTEntity> extends VerticalLayout {
             timelineService.save(zjtItem);
         });
 
-        add(timeline);
+        timeline.addItemUpdateTitle(e -> {
+            Item item = e.getItem();
+
+        });
+
+        add(getToolbar(), timeline);
     }
 
     private List<Item> getItems() {
