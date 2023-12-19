@@ -1,12 +1,13 @@
 package com.aat.application.data.entity;
 
+import com.aat.application.core.data.entity.ZJTEntity;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "zjt_timeline")
-public class ZJTItem {
+public class ZJTItem implements ZJTEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
@@ -48,8 +49,8 @@ public class ZJTItem {
         this.id = id;
     }
 
-    public Long getId() {
-        return id;
+    public int getId() {
+        return Math.toIntExact(id);
     }
 
     public LocalDateTime getStartTime() {

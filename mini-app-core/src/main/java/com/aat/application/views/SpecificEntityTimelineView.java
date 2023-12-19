@@ -1,6 +1,8 @@
 package com.aat.application.views;
 
+import com.aat.application.core.data.entity.ZJTEntity;
 import com.aat.application.data.entity.ZJTItem;
+import com.aat.application.data.entity.ZJTNode;
 import com.aat.application.data.repository.BaseEntityRepository;
 import com.aat.application.data.repository.TimelineRepository;
 import com.vaadin.flow.component.notification.Notification;
@@ -8,10 +10,10 @@ import com.vaadin.flow.router.*;
 
 
 @Route(value = "timeline/:category?/:subcategory?")
-public class SpecificEntityTimelineView extends TimeLineFormView implements HasUrlParameter<String>, BeforeEnterObserver {
+public class SpecificEntityTimelineView extends TimeLineFormView<ZJTEntity> implements HasUrlParameter<String>, BeforeEnterObserver {
     private String name;
 
-    public SpecificEntityTimelineView(TimelineRepository repository) {
+    public SpecificEntityTimelineView(BaseEntityRepository<ZJTEntity> repository) {
         super(repository);
     }
 

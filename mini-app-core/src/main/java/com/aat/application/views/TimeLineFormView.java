@@ -1,7 +1,9 @@
 package com.aat.application.views;
 
 import com.aat.application.core.data.entity.ZJTEntity;
+import com.aat.application.data.repository.BaseEntityRepository;
 import com.aat.application.data.repository.TimelineRepository;
+import com.aat.application.data.service.BaseEntityService;
 import com.aat.application.data.service.TimelineService;
 import com.aat.application.form.TimeLineCommonForm;
 import com.vaadin.flow.dom.Element;
@@ -11,15 +13,13 @@ import com.vaadin.flow.router.BeforeEnterEvent;
 public class TimeLineFormView<T extends ZJTEntity> extends CommonView<T>{
 
     protected TimeLineCommonForm<T> form;
-    private final TimelineRepository repository;
 
-    public TimeLineFormView(TimelineRepository repository) {
-        super(null);
-        this.repository = repository;
+    public TimeLineFormView(BaseEntityRepository<T> repository) {
+        super(repository);
     }
 
     private void configureForm() {
-        form = new TimeLineCommonForm<>(entityClass, new TimelineService(this.repository), groupName);
+        form = new TimeLineCommonForm<>(entityClass, new BaseEntityService<>(repository), groupName);
         setForm(form);
     }
 

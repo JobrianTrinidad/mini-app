@@ -1,9 +1,12 @@
 package com.aat.application.core.form;
 
+import com.aat.application.annotations.StartDate;
 import com.aat.application.core.data.entity.ZJTEntity;
+import com.aat.application.core.data.service.ZJTService;
 import com.aat.application.data.entity.ZJTItem;
 import com.aat.application.data.service.TimelineService;
 import com.aat.application.util.GlobalData;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.vaadin.componentfactory.timeline.Timeline;
 import com.vaadin.componentfactory.timeline.model.Item;
 import com.vaadin.componentfactory.timeline.model.ItemGroup;
@@ -16,15 +19,17 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.server.VaadinSession;
+import jakarta.persistence.Id;
 
 import java.io.Serial;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
-public abstract class TimeLineForm<T extends ZJTEntity> extends VerticalLayout {
+public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>> extends VerticalLayout {
 
     @Serial
     private static final long serialVersionUID = -5183438338263448740L;
@@ -33,14 +38,17 @@ public abstract class TimeLineForm<T extends ZJTEntity> extends VerticalLayout {
     protected Button close;
     private final String groupName;
     Timeline timeline;
-    List<ZJTItem> itemData;
-    private final TimelineService timelineService;
+    List<T> itemData;
+    //    List<ZJTItem> itemData;
+    //    private final TimelineService timelineService;
+    protected S service;
     private final Class<T> groupClass;
     private Class<T> filteredEntityClass;
 
-    public TimeLineForm(Class<T> groupClass, TimelineService timelineService, String groupName) {
+    public TimeLineForm(Class<T> groupClass, S service, String groupName) {
         this.groupClass = groupClass;
-        this.timelineService = timelineService;
+//        this.timelineService = timelineService;
+        this.service = service;
         addClassName("demo-app-form");
         this.groupName = groupName;
 
@@ -104,7 +112,8 @@ public abstract class TimeLineForm<T extends ZJTEntity> extends VerticalLayout {
             zjtItem.setGroupId(this.groupName + "-" + e.getItem().getGroup());
             zjtItem.setClassName(e.getItem().getClassName());
 
-            timelineService.save(zjtItem);
+//            timelineService.save(zjtItem);
+            service.save((T) zjtItem);
         });
 
         timeline.addItemUpdateTitle(e -> {
@@ -118,22 +127,64 @@ public abstract class TimeLineForm<T extends ZJTEntity> extends VerticalLayout {
     private List<Item> getItems() {
 
         List<Item> TableData = new ArrayList<>();
-        if (filterText != null) itemData = timelineService.findAll();
-        else itemData = timelineService.findAllByFilter(null);
+//        if (filterText != null) itemData = timelineService.findAll();
+//        else itemData = timelineService.findAllByFilter(null);
+        if (filterText != null) itemData = service.findAll(filterText.getValue());
+        else itemData = service.findAll(null);
 
-        for (ZJTItem data :
-                itemData) {
-            Item item = new Item();
-            item.setId(data.getId().toString());
-            item.setContent(data.getTitle());
-            item.setClassName(data.getClassName());
-            item.setStart(data.getStartTime());
-            item.setEnd(data.getEndTime());
-            String[] tempGroupId = data.getGroupId().split("-");
-            item.setGroup(tempGroupId[1]);
+        Comparator<T> comparator = Comparator.comparing(ZJTEntity::getId);
+        itemData.sort(comparator);
 
-            TableData.add(item);
+        for (T data : itemData) {
+            int i = 0;
+            for (String fieldName : GlobalData.getFieldNamesWithAnnotation(StartDate.class, data.getClass())) {
+                Item item = new Item();
+                for (Field field : data.getClass().getDeclaredFields()) {
+                    field.setAccessible(true);
+                    try {
+                        if (field.getAnnotation(Id.class) != null) {
+                            item.setId(field.get(data) + "-" + i);
+                            item.setContent(String.valueOf(field.get(data)));
+                        }
+                        else if (field.getAnnotation(StartDate.class) != null
+                                && fieldName.equals(field.getName())) {
+                            if (field.get(data) == null)
+                                item.setStart(LocalDateTime.now());
+                            else
+                                item.setStart((LocalDateTime) field.get(data));
+                            item.setClassName(field.getAnnotation(StartDate.class).className());
+                            item.setEnd(item.getStart().plusDays(1));
+                        } else if (field.getType().getSimpleName().equals(this.filteredEntityClass.getSimpleName())) {
+                            for (Field groupField : field.getType().getDeclaredFields()) {
+                                groupField.setAccessible(true);
+                                if (groupField.getAnnotation(Id.class) != null) {
+                                    item.setGroup(String.valueOf(groupField.get(field.get(data))));
+                                    break;
+                                }
+                            }
+                        }
+                    } catch (IllegalAccessException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+                TableData.add(item);
+                i++;
+            }
         }
+
+//        for (ZJTItem data :
+//                itemData) {
+//            Item item = new Item();
+//            item.setId(data.getId().toString());
+//            item.setContent(data.getTitle());
+//            item.setClassName(data.getClassName());
+//            item.setStart(data.getStartTime());
+//            item.setEnd(data.getEndTime());
+//            String[] tempGroupId = data.getGroupId().split("-");
+//            item.setGroup(tempGroupId[1]);
+//
+//            TableData.add(item);
+//        }
         return TableData;
     }
 

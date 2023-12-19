@@ -12,6 +12,7 @@ import org.hibernate.proxy.HibernateProxy;
 
 
 import java.io.IOException;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -88,6 +89,17 @@ public class GlobalData {
         }
         // Check superclass if no field found
         return getPrimaryKeyField(clazz.getSuperclass());
+    }
+
+    public static List<String> getFieldNamesWithAnnotation(Class<? extends Annotation> annotation, Class<?> entityClass) {
+        List<String> fieldNames = new ArrayList<>();
+        for (Field field : entityClass.getDeclaredFields()) {
+            field.setAccessible(true);
+            if (field.isAnnotationPresent(annotation)) {
+                fieldNames.add(field.getName());
+            }
+        }
+        return fieldNames;
     }
 
     public static void addData(String header) {

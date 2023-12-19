@@ -1,9 +1,12 @@
 package com.aat.application.data.entity;
 
 import com.aat.application.annotations.DisplayName;
+import com.aat.application.annotations.StartDate;
 import com.aat.application.core.data.entity.ZJTEntity;
 import com.vaadin.flow.router.PageTitle;
 import jakarta.persistence.*;
+
+import java.time.LocalDateTime;
 
 
 /**
@@ -35,12 +38,21 @@ public class ZJTVehicleServiceSchedule implements ZJTEntity {
     @DisplayName(value = "Last Service (KM)")
     private Integer lastServiceKM;
 
+    @Column
+    @StartDate(className = "bg-success")
+    private LocalDateTime planDate;
+    @Column
+    @StartDate(className = "bg-warning")
+    private LocalDateTime actualDate;
+
     public int getZjt_vehicleserviceschedule_id() {
         return zjt_vehicleserviceschedule_id;
     }
+
     public int getId() {
         return zjt_vehicleserviceschedule_id;
     }
+
     public ZJTVehicle getVehicle() {
         return vehicle;
     }
@@ -63,5 +75,21 @@ public class ZJTVehicleServiceSchedule implements ZJTEntity {
 
     public void setLastServiceKM(Integer lastServiceKM) {
         this.lastServiceKM = lastServiceKM;
+    }
+
+    public LocalDateTime getPlanDate() {
+        return planDate;
+    }
+
+    public void setPlanDate(LocalDateTime planDate) {
+        this.planDate = planDate;
+    }
+
+    public LocalDateTime getActualDate() {
+        return actualDate;
+    }
+
+    public void setActualDate(LocalDateTime actualDate) {
+        this.actualDate = actualDate;
     }
 }
