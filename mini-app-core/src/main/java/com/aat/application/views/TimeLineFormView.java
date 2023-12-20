@@ -19,7 +19,7 @@ public class TimeLineFormView<T extends ZJTEntity> extends CommonView<T>{
     }
 
     private void configureForm() {
-        form = new TimeLineCommonForm<>(entityClass, new BaseEntityService<>(repository), groupName);
+        form = new TimeLineCommonForm<>(entityClass, filteredEntityClass, new BaseEntityService<>(repository), groupName,  filterObjectId);
         setForm(form);
     }
 

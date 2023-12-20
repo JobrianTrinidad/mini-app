@@ -63,11 +63,14 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
     private VerticalLayout verticalLayout;
     private HorizontalLayout toolbar;
 
-    public StandardForm(Class<T> entityClass, S service, TableInfoService tableInfoService, String groupName, int filterObjectId) {
+    public StandardForm(Class<T> entityClass, Class<T> filteredEntityClass,
+                        S service, TableInfoService tableInfoService,
+                        String groupName, int filterObjectId) {
         addClassName("demo-app-form");
         this.service = service;
         this.tableInfoService = tableInfoService;
         this.entityClass = entityClass;
+        this.filteredEntityClass = filteredEntityClass;
 
 //        binder = new BeanValidationBinder<>(entityClass);
         save = new Button("Save");
@@ -434,7 +437,7 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
     private List<Item> getTableData(String fieldName, int filterId) {
 
         List<Item> TableData = new ArrayList<>();
-        if (filterId == -1) {
+        if (fieldName.isEmpty()) {
             if (filterText != null) tableData = service.findAll(filterText.getValue());
             else tableData = service.findAll(null);
         } else tableData = findRecordsByField(fieldName, filterId);

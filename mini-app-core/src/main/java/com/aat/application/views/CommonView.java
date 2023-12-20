@@ -18,10 +18,10 @@ import java.util.ArrayList;
 public abstract class CommonView<T extends ZJTEntity> extends VerticalLayout implements RouterLayout, BeforeEnterObserver, HasDynamicTitle {
 
     protected final BaseEntityRepository<T> repository;
-    protected Class<T> entityClass;
+    public Class<T> entityClass;
     protected Class<T> filteredEntityClass;
     protected Class<?> LayoutClass;
-    protected Class<? extends ZJTEntity> groupClass;
+    protected Class groupClass;
     protected int filterObjectId = -1;
     protected String groupName;
     protected ArrayList<Cell> filterTemp;
@@ -57,9 +57,9 @@ public abstract class CommonView<T extends ZJTEntity> extends VerticalLayout imp
         String layoutClassName = (String) VaadinSession.getCurrent().getAttribute("layout");
 //        filterTemp = (ArrayList<Cell>) VaadinSession.getCurrent().getAttribute("filter");
 //        groupName = (String) VaadinSession.getCurrent().getAttribute("groupName");
-        if (this.entityClass != null) {
-            groupClass = this.entityClass;
-            filteredEntityClass = this.entityClass;
+        if (event.getRouteParameters().getParameterNames().contains("subcategory")){
+            this.groupClass = ((CommonView) UI.getCurrent().getInternals().getActiveRouterTargetsChain().get(0)).entityClass;
+            filteredEntityClass = this.groupClass;
         }
 
         if (entityClassName != null && layoutClassName != null) {
@@ -72,6 +72,15 @@ public abstract class CommonView<T extends ZJTEntity> extends VerticalLayout imp
                 }
             } catch (ClassNotFoundException e) {
                 event.rerouteToError(NotFoundException.class);
+            }
+        }
+
+        if (this.groupClass != null) {
+            assert this.entityClass != null;
+            for (Field field : this.entityClass.getDeclaredFields()) {
+                if (field.getType().getSimpleName().equals(this.groupClass.getSimpleName())) {
+                    groupName = field.getName();
+                }
             }
         }
 

@@ -24,7 +24,7 @@ public class StandardFormView<T extends ZJTEntity> extends CommonView<T> {
     }
 
     private void configureForm() {
-        form = new GridCommonForm<>(entityClass, new BaseEntityService<>(repository), tableInfoService, groupName, filterObjectId);
+        form = new GridCommonForm<>(entityClass, filteredEntityClass, new BaseEntityService<>(repository), tableInfoService, groupName, filterObjectId);
         if (this.contextMenu != null)
             form.setContextMenu(this.contextMenu);
 //        if (this.filterObjectId != -1) {

@@ -45,8 +45,10 @@ public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>>
     private final Class<T> groupClass;
     private Class<T> filteredEntityClass;
 
-    public TimeLineForm(Class<T> groupClass, S service, String groupName) {
+    public TimeLineForm(Class<T> groupClass, Class<T> filteredEntityClass,
+                        S service, String groupName, int filterObjectId) {
         this.groupClass = groupClass;
+        this.filteredEntityClass = filteredEntityClass;
 //        this.timelineService = timelineService;
         this.service = service;
         addClassName("demo-app-form");
@@ -55,7 +57,7 @@ public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>>
         save = new Button("Save");
         close = new Button("Cancel");
         configureGroup();
-        configureTimeLine();
+        configureTimeLine(filterObjectId);
     }
 
     private HorizontalLayout getToolbar() {
@@ -90,9 +92,21 @@ public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>>
         }
     }
 
-    private void configureTimeLine() {
-        List<Item> items = getItems();
-        List<ItemGroup> itemGroups = getGroupItems((List<ZJTEntity>) GlobalData.listData.get(groupName));
+    private void configureTimeLine(int filterObjectId) {
+
+        String fieldName = "";
+        for (Field field : groupClass.getDeclaredFields()) {
+            if (field.getName().equals(groupName)) {
+                for (Field childField : field.getType().getDeclaredFields()) {
+                    if (childField.getAnnotation(Id.class) != null) {
+                        fieldName = groupName + "." + childField.getName();
+                    }
+                }
+            }
+        }
+
+        List<Item> items = getItems(fieldName, filterObjectId);
+        List<ItemGroup> itemGroups = getGroupItems((List<ZJTEntity>) GlobalData.listData.get(groupName), fieldName, filterObjectId);
         if (itemGroups == null)
             timeline = new Timeline(items);
         else
@@ -124,13 +138,19 @@ public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>>
         add(getToolbar(), timeline);
     }
 
-    private List<Item> getItems() {
+    public <T> List<T> findRecordsByField(String fieldName, int filterId) {
+        return service.findRecordsByFieldId(fieldName, filterId);
+    }
+
+    private List<Item> getItems(String filterFieldName, int filterId) {
 
         List<Item> TableData = new ArrayList<>();
 //        if (filterText != null) itemData = timelineService.findAll();
 //        else itemData = timelineService.findAllByFilter(null);
-        if (filterText != null) itemData = service.findAll(filterText.getValue());
-        else itemData = service.findAll(null);
+        if (filterFieldName.isEmpty()) {
+            if (filterText != null) itemData = service.findAll(filterText.getValue());
+            else itemData = service.findAll(null);
+        } else itemData = findRecordsByField(filterFieldName, filterId);
 
         Comparator<T> comparator = Comparator.comparing(ZJTEntity::getId);
         itemData.sort(comparator);
@@ -145,8 +165,7 @@ public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>>
                         if (field.getAnnotation(Id.class) != null) {
                             item.setId(field.get(data) + "-" + i);
                             item.setContent(String.valueOf(field.get(data)));
-                        }
-                        else if (field.getAnnotation(StartDate.class) != null
+                        } else if (field.getAnnotation(StartDate.class) != null
                                 && fieldName.equals(field.getName())) {
                             if (field.get(data) == null)
                                 item.setStart(LocalDateTime.now());
@@ -188,7 +207,7 @@ public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>>
         return TableData;
     }
 
-    private List<ItemGroup> getGroupItems(List<ZJTEntity> groupResults) {
+    private List<ItemGroup> getGroupItems(List<ZJTEntity> groupResults, String fieldName, int fieldId) {
         if (groupResults == null)
             return null;
         List<ItemGroup> itemGroups = new ArrayList<>();
@@ -217,7 +236,8 @@ public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>>
                 }
             }
 
-            itemGroups.add(itemGroup);
+            if (fieldId == itemGroup.getGroupId())
+                itemGroups.add(itemGroup);
         }
         return itemGroups;
     }

@@ -7,6 +7,8 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.datatype.hibernate5.Hibernate5Module;
 import com.vaadin.flow.component.Component;
 import jakarta.persistence.*;
+import jakarta.persistence.metamodel.IdentifiableType;
+import jakarta.persistence.metamodel.Metamodel;
 import org.hibernate.Hibernate;
 import org.hibernate.proxy.HibernateProxy;
 
@@ -27,10 +29,17 @@ public class GlobalData {
         EntityManager em = emf.createEntityManager();
         em.getTransaction().begin();
         try {
-            String queryString = "SELECT p FROM " + entityClass.getSimpleName() + " p";
+            String strEntityClass = entityClass.getName();
+            // Get the primary key name
+            Metamodel metamodel = em.getMetamodel();
+            IdentifiableType<?> identifiableType = metamodel.entity(metamodel.getClass().getClassLoader().loadClass(strEntityClass));
+            String primaryKeyFieldName = identifiableType.getId(identifiableType.getIdType().getJavaType()).getName();
+
+            // Create the query string
+            String queryString = "SELECT p FROM " + entityClass.getSimpleName() + " p ORDER BY p." + primaryKeyFieldName;
+
             TypedQuery<?> query = em.createQuery(queryString, entityClass);
             List<?> results = query.getResultList();
-//            List<ZJTEntity> results = (List<ZJTEntity>) GlobalData.executeQuery(queryString, entityClass, em);
             listData.put(headerName, results);
             em.getTransaction().commit();
         } catch (Exception e) {

@@ -44,8 +44,6 @@ public class VehicleView extends StandardFormView<ZJTNode> implements HasUrlPara
         editItem.addContextMenuClickListener(e -> Notification.show(editItem.getCaption()));
         MenuItem gridItem = editItem.addSubItem("Grid");
         gridItem.addContextMenuClickListener(e -> {
-            VaadinSession.getCurrent().setAttribute("filteredEntityClass", this.entityClass.getName());
-            VaadinSession.getCurrent().setAttribute("filter", e.getRow());
             VaadinSession.getCurrent().setAttribute("entityClass", ZJTVehicleServiceSchedule.class.getName());
             VaadinSession.getCurrent().setAttribute("previousView", "vehicle");
             UI.getCurrent().navigate("vehicle/serviceschedule/" + e.getRow().get(0).getRowKey());
@@ -53,8 +51,6 @@ public class VehicleView extends StandardFormView<ZJTNode> implements HasUrlPara
         MenuItem timelineItem = editItem.addSubItem("Timeline");
         timelineItem.addContextMenuClickListener(e -> {
             VaadinSession.getCurrent().setAttribute("entityClass", ZJTVehicleServiceSchedule.class.getName());
-            VaadinSession.getCurrent().setAttribute("groupName", "vehicle");
-            VaadinSession.getCurrent().setAttribute("groupClass", ZJTVehicle.class.getName());
             VaadinSession.getCurrent().setAttribute("previousView", "vehicle");
             UI.getCurrent().navigate("timeline/vehicle/serviceschedule/" + e.getRow().get(0).getRowKey());
         });
