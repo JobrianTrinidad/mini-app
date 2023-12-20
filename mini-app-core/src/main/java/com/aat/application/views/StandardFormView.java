@@ -24,23 +24,23 @@ public class StandardFormView<T extends ZJTEntity> extends CommonView<T> {
     }
 
     private void configureForm() {
-        form = new GridCommonForm<>(entityClass, new BaseEntityService<>(repository), tableInfoService, bFilter);
+        form = new GridCommonForm<>(entityClass, new BaseEntityService<>(repository), tableInfoService, groupName, filterObjectId);
         if (this.contextMenu != null)
             form.setContextMenu(this.contextMenu);
-        if (this.filterTemp != null) {
-//            String[] arrayFilterTemp = this.filterTemp.split("-");
-//            if (arrayFilterTemp.length > 1) {
-                String fieldName = "";
-                for (Field field :
-                        entityClass.getDeclaredFields()) {
-                    if (field.getType().getName().equals(filteredEntityClass.getTypeName())) {
-//                        fieldName = field.getName() + "." + arrayFilterTemp[0];
-                        form.setFilter(filteredEntityClass, field.getName(), this.filterTemp);
-                        break;
-                    }
-                }
+//        if (this.filterObjectId != -1) {
+////            String[] arrayFilterTemp = this.filterTemp.split("-");
+////            if (arrayFilterTemp.length > 1) {
+//            String fieldName = "";
+//            for (Field field :
+//                    entityClass.getDeclaredFields()) {
+//                if (field.getType().getName().equals(filteredEntityClass.getTypeName())) {
+////                        fieldName = field.getName() + "." + arrayFilterTemp[0];
+//                    form.setFilter(filteredEntityClass, field.getName(), this.filterTemp);
+//                    break;
+//                }
 //            }
-        }
+////            }
+//        }
         setForm(form);
     }
 

@@ -11,6 +11,7 @@ import com.vaadin.flow.server.VaadinSession;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 
@@ -21,6 +22,7 @@ public abstract class CommonView<T extends ZJTEntity> extends VerticalLayout imp
     protected Class<T> filteredEntityClass;
     protected Class<?> LayoutClass;
     protected Class<? extends ZJTEntity> groupClass;
+    protected int filterObjectId = -1;
     protected String groupName;
     protected ArrayList<Cell> filterTemp;
     protected boolean bFilter = false;
@@ -51,27 +53,14 @@ public abstract class CommonView<T extends ZJTEntity> extends VerticalLayout imp
     @Override
     public void beforeEnter(BeforeEnterEvent event) {
         String entityClassName = (String) VaadinSession.getCurrent().getAttribute("entityClass");
-        String filteredEntityClassName = (String) VaadinSession.getCurrent().getAttribute("filteredEntityClass");
+//        String filteredEntityClassName = (String) VaadinSession.getCurrent().getAttribute("filteredEntityClass");
         String layoutClassName = (String) VaadinSession.getCurrent().getAttribute("layout");
-        filterTemp = (ArrayList<Cell>) VaadinSession.getCurrent().getAttribute("filter");
-        groupName = (String) VaadinSession.getCurrent().getAttribute("groupName");
-        String groupClassName = (String) VaadinSession.getCurrent().getAttribute("groupClass");
-        if (groupClassName != null) {
-            try {
-                groupClass = (Class<? extends ZJTEntity>) Class.forName(groupClassName);
-            } catch (ClassNotFoundException e) {
-                throw new RuntimeException(e);
-            }
+//        filterTemp = (ArrayList<Cell>) VaadinSession.getCurrent().getAttribute("filter");
+//        groupName = (String) VaadinSession.getCurrent().getAttribute("groupName");
+        if (this.entityClass != null) {
+            groupClass = this.entityClass;
+            filteredEntityClass = this.entityClass;
         }
-        if (filteredEntityClassName != null && !filteredEntityClassName.isEmpty())
-            try {
-                bFilter = true;
-                filteredEntityClass = (Class<T>) Class.forName(filteredEntityClassName);
-            } catch (ClassNotFoundException e) {
-                throw new RuntimeException(e);
-            }
-        else
-            bFilter = false;
 
         if (entityClassName != null && layoutClassName != null) {
             try {
@@ -93,13 +82,43 @@ public abstract class CommonView<T extends ZJTEntity> extends VerticalLayout imp
                 repository.setEntityClass(entityClass);
         }
 
+        if (event.getRouteParameters().getParameterNames().size() > 1) {
+            filterObjectId = Integer.parseInt(event.getRouteParameters().get("___url_parameter").get());
+            for (Field field : this.entityClass.getDeclaredFields()) {
+                field.setAccessible(true);
+                if (field.getType().getSimpleName().equals(filteredEntityClass.getSimpleName())) {
+                    groupName = field.getName();
+                    break;
+                }
+            }
+        }
+//        String groupClassName = (String) VaadinSession.getCurrent().getAttribute("groupClass");
+//        if (groupClassName != null) {
+//            try {
+//                groupClass = (Class<? extends ZJTEntity>) Class.forName(groupClassName);
+//            } catch (ClassNotFoundException e) {
+//                throw new RuntimeException(e);
+//            }
+//        }
+
+//        if (filteredEntityClassName != null && !filteredEntityClassName.isEmpty())
+//            try {
+//                bFilter = true;
+//                filteredEntityClass = (Class<T>) Class.forName(filteredEntityClassName);
+//            } catch (ClassNotFoundException e) {
+//                throw new RuntimeException(e);
+//            }
+//        else
+//            bFilter = false;
+
+
         // Remove session data
-        VaadinSession.getCurrent().setAttribute("entityClass", null);
-        VaadinSession.getCurrent().setAttribute("filteredEntityClass", null);
-//        VaadinSession.getCurrent().setAttribute("layout", null);
-        VaadinSession.getCurrent().setAttribute("filter", null);
-        VaadinSession.getCurrent().setAttribute("groupName", null);
-        VaadinSession.getCurrent().setAttribute("groupClass", null);
+//        VaadinSession.getCurrent().setAttribute("entityClass", null);
+//        VaadinSession.getCurrent().setAttribute("filteredEntityClass", null);
+////        VaadinSession.getCurrent().setAttribute("layout", null);
+//        VaadinSession.getCurrent().setAttribute("filter", null);
+//        VaadinSession.getCurrent().setAttribute("groupName", null);
+//        VaadinSession.getCurrent().setAttribute("groupClass", null);
     }
 
     @Override

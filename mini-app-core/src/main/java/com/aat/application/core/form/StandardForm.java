@@ -63,7 +63,7 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
     private VerticalLayout verticalLayout;
     private HorizontalLayout toolbar;
 
-    public StandardForm(Class<T> entityClass, S service, TableInfoService tableInfoService, boolean isFilter) {
+    public StandardForm(Class<T> entityClass, S service, TableInfoService tableInfoService, String groupName, int filterObjectId) {
         addClassName("demo-app-form");
         this.service = service;
         this.tableInfoService = tableInfoService;
@@ -75,9 +75,9 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
 
         headers = configureHeader(entityClass);
 
-        initColSelDialog(entityClass, isFilter);
+        initColSelDialog(entityClass, groupName, filterObjectId);
 
-        loadGrid(entityClass, isFilter);
+        loadGrid(entityClass, groupName, filterObjectId);
         EventBus.getInstance().register(event -> {
             if ("DrawerToggleClicked".equals(event)) {
                 getUI().ifPresent(ui -> ui.access(grid::refreshGrid));
@@ -85,20 +85,19 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
         });
     }
 
-    private void loadGrid(Class<T> entityClass, boolean isFilter) {
+    private void loadGrid(Class<T> entityClass, String groupName, int filterObjectId) {
 //        removeAll();
-        if (!twinColSelect.getSelectedItems().isEmpty()) configureGrid(entityClass);
-        toolbar = getToolbar(entityClass, "", "", isFilter);
+        if (!twinColSelect.getSelectedItems().isEmpty()) configureGrid(entityClass, groupName, filterObjectId);
+        toolbar = getToolbar(groupName, "", filterObjectId);
         verticalLayout = new VerticalLayout(toolbar);
         if (grid != null) add(verticalLayout, grid);
         else add(new VerticalLayout(verticalLayout));
     }
 
-    private void initColSelDialog(Class<T> entityClass, boolean isFilter) {
+    private void initColSelDialog(Class<T> entityClass, String groupName, int filterObjectId) {
         twinColSelect = new AATTwinColSelect();
         List<String> tempHeaderNames = new ArrayList<>();
-        for (String header :
-                headers) {
+        for (String header : headers) {
             tempHeaderNames.add(headerNames.get(header));
         }
 
@@ -115,8 +114,7 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
         if (tempHeader != null && !tempHeader.equals("[]")) {
             headers = Arrays.stream(tempHeader.substring(1, tempHeader.length() - 1).split(",")).map(String::trim).collect(Collectors.toList());
             tempDisplayedHeaderNames = new ArrayList<>();
-            for (String header :
-                    headers) {
+            for (String header : headers) {
                 tempDisplayedHeaderNames.add(headerNames.get(header));
             }
         }
@@ -136,11 +134,9 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
             List<Integer> allowedWidths = new ArrayList<>();
             List<String> tempTwinItems = new ArrayList<>(twinColSelect.getSelectedItems());
             List<String> tempHeaders = new ArrayList<>();
-            if (!tempTwinItems.contains(fieldDisplayedInSelect))
-                tempTwinItems.add(fieldDisplayedInSelect);
+            if (!tempTwinItems.contains(fieldDisplayedInSelect)) tempTwinItems.add(fieldDisplayedInSelect);
             twinColSelect.select(tempTwinItems);
-            for (String desiredValue :
-                    tempTwinItems) {
+            for (String desiredValue : tempTwinItems) {
                 Enumeration<String> keys = headerNames.keys();
                 while (keys.hasMoreElements()) {
                     String key = keys.nextElement();
@@ -153,12 +149,10 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
             }
             headers = tempHeaders;
 
-            for (String allowedHeader :
-                    headers) {
+            for (String allowedHeader : headers) {
                 if (originHeaders.contains(allowedHeader)) {
                     allowedWidths.add(columnWidths.get(originHeaders.indexOf(allowedHeader)));
-                } else
-                    allowedWidths.add(0);
+                } else allowedWidths.add(0);
             }
 
             finalTableInfo.setWidths(allowedWidths.toString());
@@ -166,7 +160,7 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
             tableInfoService.save(finalTableInfo);
             tableInfo = finalTableInfo;
 
-            if (!headers.isEmpty()) this.loadGrid(entityClass, isFilter);
+            if (!headers.isEmpty()) this.loadGrid(entityClass, groupName, filterObjectId);
             else grid.removeFromParent();
 
             twinColSelDialog.close();
@@ -217,12 +211,23 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
         return fieldNames;
     }
 
-    private void configureGrid(Class<T> entityClass) {
+    private void configureGrid(Class<T> entityClass, String groupName, int filterObjectId) {
         grid = new TuiGrid();
         grid.addClassName("scheduler-grid");
         grid.setHeaders(headers);
 
-        items = this.getTableData("", -1);
+        String fieldName = "";
+        for (Field field : entityClass.getDeclaredFields()) {
+            if (field.getName().equals(groupName)) {
+                for (Field childField : field.getType().getDeclaredFields()) {
+                    if (childField.getAnnotation(Id.class) != null) {
+                        fieldName = groupName + "." + childField.getName();
+                    }
+                }
+            }
+        }
+
+        items = this.getTableData(fieldName, filterObjectId);
         grid.setItems(items);
 
         List<Column> columns = this.getColumns();
@@ -309,42 +314,42 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
         grid.setContextMenu(contextMenu);
     }
 
-    public void setFilter(Class<T> filteredEntityClass, String fieldName, List<Cell> filter) {
-        this.filteredEntityClass = filteredEntityClass;
-        configureHeader(filteredEntityClass);
-        String beforeRouteName = "";
-        String filteredValue = "";
-        String tempFieldName = fieldName;
-
-        for (Field field : this.entityClass.getDeclaredFields()) {
-            if (field.getType().getSimpleName().equals(filteredEntityClass.getSimpleName())) {
-                beforeRouteName = field.getAnnotation(DisplayName.class).value();
-                break;
-            }
-        }
-
-        for (Field field : this.filteredEntityClass.getDeclaredFields()) {
-            if (field.getAnnotation(Id.class) != null) {
-                tempFieldName += "."+field.getName();
-                break;
-            }
-        }
-        for (Cell cell : filter) {
-            if (cell.getColName().equals(this.fieldDisplayedInSelect)) {
-                filteredValue = cell.getCellValue();
-            }
-        }
-//        List<T> filteredData = service.findRecordsByFieldId(fieldName, Integer.parseInt(filterID));
-        grid.setItems(this.getTableData(tempFieldName, filter.get(0).getRowKey()));
-
-        verticalLayout.replace(toolbar, this.getToolbar(this.entityClass, beforeRouteName, filteredValue, true));
-        toolbar = this.getToolbar(this.entityClass, beforeRouteName, filteredValue, true);
-
-        grid.refreshGrid();
-//        List<T> filteredData = service.findRecordsByField(colName, filter);
-//        grid.setItems(filteredData);
-
-    }
+//    public void setFilter(Class<T> filteredEntityClass, String fieldName, List<Cell> filter) {
+//        this.filteredEntityClass = filteredEntityClass;
+//        configureHeader(filteredEntityClass);
+//        String beforeRouteName = "";
+//        String filteredValue = "";
+//        String tempFieldName = fieldName;
+//
+//        for (Field field : this.entityClass.getDeclaredFields()) {
+//            if (field.getType().getSimpleName().equals(filteredEntityClass.getSimpleName())) {
+//                beforeRouteName = field.getAnnotation(DisplayName.class).value();
+//                break;
+//            }
+//        }
+//
+//        for (Field field : this.filteredEntityClass.getDeclaredFields()) {
+//            if (field.getAnnotation(Id.class) != null) {
+//                tempFieldName += "."+field.getName();
+//                break;
+//            }
+//        }
+//        for (Cell cell : filter) {
+//            if (cell.getColName().equals(this.fieldDisplayedInSelect)) {
+//                filteredValue = cell.getCellValue();
+//            }
+//        }
+////        List<T> filteredData = service.findRecordsByFieldId(fieldName, Integer.parseInt(filterID));
+//        grid.setItems(this.getTableData(tempFieldName, filter.get(0).getRowKey()));
+//
+//        verticalLayout.replace(toolbar, this.getToolbar(this.entityClass, beforeRouteName, filteredValue, true));
+//        toolbar = this.getToolbar(this.entityClass, beforeRouteName, filteredValue, filterObjectId);
+//
+//        grid.refreshGrid();
+////        List<T> filteredData = service.findRecordsByField(colName, filter);
+////        grid.setItems(filteredData);
+//
+//    }
 
     private void save(T row, String header, String colValue) {
         try {
@@ -387,13 +392,11 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
                     }
                     break;
                 case "select_class":
-                    if (colValue.equals("All"))
-                        break;
+                    if (colValue.equals("All")) break;
 
                     int ordinal = -1;
 
-                    if (!colValue.isEmpty())
-                        ordinal = Integer.parseInt(colValue.substring(0, 1)) - 1;
+                    if (!colValue.isEmpty()) ordinal = Integer.parseInt(colValue.substring(0, 1)) - 1;
 
                     Object dataSel = field.get(row);
                     if (dataSel == null) dataSel = field.getType().getDeclaredConstructor().newInstance();
@@ -413,15 +416,14 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
                 default:
                     break;
             }
-        } catch (NoSuchFieldException | IllegalAccessException | InvocationTargetException |
-                 InstantiationException | NoSuchMethodException e) {
+        } catch (NoSuchFieldException | IllegalAccessException | InvocationTargetException | InstantiationException |
+                 NoSuchMethodException e) {
             throw new RuntimeException(e);
         }
     }
 
     private void save(T row, GuiItem item) {
-        for (String header :
-                item.getHeaders()) {
+        for (String header : item.getHeaders()) {
             String colValue = item.getRecordData().get(item.getHeaders().indexOf(header));
             this.save(row, header, colValue);
         }
@@ -435,8 +437,7 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
         if (filterId == -1) {
             if (filterText != null) tableData = service.findAll(filterText.getValue());
             else tableData = service.findAll(null);
-        } else
-            tableData = findRecordsByField(fieldName, filterId);
+        } else tableData = findRecordsByField(fieldName, filterId);
 
         Comparator<T> comparator = Comparator.comparing(ZJTEntity::getId);
         tableData.sort(comparator);
@@ -597,7 +598,7 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
         return columns;
     }
 
-    private HorizontalLayout getToolbar(Class<T> entityClass, String beforeRouteName, String filteredValue, boolean isFilter) {
+    private HorizontalLayout getToolbar(String beforeRouteName, String filteredValue, int filterObjectId) {
         filterText.setPlaceholder("Filter by name...");
         filterText.setClearButtonVisible(true);
         filterText.setValueChangeMode(ValueChangeMode.LAZY);
@@ -619,6 +620,7 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
         btnGoOriginView.addClassName("link-button");
 
         // Set visibility based on isVehicle
+        boolean isFilter = filterObjectId != -1;
         filterText.setVisible(!isFilter);
         routeLayout.setVisible(isFilter);
 

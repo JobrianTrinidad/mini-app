@@ -16,7 +16,7 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.VaadinSession;
 
 //@Route(value="vehicle")
-@Route(value = "vehicle", layout = MainLayout.class)
+@Route(value = ":category?/:subcategory?", layout = MainLayout.class)
 public class VehicleView extends StandardFormView<ZJTNode> implements HasUrlParameter<String> {
 
     private String name;
@@ -48,7 +48,7 @@ public class VehicleView extends StandardFormView<ZJTNode> implements HasUrlPara
             VaadinSession.getCurrent().setAttribute("filter", e.getRow());
             VaadinSession.getCurrent().setAttribute("entityClass", ZJTVehicleServiceSchedule.class.getName());
             VaadinSession.getCurrent().setAttribute("previousView", "vehicle");
-            UI.getCurrent().navigate("vehicle/serviceschedule?vehicle_id=" + e.getRow().get(0).getRowKey());
+            UI.getCurrent().navigate("vehicle/serviceschedule/" + e.getRow().get(0).getRowKey());
         });
         MenuItem timelineItem = editItem.addSubItem("Timeline");
         timelineItem.addContextMenuClickListener(e -> {
@@ -56,7 +56,7 @@ public class VehicleView extends StandardFormView<ZJTNode> implements HasUrlPara
             VaadinSession.getCurrent().setAttribute("groupName", "vehicle");
             VaadinSession.getCurrent().setAttribute("groupClass", ZJTVehicle.class.getName());
             VaadinSession.getCurrent().setAttribute("previousView", "vehicle");
-            UI.getCurrent().navigate("timeline/vehicle/serviceschedule");
+            UI.getCurrent().navigate("timeline/vehicle/serviceschedule/" + e.getRow().get(0).getRowKey());
         });
 
         this.setContextMenu(contextMenu);
