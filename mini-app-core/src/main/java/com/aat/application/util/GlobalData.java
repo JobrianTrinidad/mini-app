@@ -70,6 +70,23 @@ public class GlobalData {
         return results;
     }
 
+    public static String getContentDisplayedInSelect(Object data) {
+        String content = null;
+        for (Field field : data.getClass().getDeclaredFields()) {
+            field.setAccessible(true);
+            for (Annotation annotation : field.getAnnotations()) {
+                if (annotation.annotationType().getSimpleName().equals("ContentDisplayedInSelect")) {
+                    try {
+                        content = (String) field.get(data);
+                    } catch (IllegalAccessException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            }
+        }
+        return content;
+    }
+
     public static <T> T convertToZJTEntity(Object entityData, Class<?> zjtEntityClass) {
         try {
             if (entityData instanceof HibernateProxy) {
@@ -112,8 +129,7 @@ public class GlobalData {
     }
 
     public static void addData(String header) {
-        String headerName = header.substring(0, 1).toUpperCase()
-                + header.substring(1);
+        String headerName = convertToStandard(header);
         EntityManagerFactory emf = Persistence.createEntityManagerFactory("aat_persistence_unit");
         EntityManager em = emf.createEntityManager();
         em.getTransaction().begin();
@@ -156,5 +172,12 @@ public class GlobalData {
         });
 
         return matchingComponents;
+    }
+
+    public static String convertToStandard(String string) {
+        if (string == null)
+            return null;
+        return string.substring(0, 1).toUpperCase()
+                + string.substring(1);
     }
 }

@@ -57,7 +57,8 @@ public abstract class CommonView<T extends ZJTEntity> extends VerticalLayout imp
         String layoutClassName = (String) VaadinSession.getCurrent().getAttribute("layout");
 //        filterTemp = (ArrayList<Cell>) VaadinSession.getCurrent().getAttribute("filter");
 //        groupName = (String) VaadinSession.getCurrent().getAttribute("groupName");
-        if (event.getRouteParameters().getParameterNames().contains("subcategory")){
+        VaadinSession.getCurrent().setAttribute("previousView", UI.getCurrent().getInternals().getActiveViewLocation().getPath());
+        if (event.getRouteParameters().getParameterNames().contains("subcategory")) {
             this.groupClass = ((CommonView) UI.getCurrent().getInternals().getActiveRouterTargetsChain().get(0)).entityClass;
             filteredEntityClass = this.groupClass;
         }
@@ -100,7 +101,8 @@ public abstract class CommonView<T extends ZJTEntity> extends VerticalLayout imp
                     break;
                 }
             }
-        }
+        } else
+            filterObjectId = -1;
 //        String groupClassName = (String) VaadinSession.getCurrent().getAttribute("groupClass");
 //        if (groupClassName != null) {
 //            try {

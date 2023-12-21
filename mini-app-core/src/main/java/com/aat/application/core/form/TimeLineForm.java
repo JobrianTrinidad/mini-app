@@ -4,20 +4,19 @@ import com.aat.application.annotations.StartDate;
 import com.aat.application.core.data.entity.ZJTEntity;
 import com.aat.application.core.data.service.ZJTService;
 import com.aat.application.data.entity.ZJTItem;
-import com.aat.application.data.service.TimelineService;
 import com.aat.application.util.GlobalData;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.vaadin.componentfactory.timeline.Timeline;
 import com.vaadin.componentfactory.timeline.model.Item;
 import com.vaadin.componentfactory.timeline.model.ItemGroup;
 import com.vaadin.flow.component.UI;
+import com.vaadin.flow.component.Unit;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
-import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.server.VaadinSession;
 import jakarta.persistence.Id;
 
@@ -60,10 +59,45 @@ public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>>
         configureTimeLine(filterObjectId);
     }
 
-    private HorizontalLayout getToolbar() {
+    private VerticalLayout getToolbar(int filterObjectId) {
 //        Span sp = new Span(">> " + filteredValue);
-        Button btnGoOriginView = new Button(this.groupName);
-        HorizontalLayout routeLayout = new HorizontalLayout(btnGoOriginView);
+        Button btnGoOriginView = new Button(GlobalData.convertToStandard(this.groupName));
+
+        VerticalLayout itemKindLayout = new VerticalLayout();
+        for (String fieldName : GlobalData.getFieldNamesWithAnnotation(StartDate.class, this.groupClass)) {
+            HorizontalLayout everyItemLayout = new HorizontalLayout();
+            everyItemLayout.setWidth( 200, Unit.PIXELS);
+            everyItemLayout.setJustifyContentMode(FlexComponent.JustifyContentMode.BETWEEN);
+            String itemClassName = null;
+            for (Field field : this.groupClass.getDeclaredFields()) {
+                if (field.getName().equals(fieldName)) {
+                    itemClassName = field.getAnnotation(StartDate.class).className();
+                }
+            }
+            Span label = new Span(GlobalData.convertToStandard(fieldName));
+            Div graph = new Div();
+            graph.setWidth(50, Unit.PIXELS);
+            graph.setClassName(itemClassName);
+            everyItemLayout.add(label, graph);
+            itemKindLayout.add(everyItemLayout);
+        }
+
+        String filteredValue = "";
+        if (filterObjectId != -1)
+            for (Object data :
+                    GlobalData.listData.get(this.groupName)) {
+                Field pkFiled = GlobalData.getPrimaryKeyField(data.getClass());
+                pkFiled.setAccessible(true);
+                try {
+                    if ((int) pkFiled.get(data) == filterObjectId)
+                        filteredValue = GlobalData.getContentDisplayedInSelect(data);
+
+                } catch (IllegalAccessException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        Span sp = new Span(">> " + filteredValue);
+        HorizontalLayout routeLayout = new HorizontalLayout(btnGoOriginView, sp);
         routeLayout.setAlignItems(FlexComponent.Alignment.CENTER);
 
         btnGoOriginView.addClickListener(e -> {
@@ -75,7 +109,7 @@ public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>>
         });
         btnGoOriginView.getElement().setAttribute("theme", "tertiary-inline");
         btnGoOriginView.addClassName("link-button");
-        return routeLayout;
+        return new VerticalLayout(itemKindLayout, routeLayout);
     }
 
     private void configureGroup() {
@@ -135,7 +169,7 @@ public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>>
 
         });
 
-        add(getToolbar(), timeline);
+        add(getToolbar(filterObjectId), timeline);
     }
 
     public <T> List<T> findRecordsByField(String fieldName, int filterId) {
@@ -147,7 +181,7 @@ public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>>
         List<Item> TableData = new ArrayList<>();
 //        if (filterText != null) itemData = timelineService.findAll();
 //        else itemData = timelineService.findAllByFilter(null);
-        if (filterFieldName.isEmpty()) {
+        if (filterId == -1) {
             if (filterText != null) itemData = service.findAll(filterText.getValue());
             else itemData = service.findAll(null);
         } else itemData = findRecordsByField(filterFieldName, filterId);

@@ -45,6 +45,7 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
     String fieldDisplayedInSelect;
     private ZJTTableInfo tableInfo;
     protected TextField filterText = new TextField();
+    private String groupName = "";
     protected Button save;
     protected Button close;
     protected Button columns;
@@ -71,6 +72,7 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
         this.tableInfoService = tableInfoService;
         this.entityClass = entityClass;
         this.filteredEntityClass = filteredEntityClass;
+        this.groupName = groupName;
 
 //        binder = new BeanValidationBinder<>(entityClass);
         save = new Button("Save");
@@ -91,7 +93,7 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
     private void loadGrid(Class<T> entityClass, String groupName, int filterObjectId) {
 //        removeAll();
         if (!twinColSelect.getSelectedItems().isEmpty()) configureGrid(entityClass, groupName, filterObjectId);
-        toolbar = getToolbar(groupName, "", filterObjectId);
+        toolbar = getToolbar(groupName, filterObjectId);
         verticalLayout = new VerticalLayout(toolbar);
         if (grid != null) add(verticalLayout, grid);
         else add(new VerticalLayout(verticalLayout));
@@ -437,7 +439,7 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
     private List<Item> getTableData(String fieldName, int filterId) {
 
         List<Item> TableData = new ArrayList<>();
-        if (fieldName.isEmpty()) {
+        if (filterId == -1) {
             if (filterText != null) tableData = service.findAll(filterText.getValue());
             else tableData = service.findAll(null);
         } else tableData = findRecordsByField(fieldName, filterId);
@@ -601,14 +603,27 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
         return columns;
     }
 
-    private HorizontalLayout getToolbar(String beforeRouteName, String filteredValue, int filterObjectId) {
+    private HorizontalLayout getToolbar(String beforeRouteName, int filterObjectId) {
         filterText.setPlaceholder("Filter by name...");
         filterText.setClearButtonVisible(true);
         filterText.setValueChangeMode(ValueChangeMode.LAZY);
         filterText.addValueChangeListener(e -> updateList());
+        String filteredValue = "";
+        if (filterObjectId != -1)
+            for (Object data :
+                    GlobalData.listData.get(this.groupName)) {
+                Field pkFiled = GlobalData.getPrimaryKeyField(data.getClass());
+                pkFiled.setAccessible(true);
+                try {
+                    if ((int) pkFiled.get(data) == filterObjectId)
+                        filteredValue = GlobalData.getContentDisplayedInSelect(data);
 
+                } catch (IllegalAccessException e) {
+                    throw new RuntimeException(e);
+                }
+            }
         Span sp = new Span(">> " + filteredValue);
-        Button btnGoOriginView = new Button(beforeRouteName);
+        Button btnGoOriginView = new Button(GlobalData.convertToStandard(beforeRouteName));
         HorizontalLayout routeLayout = new HorizontalLayout(btnGoOriginView, sp);
         routeLayout.setAlignItems(FlexComponent.Alignment.CENTER);
 
