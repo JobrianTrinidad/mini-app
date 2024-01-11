@@ -1,4 +1,4 @@
-package com.aat.application.annotations;
+package com.aat.application.annotations.timeline;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -7,8 +7,6 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
-public @interface StartDate {
+public @interface Group {
     String value() default "";
-
-    String className() default "";
 }

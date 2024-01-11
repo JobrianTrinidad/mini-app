@@ -6,7 +6,7 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "zjt_timeline")
+//@Table(name = "zjt_timeline")
 public class ZJTItem implements ZJTEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
@@ -27,6 +27,14 @@ public class ZJTItem implements ZJTEntity {
     public ZJTItem() {
         this.startTime = LocalDateTime.now(); // Set start time to current time
         this.endTime = LocalDateTime.now(); // Set end time to current time
+    }
+
+    public ZJTItem(String title, String groupId, LocalDateTime startTime, LocalDateTime endTime, String className) {
+        this.title = title;
+        this.groupId = groupId;
+        this.startTime = startTime;
+        this.endTime = endTime;
+        this.className = className;
     }
 
     public String getTitle() {

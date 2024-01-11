@@ -1,6 +1,6 @@
 package com.aat.application.core.form;
 
-import com.aat.application.annotations.StartDate;
+import com.aat.application.annotations.timeline.*;
 import com.aat.application.core.data.entity.ZJTEntity;
 import com.aat.application.core.data.service.ZJTService;
 import com.aat.application.data.entity.ZJTItem;
@@ -176,7 +176,7 @@ public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>>
         return service.findRecordsByFieldId(fieldName, filterId);
     }
 
-    private List<Item> getItems(String query) {
+    private List<Item> getItems() {
         List<Item> TableData = new ArrayList<>();
 
 //        if (filterId == -1) {
@@ -184,10 +184,45 @@ public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>>
 //            else itemData = service.findAll(null);
 //        } else itemData = findRecordsByField(filterFieldName, filterId);
 //
-        List<ZJTItem> data = service.findByQuery(query);
-        Comparator<ZJTItem> comparator = Comparator.comparing(ZJTItem::getId);
-        data.sort(comparator);
+        String titleFieldName = null;
+        String groupFieldName = null;
+        String startDateFieldName = null;
+        String endDateFieldName = null;
+        String classNameFieldName = null;
+        for (Field field : this.groupClass.getDeclaredFields()) {
+            field.setAccessible(true);
+            if (field.getAnnotation(Title.class) != null)
+                titleFieldName = field.getName();
+            else if (field.getAnnotation(Group.class) != null)
+                groupFieldName = field.getName();
+            else if (field.getAnnotation(StartDate.class) != null)
+                startDateFieldName = field.getName();
+            else if (field.getAnnotation(EndDate.class) != null)
+                endDateFieldName = field.getName();
+            else if (field.getAnnotation(ClassName.class) != null)
+                classNameFieldName = field.getName();
+        }
 
+        String query = "SELECT new ZJTItem(p." + titleFieldName +
+                ", p." + groupFieldName +
+                ", p." + startDateFieldName +
+                ", p." + endDateFieldName +
+                ", p." + classNameFieldName +
+                ") FROM " + this.groupClass.getSimpleName() + " p ";
+
+        for (ZJTItem data :
+                service.findByQuery(query)) {
+            Item item = new Item();
+//            item.setId(data.getId().toString());
+            item.setContent(data.getTitle());
+            item.setClassName(data.getClassName());
+            item.setStart(data.getStartTime());
+            item.setEnd(data.getEndTime());
+            String[] tempGroupId = data.getGroupId().split("-");
+            item.setGroup(tempGroupId[1]);
+
+            TableData.add(item);
+        }
         return TableData;
     }
 
