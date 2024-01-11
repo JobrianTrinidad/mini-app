@@ -3,7 +3,6 @@ package com.aat.application.data.entity;
 import com.aat.application.annotations.BaseItems;
 import com.aat.application.annotations.ContentDisplayedInSelect;
 import com.aat.application.annotations.DisplayName;
-//import com.aat.application.annotations.StartDate;
 import com.vaadin.flow.router.PageTitle;
 import jakarta.persistence.*;
 
