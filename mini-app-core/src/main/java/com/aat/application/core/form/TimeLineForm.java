@@ -178,17 +178,12 @@ public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>>
 
     private List<Item> getItems() {
         List<Item> TableData = new ArrayList<>();
-
-//        if (filterId == -1) {
-//            if (filterText != null) itemData = service.findAll(filterText.getValue());
-//            else itemData = service.findAll(null);
-//        } else itemData = findRecordsByField(filterFieldName, filterId);
-//
         String titleFieldName = null;
         String groupFieldName = null;
         String startDateFieldName = null;
         String endDateFieldName = null;
         String classNameFieldName = null;
+
         for (Field field : this.groupClass.getDeclaredFields()) {
             field.setAccessible(true);
             if (field.getAnnotation(Title.class) != null)
