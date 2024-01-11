@@ -1,5 +1,6 @@
 package com.aat.application.data.repository;
 
+import com.aat.application.data.entity.ZJTItem;
 import com.aat.application.util.GlobalData;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -49,12 +50,21 @@ public class BaseEntityRepository<T> {
 
         if (stringFilter == null || stringFilter.isEmpty()) {
             TypedQuery<T> query = entityManager.createQuery("SELECT e FROM " + getEntityClassName() + " e", entityClass);
-            List<T> result = query.getResultList();
-            return result;
+            return query.getResultList();
         } else {
             TypedQuery<T> query = entityManager.createQuery("SELECT e FROM " + getEntityClassName() + " e WHERE lower(e.name) LIKE lower(:filter)", entityClass);
             query.setParameter("filter", "%" + stringFilter + "%");
             return query.getResultList();
+        }
+    }
+
+    public List<ZJTItem> findByQuery(String query) {
+        if (query == null || query.isEmpty()) {
+            TypedQuery<ZJTItem> defaultQuery = entityManager.createQuery("SELECT e FROM " + getEntityClassName() + " e", ZJTItem.class);
+            return defaultQuery.getResultList();
+        } else {
+            TypedQuery<ZJTItem> customQuery = entityManager.createQuery(query, ZJTItem.class);
+            return customQuery.getResultList();
         }
     }
 
@@ -88,7 +98,7 @@ public class BaseEntityRepository<T> {
             ClassLoader entityClassLoader = entity.getClass().getClassLoader();
             Thread.currentThread().setContextClassLoader(entityClassLoader);
 
-            entity = GlobalData.convertToZJTEntity(entity, entityClass);
+            entity = (T) GlobalData.convertToZJTEntity(entity, entityClass);
             entityManager.merge(entity);
             entityManager.flush();
 
@@ -117,6 +127,7 @@ public class BaseEntityRepository<T> {
             e.printStackTrace();
         }
     }
+
 
 
 }

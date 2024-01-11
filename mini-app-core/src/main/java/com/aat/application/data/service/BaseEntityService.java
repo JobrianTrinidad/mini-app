@@ -1,6 +1,7 @@
 package com.aat.application.data.service;
 
 import com.aat.application.core.data.service.ZJTService;
+import com.aat.application.data.entity.ZJTItem;
 import com.aat.application.data.repository.BaseEntityRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,6 +21,11 @@ public class BaseEntityService<T> implements ZJTService<T> {
     @Override
     public List<T> findAll(String filter) {
         return generalRepository.findAll(filter);
+    }
+
+    @Override
+    public List<ZJTItem> findByQuery(String query) {
+        return generalRepository.findByQuery(query);
     }
 
     @Override

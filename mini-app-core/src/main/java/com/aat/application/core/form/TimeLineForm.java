@@ -66,7 +66,7 @@ public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>>
         VerticalLayout itemKindLayout = new VerticalLayout();
         for (String fieldName : GlobalData.getFieldNamesWithAnnotation(StartDate.class, this.groupClass)) {
             HorizontalLayout everyItemLayout = new HorizontalLayout();
-            everyItemLayout.setWidth( 200, Unit.PIXELS);
+            everyItemLayout.setWidth(200, Unit.PIXELS);
             everyItemLayout.setJustifyContentMode(FlexComponent.JustifyContentMode.BETWEEN);
             String itemClassName = null;
             for (Field field : this.groupClass.getDeclaredFields()) {
@@ -146,7 +146,7 @@ public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>>
         else
             timeline = new Timeline(items, itemGroups);
 
-        timeline.setTimelineRange(LocalDateTime.of(2023, 1, 1, 0, 0, 0), LocalDateTime.of(2023, 12, 25, 0, 0, 0));
+        timeline.setTimelineRange(LocalDateTime.of(2023, 1, 1, 0, 0, 0), LocalDateTime.of(2024, 12, 25, 0, 0, 0));
 
         timeline.setMultiselect(true);
         timeline.setStack(true);
@@ -174,6 +174,21 @@ public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>>
 
     public <T> List<T> findRecordsByField(String fieldName, int filterId) {
         return service.findRecordsByFieldId(fieldName, filterId);
+    }
+
+    private List<Item> getItems(String query) {
+        List<Item> TableData = new ArrayList<>();
+
+//        if (filterId == -1) {
+//            if (filterText != null) itemData = service.findAll(filterText.getValue());
+//            else itemData = service.findAll(null);
+//        } else itemData = findRecordsByField(filterFieldName, filterId);
+//
+        List<ZJTItem> data = service.findByQuery(query);
+        Comparator<ZJTItem> comparator = Comparator.comparing(ZJTItem::getId);
+        data.sort(comparator);
+
+        return TableData;
     }
 
     private List<Item> getItems(String filterFieldName, int filterId) {

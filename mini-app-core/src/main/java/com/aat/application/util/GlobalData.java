@@ -15,7 +15,9 @@ import org.hibernate.proxy.HibernateProxy;
 
 import java.io.IOException;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -87,21 +89,40 @@ public class GlobalData {
         return content;
     }
 
-    public static <T> T convertToZJTEntity(Object entityData, Class<?> zjtEntityClass) {
+    public static Object convertToZJTEntity(Object entityData, Class<?> zjtEntityClass) {
+        Object data = null;
         try {
-            if (entityData instanceof HibernateProxy) {
-                Hibernate.initialize(entityData);
-                entityData = ((HibernateProxy) entityData).getHibernateLazyInitializer().getImplementation();
+            data = zjtEntityClass.getDeclaredConstructor().newInstance();
+            for (Field field : data.getClass().getDeclaredFields()) {
+                field.setAccessible(true);
+                for (Field dataField : entityData.getClass().getDeclaredFields()) {
+                    dataField.setAccessible(true);
+                    if (field.getName().equals(dataField.getName())) {
+                        field.set(data, dataField.get(entityData));
+                    }
+                }
             }
-            ObjectMapper mapper = new ObjectMapper();
-            mapper.registerModule(new Hibernate5Module());
-            mapper.registerModule(new JavaTimeModule());
-            mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-            String json = mapper.writeValueAsString(entityData);
-            return (T) mapper.readValue(json, zjtEntityClass);
-        } catch (IOException e) {
+        } catch (InstantiationException | IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException | NoSuchMethodException e) {
             throw new RuntimeException(e);
         }
+
+//        try {
+//            if (entityData instanceof HibernateProxy) {
+//                Hibernate.initialize(entityData);
+//                entityData = ((HibernateProxy) entityData).getHibernateLazyInitializer().getImplementation();
+//            }
+//            ObjectMapper mapper = new ObjectMapper();
+//            mapper.registerModule(new Hibernate5Module());
+//            mapper.registerModule(new JavaTimeModule());
+//            mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+//            String json = mapper.writeValueAsString(entityData);
+//            return (T) mapper.readValue(json, zjtEntityClass);
+//        } catch (IOException e) {
+//            throw new RuntimeException(e);
+//        }
+        return data;
     }
 
     public static Field getPrimaryKeyField(Class<?> clazz) {
