@@ -176,48 +176,91 @@ public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>>
         return service.findRecordsByFieldId(fieldName, filterId);
     }
 
-    private List<Item> getItems() {
-        List<Item> TableData = new ArrayList<>();
-        String titleFieldName = null;
-        String groupFieldName = null;
-        String startDateFieldName = null;
-        String endDateFieldName = null;
-        String classNameFieldName = null;
+    /**
+     * Retrieve Items from DB to display
+     * @param td - Timeline view definition
+     * @param parameters - setParameters if applicable
+     * @param flushRecords - if true, flush existing items in timelime, otherwise just add it
+     * @return
+     */
+    public List<Item> getItems(TimeLineViewParameter td, Object[] parameters, boolean flushRecords) throws Exception {
+//        List<Item> TableData = new ArrayList<>();
+//        String titleFieldName = null;
+//        String groupFieldName = null;
+//        String startDateFieldName = null;
+//        String endDateFieldName = null;
+//        String classNameFieldName = null;
+//
+//        for (Field field : this.groupClass.getDeclaredFields()) {
+//            field.setAccessible(true);
+//            if (field.getAnnotation(Title.class) != null)
+//                titleFieldName = field.getName();
+//            else if (field.getAnnotation(Group.class) != null)
+//                groupFieldName = field.getName();
+//            else if (field.getAnnotation(StartDate.class) != null)
+//                startDateFieldName = field.getName();
+//            else if (field.getAnnotation(EndDate.class) != null)
+//                endDateFieldName = field.getName();
+//            else if (field.getAnnotation(ClassName.class) != null)
+//                classNameFieldName = field.getName();
+//        }
 
-        for (Field field : this.groupClass.getDeclaredFields()) {
-            field.setAccessible(true);
-            if (field.getAnnotation(Title.class) != null)
-                titleFieldName = field.getName();
-            else if (field.getAnnotation(Group.class) != null)
-                groupFieldName = field.getName();
-            else if (field.getAnnotation(StartDate.class) != null)
-                startDateFieldName = field.getName();
-            else if (field.getAnnotation(EndDate.class) != null)
-                endDateFieldName = field.getName();
-            else if (field.getAnnotation(ClassName.class) != null)
-                classNameFieldName = field.getName();
+//        String query = "SELECT new ZJTItem(p." + titleFieldName +
+//                ", p." + groupFieldName +
+//                ", p." + startDateFieldName +
+//                ", p." + endDateFieldName +
+//                ", p." + classNameFieldName +
+//                ") FROM " + this.groupClass.getSimpleName() + " p ";
+
+        if (!td.isValid()) {
+            throw new Exception("Timeline Definition is not valid.");
+            return null;
+        }
+        if (td.isRequireParameter() && parameters == null) {
+            throw new Exception("Parameters are required, but not set");
+            return null;
         }
 
-        String query = "SELECT new ZJTItem(p." + titleFieldName +
-                ", p." + groupFieldName +
-                ", p." + startDateFieldName +
-                ", p." + endDateFieldName +
-                ", p." + classNameFieldName +
-                ") FROM " + this.groupClass.getSimpleName() + " p ";
+        String query = "SELECT  " +
+                td.getTitleFieldName() + " as titlefieldname" +
+                ", " + td.getStartDateFieldName() + " as startdatefieldname" +
+                ", " + td.getEndDateFieldName() + " as enddatefieldname";
 
-        for (ZJTItem data :
-                service.findByQuery(query)) {
-            Item item = new Item();
-//            item.setId(data.getId().toString());
-            item.setContent(data.getTitle());
-            item.setClassName(data.getClassName());
-            item.setStart(data.getStartTime());
-            item.setEnd(data.getEndTime());
-            String[] tempGroupId = data.getGroupId().split("-");
-            item.setGroup(tempGroupId[1]);
-
-            TableData.add(item);
+        if (td.getGroupIDFieldName() != null) {
+                query =  query +
+                        ", " + td.getGroupIDFieldName() + " as groupfiledidname";
         }
+                query = query +
+                        " FROM " + td.getFromDefinition();
+
+        if (td.getWhereDefinition() != null) {
+            query = query +
+                    " WHERE " + td.getWhereDefinition();
+
+        }
+
+        //TODO -set parameter
+
+//                ", p." + startDateFieldName +
+//                ", p." + endDateFieldName +
+//                ", p." + classNameFieldName +
+//                ") FROM " + this.groupClass.getSimpleName() + " p ";
+
+        //TODO - query data and populate the items
+        // use the flushRecords parameter to decide when to retain or flush existing records
+//        for (ZJTItem data :
+//                service.findByQuery(query)) {
+//            Item item = new Item();
+////            item.setId(data.getId().toString());
+//            item.setContent(data.getTitle());
+//            item.setClassName(data.getClassName());
+//            item.setStart(data.getStartTime());
+//            item.setEnd(data.getEndTime());
+//            String[] tempGroupId = data.getGroupId().split("-");
+//            item.setGroup(tempGroupId[1]);
+//
+//            TableData.add(item);
+//        }
         return TableData;
     }
 
