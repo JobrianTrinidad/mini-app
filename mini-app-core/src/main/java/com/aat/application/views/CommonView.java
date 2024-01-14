@@ -53,10 +53,7 @@ public abstract class CommonView<T extends ZJTEntity> extends VerticalLayout imp
     @Override
     public void beforeEnter(BeforeEnterEvent event) {
         String entityClassName = (String) VaadinSession.getCurrent().getAttribute("entityClass");
-//        String filteredEntityClassName = (String) VaadinSession.getCurrent().getAttribute("filteredEntityClass");
         String layoutClassName = (String) VaadinSession.getCurrent().getAttribute("layout");
-//        filterTemp = (ArrayList<Cell>) VaadinSession.getCurrent().getAttribute("filter");
-//        groupName = (String) VaadinSession.getCurrent().getAttribute("groupName");
         VaadinSession.getCurrent().setAttribute("previousView", UI.getCurrent().getInternals().getActiveViewLocation().getPath());
         if (event.getRouteParameters().getParameterNames().contains("subcategory")) {
             this.groupClass = ((CommonView) UI.getCurrent().getInternals().getActiveRouterTargetsChain().get(0)).entityClass;

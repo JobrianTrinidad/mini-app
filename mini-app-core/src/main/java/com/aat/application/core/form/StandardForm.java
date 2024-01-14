@@ -46,8 +46,6 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
     private ZJTTableInfo tableInfo;
     protected TextField filterText = new TextField();
     private String groupName = "";
-    protected Button save;
-    protected Button close;
     protected Button columns;
     private Dialog twinColSelDialog;
     AATTwinColSelect twinColSelect;
@@ -73,10 +71,6 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
         this.entityClass = entityClass;
         this.filteredEntityClass = filteredEntityClass;
         this.groupName = groupName;
-
-//        binder = new BeanValidationBinder<>(entityClass);
-        save = new Button("Save");
-        close = new Button("Cancel");
 
         headers = configureHeader(entityClass);
 
@@ -319,43 +313,6 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
         grid.setContextMenu(contextMenu);
     }
 
-//    public void setFilter(Class<T> filteredEntityClass, String fieldName, List<Cell> filter) {
-//        this.filteredEntityClass = filteredEntityClass;
-//        configureHeader(filteredEntityClass);
-//        String beforeRouteName = "";
-//        String filteredValue = "";
-//        String tempFieldName = fieldName;
-//
-//        for (Field field : this.entityClass.getDeclaredFields()) {
-//            if (field.getType().getSimpleName().equals(filteredEntityClass.getSimpleName())) {
-//                beforeRouteName = field.getAnnotation(DisplayName.class).value();
-//                break;
-//            }
-//        }
-//
-//        for (Field field : this.filteredEntityClass.getDeclaredFields()) {
-//            if (field.getAnnotation(Id.class) != null) {
-//                tempFieldName += "."+field.getName();
-//                break;
-//            }
-//        }
-//        for (Cell cell : filter) {
-//            if (cell.getColName().equals(this.fieldDisplayedInSelect)) {
-//                filteredValue = cell.getCellValue();
-//            }
-//        }
-////        List<T> filteredData = service.findRecordsByFieldId(fieldName, Integer.parseInt(filterID));
-//        grid.setItems(this.getTableData(tempFieldName, filter.get(0).getRowKey()));
-//
-//        verticalLayout.replace(toolbar, this.getToolbar(this.entityClass, beforeRouteName, filteredValue, true));
-//        toolbar = this.getToolbar(this.entityClass, beforeRouteName, filteredValue, filterObjectId);
-//
-//        grid.refreshGrid();
-////        List<T> filteredData = service.findRecordsByField(colName, filter);
-////        grid.setItems(filteredData);
-//
-//    }
-
     private void save(T row, String header, String colValue) {
         try {
             Field field = row.getClass().getDeclaredField(header);
@@ -381,7 +338,6 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
                                 field.set(row, colValue); // Fallback for String and other types
                         }
                     } catch (NumberFormatException e) {
-                        // Handle the case where the string does not contain a parsable number
                         System.out.println("Cannot parse to " + fieldType + ": " + colValue);
                     }
                     break;
@@ -452,6 +408,8 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
             for (int i = 0; i < headers.size(); i++) {
                 String header = headers.get(i);
                 try {
+                    if (header.equals("id"))
+                        continue;
                     String headerName = header.substring(0, 1).toLowerCase() + header.substring(1);
                     Field headerField = data.getClass().getDeclaredField(headerName);
                     headerField.setAccessible(true);
@@ -494,47 +452,16 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
                     field.setAccessible(true);
                     if (field.getAnnotation(Id.class) != null) {
                         TableData.add(new GuiItem((Integer) field.get(data), rowData, headers));
-//                        rowData.add(String.valueOf(field.get(data)));
                     }
                 }
             } catch (IllegalAccessException e) {
                 throw new RuntimeException(e);
             }
-
-
         }
         return TableData;
     }
 
     public <T> List<T> findRecordsByField(String fieldName, int filterId) {
-        // Split the fieldName
-//        String[] fieldNames = fieldName.split("\\.");
-//
-//        // Get the type of fieldName
-//        Class<?> fieldType = filterEntityClass;
-//        try {
-//            Field field = fieldType.getDeclaredField(fieldNames[1]);
-//            fieldType = field.getType();
-//        } catch (NoSuchFieldException e) {
-//            throw new RuntimeException(e);
-//        }
-
-        // Convert filter to the type of fieldName
-//        Object convertedFilter;
-//        if (fieldType == String.class) {
-//            convertedFilter = filter;
-//        } else if (fieldType == Integer.class || fieldType == int.class) {
-//            convertedFilter = Integer.parseInt(filter);
-//        } else if (fieldType == Boolean.class || fieldType == boolean.class) {
-//            convertedFilter = Boolean.parseBoolean(filter);
-//        } else if (fieldType == Double.class || fieldType == double.class) {
-//            convertedFilter = Double.parseDouble(filter);
-//        } else {
-//            throw new IllegalArgumentException("Unsupported field type: " + fieldType);
-//        }
-
-        // Call the method with the converted filter
-//        return service.findRecordsByField(fieldName, convertedFilter);
         return service.findRecordsByFieldId(fieldName, filterId);
     }
 
@@ -552,6 +479,8 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
             column.setSortable(true);
             column.setSortingType("asc");
             int index = 1;
+            if (header.equals("id"))
+                continue;
             switch (headerOptions.get(header)) {
                 case "input":
                     column.setType("input");
@@ -682,15 +611,6 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
     private void updateList() {
         grid.setItems(this.getTableData("", -1));
         add(grid);
-    }
-
-    private HorizontalLayout createButtonsLayout() {
-        save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        close.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
-        save.addClickShortcut(Key.ENTER);
-        close.addClickShortcut(Key.ESCAPE);
-
-        return new HorizontalLayout(save, close);
     }
 
     private void delete() {

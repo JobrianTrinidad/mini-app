@@ -24,7 +24,10 @@ public class VehicleView extends StandardFormView<ZJTEntity> implements HasUrlPa
     private String name;
 
     public VehicleView(BaseEntityRepository<ZJTEntity> repository, TableInfoService tableInfoService) {
-        super(repository, tableInfoService, new TimeLineViewParameter("timelineItemTitle", "vehicle", "planDate", null, null, "ZJTVehicleServiceSchedule"));
+        super(repository, tableInfoService);
+        TimeLineViewParameter timeLineViewParameter =  new TimeLineViewParameter("timelineItemTitle", "vehicle", "planDate", null, null, "ZJTVehicleServiceSchedule");
+        timeLineViewParameter.setWhereDefinition("vehicle.zjt_vehicle_id");
+        super.setTimeLineViewParameter(timeLineViewParameter);
     }
 
     @Override
@@ -39,8 +42,6 @@ public class VehicleView extends StandardFormView<ZJTEntity> implements HasUrlPa
         AATContextMenu contextMenu = new AATContextMenu();
         contextMenu.setOpenOnClick(true);
 
-//        MenuItem fileItem = contextMenu.addItem("File");
-//        fileItem.addContextMenuClickListener(e -> Notification.show(fileItem.getCaption()));
 
         MenuItem editItem = contextMenu.addItem("Service Schedule");
         editItem.addContextMenuClickListener(e -> Notification.show(editItem.getCaption()));

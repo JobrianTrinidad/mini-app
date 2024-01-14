@@ -25,10 +25,13 @@ public class StandardFormView<T extends ZJTEntity> extends CommonView<T> {
     private String name;
 
     public StandardFormView(BaseEntityRepository<T> repository,
-                            TableInfoService tableInfoService,
-                            TimeLineViewParameter timeLineViewParameter) {
+                            TableInfoService tableInfoService) {
         super(repository);
         this.tableInfoService = tableInfoService;
+        this.timeLineViewParameter = timeLineViewParameter;
+    }
+
+    public void setTimeLineViewParameter(TimeLineViewParameter timeLineViewParameter){
         this.timeLineViewParameter = timeLineViewParameter;
     }
 
