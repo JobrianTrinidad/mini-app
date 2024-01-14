@@ -13,7 +13,7 @@ import jakarta.persistence.*;
 @Entity
 @Table(name = "zjt_vehicleservicetype")
 @PageTitle("Service Type")
-public class ZJTVehicleServiceType extends ZJTNode {
+public class ZJTVehicleServiceType implements ZJTEntity {
 
 
     @Id

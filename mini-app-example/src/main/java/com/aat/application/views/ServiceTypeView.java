@@ -1,7 +1,7 @@
 package com.aat.application.views;
 
-import com.aat.application.data.entity.ZJTNode;
-import com.aat.application.data.entity.ZJTVehicle;
+import com.aat.application.core.data.entity.ZJTEntity;
+import com.aat.application.core.form.TimeLineViewParameter;
 import com.aat.application.data.entity.ZJTVehicleServiceSchedule;
 import com.aat.application.data.entity.ZJTVehicleServiceType;
 import com.aat.application.data.repository.BaseEntityRepository;
@@ -17,12 +17,12 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.VaadinSession;
 
 @Route(value = "service-type", layout = CoreMainLayout.class)
-public class ServiceTypeView extends StandardFormView<ZJTNode> implements HasUrlParameter<String> {
+public class ServiceTypeView extends StandardFormView<ZJTEntity> implements HasUrlParameter<String> {
 
     private String name;
 
-    public ServiceTypeView(BaseEntityRepository<ZJTNode> repository, TableInfoService tableInfoService) {
-        super(repository, tableInfoService);
+    public ServiceTypeView(BaseEntityRepository<ZJTEntity> repository, TableInfoService tableInfoService) {
+        super(repository, tableInfoService, new TimeLineViewParameter("timelineItemTitle","", "planDate", null, null, "ZJTVehicleServiceSchedule"));
         this.getElement().getStyle().set("overflow-x", "hidden");
         addMenu();
     }

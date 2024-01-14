@@ -37,13 +37,14 @@ public class ZJTVehicleServiceSchedule implements ZJTEntity {
     @Column
     @DisplayName(value = "Last Service (KM)")
     private Integer lastServiceKM;
-
     @Column
-    @StartDate(className = "bg-success")
+    private String timelineItemTitle;
+    @Column
     private LocalDateTime planDate;
     @Column
-    @StartDate(className = "bg-warning")
     private LocalDateTime actualDate;
+    @Transient
+    private ZJTItem item;
 
     public int getZjt_vehicleserviceschedule_id() {
         return zjt_vehicleserviceschedule_id;
@@ -75,6 +76,14 @@ public class ZJTVehicleServiceSchedule implements ZJTEntity {
 
     public void setLastServiceKM(Integer lastServiceKM) {
         this.lastServiceKM = lastServiceKM;
+    }
+
+    public String getTimelineItemTitle() {
+        return timelineItemTitle;
+    }
+
+    public void setTimelineItemTitle(String timelineItemTitle) {
+        this.timelineItemTitle = timelineItemTitle;
     }
 
     public LocalDateTime getPlanDate() {

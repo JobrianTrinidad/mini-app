@@ -1,6 +1,6 @@
 package com.aat.application.views;
 
-import com.aat.application.data.entity.ZJTVehicle;
+import com.aat.application.core.form.TimeLineViewParameter;
 import com.aat.application.data.entity.ZJTVehiclePart;
 import com.aat.application.data.repository.BaseEntityRepository;
 import com.aat.application.data.service.TableInfoService;
@@ -10,7 +10,7 @@ import com.vaadin.flow.router.Route;
 public class VehiclePartView extends  StandardFormView<ZJTVehiclePart> {
 
     public VehiclePartView(BaseEntityRepository<ZJTVehiclePart> repository, TableInfoService tableInfoService){
-        super(repository, tableInfoService);
+        super(repository, tableInfoService, new TimeLineViewParameter("timelineItemTitle","", "planDate", null, null, "ZJTVehicleServiceSchedule"));
 
     }
 

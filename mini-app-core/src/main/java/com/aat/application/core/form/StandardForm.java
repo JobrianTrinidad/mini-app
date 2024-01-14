@@ -34,7 +34,7 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
-public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>> extends VerticalLayout {
+public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>> extends CommonForm<T> {
 
     @Serial
     private static final long serialVersionUID = -5183438338263448739L;

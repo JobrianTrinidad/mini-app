@@ -3,8 +3,11 @@ package com.aat.application.data.entity;
 import com.aat.application.annotations.BaseItems;
 import com.aat.application.annotations.ContentDisplayedInSelect;
 import com.aat.application.annotations.DisplayName;
+import com.aat.application.core.data.entity.ZJTEntity;
+import com.aat.application.core.form.TimeLineViewParameter;
 import com.vaadin.flow.router.PageTitle;
 import jakarta.persistence.*;
+import jakarta.transaction.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -13,7 +16,7 @@ import java.util.List;
 @Entity
 @Table(name = "zjt_vehicle")
 @PageTitle("Vehicle")
-public class ZJTVehicle extends ZJTNode {
+public class ZJTVehicle implements ZJTEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)

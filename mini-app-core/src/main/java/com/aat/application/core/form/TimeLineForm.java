@@ -25,10 +25,9 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
-public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>> extends VerticalLayout {
+public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>> extends CommonForm<T> {
 
     @Serial
     private static final long serialVersionUID = -5183438338263448740L;
@@ -37,16 +36,17 @@ public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>>
     protected Button close;
     private final String groupName;
     Timeline timeline;
+    TimeLineViewParameter timeLineViewParameter;
     List<T> itemData;
-    //    List<ZJTItem> itemData;
-    //    private final TimelineService timelineService;
     protected S service;
     private final Class<T> groupClass;
     private Class<T> filteredEntityClass;
 
-    public TimeLineForm(Class<T> groupClass, Class<T> filteredEntityClass,
+    public TimeLineForm(Class<T> groupClass, TimeLineViewParameter timeLineViewParameter,
+                        Class<T> filteredEntityClass,
                         S service, String groupName, int filterObjectId) {
         this.groupClass = groupClass;
+        this.timeLineViewParameter = timeLineViewParameter;
         this.filteredEntityClass = filteredEntityClass;
 //        this.timelineService = timelineService;
         this.service = service;
@@ -139,7 +139,13 @@ public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>>
             }
         }
 
-        List<Item> items = getItems(fieldName, filterObjectId);
+//        List<Item> items = getItems(fieldName, filterObjectId);
+        List<Item> items = null;
+        try {
+            items = getItems(timeLineViewParameter, null, false);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
         List<ItemGroup> itemGroups = getGroupItems((List<ZJTEntity>) GlobalData.listData.get(groupName), fieldName, filterObjectId);
         if (itemGroups == null)
             timeline = new Timeline(items);
@@ -176,34 +182,40 @@ public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>>
         return service.findRecordsByFieldId(fieldName, filterId);
     }
 
-    private List<Item> getItems() {
+    /**
+     * Retrieve Items from DB to display
+     *
+     * @param td           - Timeline view definition
+     * @param parameters   - setParameters if applicable
+     * @param flushRecords - if true, flush existing items in timelime, otherwise just add it
+     * @return
+     */
+    public List<Item> getItems(TimeLineViewParameter td, Object[] parameters, boolean flushRecords) throws Exception {
         List<Item> TableData = new ArrayList<>();
-        String titleFieldName = null;
-        String groupFieldName = null;
-        String startDateFieldName = null;
-        String endDateFieldName = null;
-        String classNameFieldName = null;
-
-        for (Field field : this.groupClass.getDeclaredFields()) {
-            field.setAccessible(true);
-            if (field.getAnnotation(Title.class) != null)
-                titleFieldName = field.getName();
-            else if (field.getAnnotation(Group.class) != null)
-                groupFieldName = field.getName();
-            else if (field.getAnnotation(StartDate.class) != null)
-                startDateFieldName = field.getName();
-            else if (field.getAnnotation(EndDate.class) != null)
-                endDateFieldName = field.getName();
-            else if (field.getAnnotation(ClassName.class) != null)
-                classNameFieldName = field.getName();
+        if (!td.isValid()) {
+            throw new Exception("Timeline Definition is not valid.");
+        }
+        if (td.isRequireParameter() && parameters == null) {
+            throw new Exception("Parameters are required, but not set");
         }
 
-        String query = "SELECT new ZJTItem(p." + titleFieldName +
-                ", p." + groupFieldName +
-                ", p." + startDateFieldName +
-                ", p." + endDateFieldName +
-                ", p." + classNameFieldName +
-                ") FROM " + this.groupClass.getSimpleName() + " p ";
+        String query = "SELECT "
+                + "p." + td.getTitleFieldName()
+                + ", p." + td.getGroupIDFieldName()
+                + ", p." + td.getStartDateFieldName()
+                + (td.getEndDateFieldName() != null ? ", p." + td.getEndDateFieldName() : "")
+                + (td.getClassNameFieldName() != null ? ", p." + td.getClassNameFieldName() : "");
+
+
+        query = query +
+                " FROM " + td.getFromDefinition() + " as p";
+
+        if (td.getWhereDefinition() != null) {
+            query = query +
+                    " WHERE " + td.getWhereDefinition();
+        }
+
+        //TODO -set parameter
 
         for (ZJTItem data :
                 service.findByQuery(query)) {
@@ -213,78 +225,77 @@ public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>>
             item.setClassName(data.getClassName());
             item.setStart(data.getStartTime());
             item.setEnd(data.getEndTime());
-            String[] tempGroupId = data.getGroupId().split("-");
-            item.setGroup(tempGroupId[1]);
+            item.setGroup(data.getGroupId());
 
             TableData.add(item);
         }
         return TableData;
     }
 
-    private List<Item> getItems(String filterFieldName, int filterId) {
-
-        List<Item> TableData = new ArrayList<>();
-//        if (filterText != null) itemData = timelineService.findAll();
-//        else itemData = timelineService.findAllByFilter(null);
-        if (filterId == -1) {
-            if (filterText != null) itemData = service.findAll(filterText.getValue());
-            else itemData = service.findAll(null);
-        } else itemData = findRecordsByField(filterFieldName, filterId);
-
-        Comparator<T> comparator = Comparator.comparing(ZJTEntity::getId);
-        itemData.sort(comparator);
-
-        for (T data : itemData) {
-            int i = 0;
-            for (String fieldName : GlobalData.getFieldNamesWithAnnotation(StartDate.class, data.getClass())) {
-                Item item = new Item();
-                for (Field field : data.getClass().getDeclaredFields()) {
-                    field.setAccessible(true);
-                    try {
-                        if (field.getAnnotation(Id.class) != null) {
-                            item.setId(field.get(data) + "-" + i);
-                            item.setContent(String.valueOf(field.get(data)));
-                        } else if (field.getAnnotation(StartDate.class) != null
-                                && fieldName.equals(field.getName())) {
-                            if (field.get(data) == null)
-                                item.setStart(LocalDateTime.now());
-                            else
-                                item.setStart((LocalDateTime) field.get(data));
-                            item.setClassName(field.getAnnotation(StartDate.class).className());
-                            item.setEnd(item.getStart().plusDays(1));
-                        } else if (field.getType().getSimpleName().equals(this.filteredEntityClass.getSimpleName())) {
-                            for (Field groupField : field.getType().getDeclaredFields()) {
-                                groupField.setAccessible(true);
-                                if (groupField.getAnnotation(Id.class) != null) {
-                                    item.setGroup(String.valueOf(groupField.get(field.get(data))));
-                                    break;
-                                }
-                            }
-                        }
-                    } catch (IllegalAccessException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
-                TableData.add(item);
-                i++;
-            }
-        }
-
-//        for (ZJTItem data :
-//                itemData) {
-//            Item item = new Item();
-//            item.setId(data.getId().toString());
-//            item.setContent(data.getTitle());
-//            item.setClassName(data.getClassName());
-//            item.setStart(data.getStartTime());
-//            item.setEnd(data.getEndTime());
-//            String[] tempGroupId = data.getGroupId().split("-");
-//            item.setGroup(tempGroupId[1]);
+//    private List<Item> getItems(String filterFieldName, int filterId) {
 //
-//            TableData.add(item);
+//        List<Item> TableData = new ArrayList<>();
+////        if (filterText != null) itemData = timelineService.findAll();
+////        else itemData = timelineService.findAllByFilter(null);
+//        if (filterId == -1) {
+//            if (filterText != null) itemData = service.findAll(filterText.getValue());
+//            else itemData = service.findAll(null);
+//        } else itemData = findRecordsByField(filterFieldName, filterId);
+//
+//        Comparator<T> comparator = Comparator.comparing(ZJTEntity::getId);
+//        itemData.sort(comparator);
+//
+//        for (T data : itemData) {
+//            int i = 0;
+//            for (String fieldName : GlobalData.getFieldNamesWithAnnotation(StartDate.class, data.getClass())) {
+//                Item item = new Item();
+//                for (Field field : data.getClass().getDeclaredFields()) {
+//                    field.setAccessible(true);
+//                    try {
+//                        if (field.getAnnotation(Id.class) != null) {
+//                            item.setId(field.get(data) + "-" + i);
+//                            item.setContent(String.valueOf(field.get(data)));
+//                        } else if (field.getAnnotation(StartDate.class) != null
+//                                && fieldName.equals(field.getName())) {
+//                            if (field.get(data) == null)
+//                                item.setStart(LocalDateTime.now());
+//                            else
+//                                item.setStart((LocalDateTime) field.get(data));
+//                            item.setClassName(field.getAnnotation(StartDate.class).className());
+//                            item.setEnd(item.getStart().plusDays(1));
+//                        } else if (field.getType().getSimpleName().equals(this.filteredEntityClass.getSimpleName())) {
+//                            for (Field groupField : field.getType().getDeclaredFields()) {
+//                                groupField.setAccessible(true);
+//                                if (groupField.getAnnotation(Id.class) != null) {
+//                                    item.setGroup(String.valueOf(groupField.get(field.get(data))));
+//                                    break;
+//                                }
+//                            }
+//                        }
+//                    } catch (IllegalAccessException e) {
+//                        throw new RuntimeException(e);
+//                    }
+//                }
+//                TableData.add(item);
+//                i++;
+//            }
 //        }
-        return TableData;
-    }
+//
+////        for (ZJTItem data :
+////                itemData) {
+////            Item item = new Item();
+////            item.setId(data.getId().toString());
+////            item.setContent(data.getTitle());
+////            item.setClassName(data.getClassName());
+////            item.setStart(data.getStartTime());
+////            item.setEnd(data.getEndTime());
+////            String[] tempGroupId = data.getGroupId().split("-");
+////            item.setGroup(tempGroupId[1]);
+////
+////            TableData.add(item);
+////        }
+//        return TableData;
+//    }
 
     private List<ItemGroup> getGroupItems(List<ZJTEntity> groupResults, String fieldName, int fieldId) {
         if (groupResults == null)

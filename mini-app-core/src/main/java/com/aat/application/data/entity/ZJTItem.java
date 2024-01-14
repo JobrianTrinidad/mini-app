@@ -9,7 +9,6 @@ import java.time.LocalDateTime;
 //@Table(name = "zjt_timeline")
 public class ZJTItem implements ZJTEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
     @Column
     private String title;
@@ -33,8 +32,15 @@ public class ZJTItem implements ZJTEntity {
         this.title = title;
         this.groupId = groupId;
         this.startTime = startTime;
-        this.endTime = endTime;
+        this.endTime = (endTime != null) ? endTime : startTime.plusDays(1); // If endTime is null, set it to startTime plus 1 day
         this.className = className;
+    }
+
+    public ZJTItem(String title, String groupId, LocalDateTime startTime) {
+        this.title = title;
+        this.groupId = groupId;
+        this.startTime = startTime;
+        this.endTime = startTime.plusDays(1); // If endTime is null, set it to startTime plus 1 day
     }
 
     public String getTitle() {

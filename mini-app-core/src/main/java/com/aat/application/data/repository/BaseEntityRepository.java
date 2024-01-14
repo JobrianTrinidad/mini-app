@@ -2,9 +2,7 @@ package com.aat.application.data.repository;
 
 import com.aat.application.data.entity.ZJTItem;
 import com.aat.application.util.GlobalData;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
-import jakarta.persistence.TypedQuery;
+import jakarta.persistence.*;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Root;
@@ -12,9 +10,12 @@ import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Repository
@@ -59,13 +60,36 @@ public class BaseEntityRepository<T> {
     }
 
     public List<ZJTItem> findByQuery(String query) {
-        if (query == null || query.isEmpty()) {
-            TypedQuery<ZJTItem> defaultQuery = entityManager.createQuery("SELECT e FROM " + getEntityClassName() + " e", ZJTItem.class);
-            return defaultQuery.getResultList();
-        } else {
-            TypedQuery<ZJTItem> customQuery = entityManager.createQuery(query, ZJTItem.class);
-            return customQuery.getResultList();
+//        String newQuery = query + " From " + entityClass.getSimpleName() + " as p";
+//        String newQuery = "SELECT p.timelineItemTitle as title, p.planDate as startDate FROM " + entityClass.getSimpleName() + " AS p";
+        Query customQuery = entityManager.createQuery(query);
+        List<Object[]> results = customQuery.getResultList();
+        List<ZJTItem> items = new ArrayList<>();
+        for (Object[] result : results) {
+            String title = "new item";
+            String groupID = null;
+            LocalDateTime startDate = LocalDateTime.now();
+            if (result[0] != null) {
+                title = (String) result[0];
+            }
+            if (result[1] != null && result[2] != null) {
+                for (Field field : result[1].getClass().getDeclaredFields()) {
+                    field.setAccessible(true);
+                    if (field.getAnnotation(Id.class) != null) {
+                        try {
+                            groupID = String.valueOf(field.get(result[1]));
+                        } catch (IllegalAccessException e) {
+                            throw new RuntimeException(e);
+                        }
+                        break;
+                    }
+                }
+                startDate = (LocalDateTime) result[2];
+                ZJTItem item = new ZJTItem(title, groupID, startDate);
+                items.add(item);
+            }
         }
+        return items;
     }
 
     public <T> List<T> findRecordsByField(String fieldName, Object fieldValue) {
@@ -75,6 +99,7 @@ public class BaseEntityRepository<T> {
         query.setParameter("fieldValue", fieldValue);
         return query.getResultList();
     }
+
     public <T> List<T> findRecordsByFieldId(String fieldName, int fieldId) {
         TypedQuery<T> query = (TypedQuery<T>) entityManager.createQuery(
                 "SELECT e FROM " + getEntityClassName() + " e WHERE e." + fieldName + " = :fieldId", entityClass);
@@ -127,7 +152,6 @@ public class BaseEntityRepository<T> {
             e.printStackTrace();
         }
     }
-
 
 
 }
