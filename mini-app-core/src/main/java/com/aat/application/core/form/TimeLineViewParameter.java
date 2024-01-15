@@ -2,13 +2,13 @@ package com.aat.application.core.form;
 
 /**
  *  Class definition to create the mapping for the timeline
-*/
+ */
 public class TimeLineViewParameter {
 
     /**
      * Name of the column to display in the content
      * e.g  e.employeename
-    */
+     */
     private String titleFieldName = null;
 
     public String getToolTipFieldName() {
@@ -22,31 +22,31 @@ public class TimeLineViewParameter {
     /**
      * Name of the column to display in the tooltip
      * e.g,  e.empid || ' ' || e.employeename
-    */
+     */
     private String toolTipFieldName = null;
     /**
      * Name of the column for the group ID
      * Note : separate definition on how group hieararchies are defined
      * e.g.  e.departmentid
-    */
+     */
     private String groupIDFieldName = null;
 
     /**
      * Name of the column for the startdate
      * e.g pd.birthdate
-    */
+     */
     private String startDateFieldName = null;
 
     /**
      * Name of the column for the enddate
      * e. pd.birthdate +  interval '1' day  (based on postgres datetime function)
-    */
+     */
     private String endDateFieldName = null;
 
     /**
-    * Name of the column for the class
-    * Classname is the CSS name to control the appearance of the item
-    */
+     * Name of the column for the class
+     * Classname is the CSS name to control the appearance of the item
+     */
     private String classNameFieldName = null;
 
     /**
@@ -83,7 +83,7 @@ public class TimeLineViewParameter {
             //TODO - add some logging or notification to developer for missing definition
         }
 
-        return true;
+        return valid;
 
     }
 
@@ -97,8 +97,9 @@ public class TimeLineViewParameter {
     }
 
 
-    public TimeLineViewParameter(String titleFieldName, String startDateFieldName, String endDateFieldName, String classNameFieldName, String fromDefinition) {
+    public TimeLineViewParameter(String titleFieldName, String groupIDFieldName, String startDateFieldName, String endDateFieldName, String classNameFieldName, String fromDefinition) {
         this.titleFieldName = titleFieldName;
+        this.groupIDFieldName = groupIDFieldName;
         this.startDateFieldName = startDateFieldName;
         this.endDateFieldName = endDateFieldName;
         this.classNameFieldName = classNameFieldName;

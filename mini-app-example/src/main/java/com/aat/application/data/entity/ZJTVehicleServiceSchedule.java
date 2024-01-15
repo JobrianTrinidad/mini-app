@@ -39,11 +39,12 @@ public class ZJTVehicleServiceSchedule implements ZJTEntity {
     private Integer lastServiceKM;
 
     @Column
-    @StartDate(className = "bg-success")
+    @DisplayName(value = "Plan Date")
     private LocalDateTime planDate;
     @Column
-    @StartDate(className = "bg-warning")
     private LocalDateTime actualDate;
+    @Transient
+    private ZJTItem item;
 
     public int getZjt_vehicleserviceschedule_id() {
         return zjt_vehicleserviceschedule_id;

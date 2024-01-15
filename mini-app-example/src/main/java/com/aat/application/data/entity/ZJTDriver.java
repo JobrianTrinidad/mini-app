@@ -1,5 +1,6 @@
 package com.aat.application.data.entity;
 
+import com.aat.application.core.data.entity.ZJTEntity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.vaadin.flow.router.PageTitle;
 import jakarta.persistence.*;
@@ -9,7 +10,7 @@ import java.util.List;
 @Entity
 @Table(name = "zjt_driver")
 @PageTitle("TimeLine")
-public class ZJTDriver extends ZJTNode {
+public class ZJTDriver implements ZJTEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
