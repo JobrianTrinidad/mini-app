@@ -83,7 +83,7 @@ public class TimeLineViewParameter {
             //TODO - add some logging or notification to developer for missing definition
         }
 
-        return true;
+        return valid;
 
     }
 

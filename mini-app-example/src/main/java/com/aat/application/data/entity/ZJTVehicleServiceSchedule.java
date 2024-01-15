@@ -37,9 +37,9 @@ public class ZJTVehicleServiceSchedule implements ZJTEntity {
     @Column
     @DisplayName(value = "Last Service (KM)")
     private Integer lastServiceKM;
+
     @Column
-    private String timelineItemTitle;
-    @Column
+    @DisplayName(value = "Plan Date")
     private LocalDateTime planDate;
     @Column
     private LocalDateTime actualDate;
@@ -76,14 +76,6 @@ public class ZJTVehicleServiceSchedule implements ZJTEntity {
 
     public void setLastServiceKM(Integer lastServiceKM) {
         this.lastServiceKM = lastServiceKM;
-    }
-
-    public String getTimelineItemTitle() {
-        return timelineItemTitle;
-    }
-
-    public void setTimelineItemTitle(String timelineItemTitle) {
-        this.timelineItemTitle = timelineItemTitle;
     }
 
     public LocalDateTime getPlanDate() {

@@ -25,7 +25,7 @@ public class VehicleView extends StandardFormView<ZJTEntity> implements HasUrlPa
 
     public VehicleView(BaseEntityRepository<ZJTEntity> repository, TableInfoService tableInfoService) {
         super(repository, tableInfoService);
-        TimeLineViewParameter timeLineViewParameter =  new TimeLineViewParameter("timelineItemTitle", "vehicle", "planDate", null, null, "ZJTVehicleServiceSchedule");
+        TimeLineViewParameter timeLineViewParameter =  new TimeLineViewParameter("vehicle.fleetid", "vehicle", "planDate", null, null, "ZJTVehicleServiceSchedule");
         timeLineViewParameter.setWhereDefinition("vehicle.zjt_vehicle_id");
         super.setTimeLineViewParameter(timeLineViewParameter);
     }

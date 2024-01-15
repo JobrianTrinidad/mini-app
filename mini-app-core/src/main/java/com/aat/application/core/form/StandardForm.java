@@ -11,10 +11,8 @@ import com.aat.application.data.service.TableInfoService;
 import com.aat.application.util.GlobalData;
 import com.vaadin.componentfactory.tuigrid.TuiGrid;
 import com.vaadin.componentfactory.tuigrid.model.*;
-import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.html.Span;
@@ -30,6 +28,10 @@ import java.io.Serial;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
@@ -133,7 +135,9 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
             List<Integer> allowedWidths = new ArrayList<>();
             List<String> tempTwinItems = new ArrayList<>(twinColSelect.getSelectedItems());
             List<String> tempHeaders = new ArrayList<>();
-            if (!tempTwinItems.contains(fieldDisplayedInSelect)) tempTwinItems.add(fieldDisplayedInSelect);
+            if (!tempTwinItems.contains(fieldDisplayedInSelect)
+                    && fieldDisplayedInSelect != null)
+                tempTwinItems.add(fieldDisplayedInSelect);
             twinColSelect.select(tempTwinItems);
             for (String desiredValue : tempTwinItems) {
                 Enumeration<String> keys = headerNames.keys();
@@ -190,7 +194,10 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
             }
             if (field.getAnnotation(jakarta.persistence.Column.class) != null) {
                 fieldNames.add(field.getName());
-                headerOptions.put(field.getName(), "input");
+                if (field.getType().getSimpleName().equals("LocalDateTime"))
+                    headerOptions.put(field.getName(), "date");
+                else
+                    headerOptions.put(field.getName(), "input");
                 headerNames.put(field.getName(), field.getAnnotation(DisplayName.class).value());
             }
             if (field.getAnnotation(jakarta.persistence.Enumerated.class) != null) {
@@ -334,11 +341,25 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
                             case "float":
                                 field.set(row, Float.parseFloat(colValue));
                                 break;
+                            case "LocalDateTime":
+                                LocalDate date = LocalDate.parse(colValue);
+                                LocalDateTime dateTime = date.atStartOfDay();
+                                field.set(row, dateTime);
+                                break;
                             default:
                                 field.set(row, colValue); // Fallback for String and other types
                         }
                     } catch (NumberFormatException e) {
                         System.out.println("Cannot parse to " + fieldType + ": " + colValue);
+                    }
+                    break;
+                case "date":
+                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm a");
+                    try {
+                        LocalDateTime dateTime = LocalDateTime.parse(colValue, formatter);
+                        field.set(row, dateTime);
+                    } catch (DateTimeParseException e) {
+                        e.printStackTrace();
                     }
                     break;
                 case "select_enum":
@@ -416,6 +437,7 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
                     Object dataSel = headerField.get(data);
                     switch (headerOptions.get(header)) {
                         case "input":
+                        case "date":
                             rowData.set(i, dataSel != null ? dataSel.toString() : "");
                             break;
                         case "select_enum":
@@ -475,6 +497,7 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
             String headerName = headerNames.get(header);
             ColumnBaseOption baseOption = new ColumnBaseOption(nId++, headerName, header, colWidths.get(headers.indexOf(header)), "center", "");
             com.vaadin.componentfactory.tuigrid.model.Column column = new com.vaadin.componentfactory.tuigrid.model.Column(baseOption);
+            new Column(new ColumnBaseOption(4, "Date-TimePicker With tab", "timepickerwithtab", 150, "center", ""), true, "datePicker", new DateOption("yyyy-MM-dd HH:mm A", true, "tab", "spinbox"));
             column.setEditable(true);
             column.setSortable(true);
             column.setSortingType("asc");
@@ -484,6 +507,10 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
             switch (headerOptions.get(header)) {
                 case "input":
                     column.setType("input");
+                    break;
+                case "date":
+                    column.setType("datePicker");
+                    column.setDateOption(new DateOption("yyyy-MM-dd HH:mm A", true));
                     break;
                 case "select_enum":
                     column.setType("select");
