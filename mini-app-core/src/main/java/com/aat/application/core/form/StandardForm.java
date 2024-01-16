@@ -5,6 +5,7 @@ import com.aat.application.annotations.DisplayName;
 import com.aat.application.core.component.AATTwinColSelect;
 import com.aat.application.core.data.entity.ZJTEntity;
 import com.aat.application.core.data.service.ZJTService;
+import com.aat.application.core.event.EventBus;
 import com.aat.application.data.entity.ZJTTableInfo;
 import com.aat.application.data.service.TableInfoService;
 import com.aat.application.util.GlobalData;
@@ -18,7 +19,6 @@ import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.page.PendingJavaScriptResult;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.server.VaadinSession;
@@ -47,8 +47,6 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
     String fieldDisplayedInSelect;
     private ZJTTableInfo tableInfo;
     protected TextField filterText = new TextField();
-    private final Button btnReload = new Button("Reload");
-    private final Button btnSave = new Button("Save");
     private String groupName = "";
     protected Button columns;
     private Dialog twinColSelDialog;
@@ -75,24 +73,23 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
         this.entityClass = entityClass;
         this.filteredEntityClass = filteredEntityClass;
         this.groupName = groupName;
-        this.setHeight("calc(100vh - 60px)");
 
         headers = configureHeader(entityClass);
 
         initColSelDialog(entityClass, groupName, filterObjectId);
 
         loadGrid(entityClass, groupName, filterObjectId);
-//        EventBus.getInstance().register(event -> {
-//            if ("DrawerToggleClicked".equals(event)) {
-//                getUI().ifPresent(ui -> ui.access(grid::refreshGrid));
-//            }
-//        });
+        EventBus.getInstance().register(event -> {
+            if ("DrawerToggleClicked".equals(event)) {
+                getUI().ifPresent(ui -> ui.access(grid::refreshGrid));
+            }
+        });
     }
 
     private void loadGrid(Class<T> entityClass, String groupName, int filterObjectId) {
 //        removeAll();
-        toolbar = getToolbar(groupName, filterObjectId);
         if (!twinColSelect.getSelectedItems().isEmpty()) configureGrid(entityClass, groupName, filterObjectId);
+        toolbar = getToolbar(groupName, filterObjectId);
         verticalLayout = new VerticalLayout(toolbar);
         if (grid != null) add(verticalLayout, grid);
         else add(new VerticalLayout(verticalLayout));
@@ -220,17 +217,10 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
         return fieldNames;
     }
 
-    private  void configureGrid(Class<T> entityClass, String groupName, int filterObjectId) {
+    private void configureGrid(Class<T> entityClass, String groupName, int filterObjectId) {
         grid = new TuiGrid();
         grid.addClassName("scheduler-grid");
         grid.setHeaders(headers);
-//        grid.getStyle().setHeight("calc(100vh - 130px)");
-//        PendingJavaScriptResult toolbarHeight = UI.getCurrent().getPage().executeJs("return document.querySelector('.aat-toolbar').offsetHeight");
-//        toolbarHeight.then(result->{
-//            grid.setHeight("calc(100vh - 159px)");
-//        });
-
-//        grid.setHeight("calc(100vh - 200px)");
 
         String fieldName = "";
         for (Field field : entityClass.getDeclaredFields()) {
@@ -248,13 +238,6 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
 
         List<Column> columns = this.getColumns();
         grid.setColumns(columns);
-
-        List<Summary> summaries = List.of(
-                new Summary(columns.get(columns.size() - 1).getColumnBaseOption().getName(), Summary.OperationType.rowcount));
-
-        grid.setSummaries(summaries);
-        grid.setHeaderHeight(100);
-        grid.setSummaryHeight(40);
 
         grid.setRowHeaders(List.of("checkbox"));
         grid.sethScroll(true);
@@ -326,8 +309,8 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
         });
 
         grid.setAutoSave(true);
-        grid.setHeaderHeight(50);
         grid.setSizeFull();
+        grid.setHeaderHeight(50);
 //        grid.setTableWidth(500);
 //        grid.setTableHeight(750);
     }
@@ -448,8 +431,8 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
                 try {
                     if (header.equals("id"))
                         continue;
-//                    String headerName = header.substring(0, 1).toLowerCase() + header.substring(1);
-                    Field headerField = data.getClass().getDeclaredField(header);
+                    String headerName = header.substring(0, 1).toLowerCase() + header.substring(1);
+                    Field headerField = data.getClass().getDeclaredField(headerName);
                     headerField.setAccessible(true);
                     Object dataSel = headerField.get(data);
                     switch (headerOptions.get(header)) {
@@ -514,6 +497,7 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
             String headerName = headerNames.get(header);
             ColumnBaseOption baseOption = new ColumnBaseOption(nId++, headerName, header, colWidths.get(headers.indexOf(header)), "center", "");
             com.vaadin.componentfactory.tuigrid.model.Column column = new com.vaadin.componentfactory.tuigrid.model.Column(baseOption);
+            new Column(new ColumnBaseOption(4, "Date-TimePicker With tab", "timepickerwithtab", 150, "center", ""), true, "datePicker", new DateOption("yyyy-MM-dd HH:mm A", true, "tab", "spinbox"));
             column.setEditable(true);
             column.setSortable(true);
             column.setSortingType("asc");
@@ -580,9 +564,6 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
         filterText.setClearButtonVisible(true);
         filterText.setValueChangeMode(ValueChangeMode.LAZY);
         filterText.addValueChangeListener(e -> updateList());
-        btnReload.addClickListener(e -> reloadGrid());
-        btnSave.addClickListener(e -> saveAll());
-        HorizontalLayout baseLayout = new HorizontalLayout(btnReload, btnSave);
         String filteredValue = "";
         if (filterObjectId != -1)
             for (Object data :
@@ -627,20 +608,13 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
         autoWidthSave.addValueChangeListener(e -> bSavedWidth = e.getValue());
         HorizontalLayout columnToolbar = new HorizontalLayout(autoWidthSave, columns);
         columnToolbar.setAlignItems(FlexComponent.Alignment.CENTER);
-        HorizontalLayout toolbar = new HorizontalLayout(new HorizontalLayout(filterText, routeLayout, baseLayout), columnToolbar);
+        HorizontalLayout toolbar = new HorizontalLayout(filterText, routeLayout, columnToolbar);
         toolbar.setWidthFull();
         toolbar.setJustifyContentMode(FlexComponent.JustifyContentMode.BETWEEN);
 
         toolbar.addClassName("aat-toolbar");
 
         return toolbar;
-    }
-
-    private void saveAll() {
-    }
-
-    private void reloadGrid() {
-        grid.reloadData();
     }
 
     private List<Integer> getColumnWidths() {
