@@ -24,7 +24,6 @@ import com.vaadin.flow.theme.lumo.LumoUtility;
 @PageTitle("Main")
 //@Route(value = "")
 @CssImport("./styles/styles.css")
-@CssImport("./styles/styles.css")
 public class CoreMainLayout extends AppLayout implements RouterLayout, BeforeEnterObserver {
     private H2 viewTitle;
     protected AppNav nav;
@@ -33,7 +32,6 @@ public class CoreMainLayout extends AppLayout implements RouterLayout, BeforeEnt
     public CoreMainLayout() {
         setPrimarySection(Section.DRAWER);
         addHeaderContent();
-
     }
 
     protected AppNav getNavigation() {

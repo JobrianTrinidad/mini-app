@@ -144,6 +144,18 @@
             <groupId>com.vaadin</groupId>
             <artifactId>vaadin-notification-flow</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.github.rosauromatib</groupId>
+            <artifactId>toast-ui-grid-addon</artifactId>
+            <version>v1.2.68</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.github.rosauromatib</groupId>
+            <artifactId>toast-ui-grid-addon</artifactId>
+            <version>v1.2.69</version>
+            <scope>compile</scope>
+        </dependency>
 
         <!--
         <dependency>
