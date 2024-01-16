@@ -72,8 +72,11 @@ public class TimeLineViewParameter {
      */
     public boolean isValid()
     {
-        boolean valid = titleFieldName != null;
-        //TODO - add some logging or notification to developer for missing definition
+        boolean valid = true;
+        if (titleFieldName == null) {
+            valid = false;
+            //TODO - add some logging or notification to developer for missing definition
+        }
 
         if (fromDefinition == null) {
             valid = false;
