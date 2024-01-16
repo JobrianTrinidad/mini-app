@@ -81,11 +81,11 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
         initColSelDialog(entityClass, groupName, filterObjectId);
 
         loadGrid(entityClass, groupName, filterObjectId);
-        EventBus.getInstance().register(event -> {
-            if ("DrawerToggleClicked".equals(event)) {
-                getUI().ifPresent(ui -> ui.access(grid::refreshGrid));
-            }
-        });
+//        EventBus.getInstance().register(event -> {
+//            if ("DrawerToggleClicked".equals(event)) {
+//                getUI().ifPresent(ui -> ui.access(grid::refreshGrid));
+//            }
+//        });
     }
 
     private void loadGrid(Class<T> entityClass, String groupName, int filterObjectId) {
@@ -223,6 +223,8 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
         grid = new TuiGrid();
         grid.addClassName("scheduler-grid");
         grid.setHeaders(headers);
+        grid.getStyle().setHeight("calc(100vh - 130px)");
+//        grid.setHeight("calc(100vh - 200px)");
 
         String fieldName = "";
         for (Field field : entityClass.getDeclaredFields()) {
@@ -318,7 +320,6 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
         });
 
         grid.setAutoSave(true);
-        grid.setSizeFull();
         grid.setHeaderHeight(50);
 //        grid.setTableWidth(500);
 //        grid.setTableHeight(750);
@@ -440,8 +441,8 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
                 try {
                     if (header.equals("id"))
                         continue;
-                    String headerName = header.substring(0, 1).toLowerCase() + header.substring(1);
-                    Field headerField = data.getClass().getDeclaredField(headerName);
+//                    String headerName = header.substring(0, 1).toLowerCase() + header.substring(1);
+                    Field headerField = data.getClass().getDeclaredField(header);
                     headerField.setAccessible(true);
                     Object dataSel = headerField.get(data);
                     switch (headerOptions.get(header)) {
@@ -575,7 +576,7 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
         filterText.addValueChangeListener(e -> updateList());
         btnReload.addClickListener(e -> reloadGrid());
         btnSave.addClickListener(e -> saveAll());
-        HorizontalLayout baseLayout = new HorizontalLayout(filterText, btnReload, btnSave);
+        HorizontalLayout baseLayout = new HorizontalLayout(btnReload, btnSave);
         String filteredValue = "";
         if (filterObjectId != -1)
             for (Object data :
@@ -607,7 +608,7 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
 
         // Set visibility based on isVehicle
         boolean isFilter = filterObjectId != -1;
-        baseLayout.setVisible(!isFilter);
+        filterText.setVisible(!isFilter);
         routeLayout.setVisible(isFilter);
 
         columns = new Button("Columns");
@@ -620,7 +621,7 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
         autoWidthSave.addValueChangeListener(e -> bSavedWidth = e.getValue());
         HorizontalLayout columnToolbar = new HorizontalLayout(autoWidthSave, columns);
         columnToolbar.setAlignItems(FlexComponent.Alignment.CENTER);
-        HorizontalLayout toolbar = new HorizontalLayout(baseLayout, routeLayout, columnToolbar);
+        HorizontalLayout toolbar = new HorizontalLayout(new HorizontalLayout(filterText, routeLayout, baseLayout), columnToolbar);
         toolbar.setWidthFull();
         toolbar.setJustifyContentMode(FlexComponent.JustifyContentMode.BETWEEN);
 
