@@ -31,11 +31,11 @@ public class BaseEntityService<T> implements ZJTService<T> {
     @Override
     public <T1> List<T1> findRecordsByField(String fieldName, Object fieldValue) {
         if (fieldValue instanceof String) {
-            return generalRepository.findRecordsByField(fieldName, (String) fieldValue);
+            return generalRepository.findRecordsByField(fieldName, fieldValue);
         } else if (fieldValue instanceof Boolean) {
-            return generalRepository.findRecordsByField(fieldName, (Boolean) fieldValue);
+            return generalRepository.findRecordsByField(fieldName, fieldValue);
         } else if (fieldValue instanceof Integer) {
-            return generalRepository.findRecordsByField(fieldName, (Integer) fieldValue);
+            return generalRepository.findRecordsByField(fieldName, fieldValue);
         }
         // Handle other types as needed
         else {
