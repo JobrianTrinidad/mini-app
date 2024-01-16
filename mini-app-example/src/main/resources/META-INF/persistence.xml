@@ -13,7 +13,7 @@
         <properties>
             <property name="javax.persistence.jdbc.driver" value="org.postgresql.Driver"/>
             <property name="javax.persistence.jdbc.url"
-                      value="jdbc:postgresql://localhost:5432/myapp-db?currentSchema=adempiere"/>
+                      value="jdbc:postgresql://localhost:5432/adempiere?currentSchema=adempiere"/>
             <property name="javax.persistence.jdbc.user" value="adempiere"/>
             <property name="javax.persistence.jdbc.password" value="adempiere"/>
             <property name="hibernate.dialect" value="org.hibernate.dialect.PostgreSQLDialect"/>
