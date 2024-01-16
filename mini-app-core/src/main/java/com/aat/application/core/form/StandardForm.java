@@ -47,6 +47,8 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
     String fieldDisplayedInSelect;
     private ZJTTableInfo tableInfo;
     protected TextField filterText = new TextField();
+    private final Button btnReload = new Button("Reload");
+    private final Button btnSave = new Button("Save");
     private String groupName = "";
     protected Button columns;
     private Dialog twinColSelDialog;
@@ -238,6 +240,13 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
 
         List<Column> columns = this.getColumns();
         grid.setColumns(columns);
+
+        List<Summary> summaries = List.of(
+                new Summary(columns.get(columns.size() - 1).getColumnBaseOption().getName(), Summary.OperationType.rowcount));
+
+        grid.setSummaries(summaries);
+        grid.setHeaderHeight(100);
+        grid.setSummaryHeight(40);
 
         grid.setRowHeaders(List.of("checkbox"));
         grid.sethScroll(true);
@@ -564,6 +573,9 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
         filterText.setClearButtonVisible(true);
         filterText.setValueChangeMode(ValueChangeMode.LAZY);
         filterText.addValueChangeListener(e -> updateList());
+        btnReload.addClickListener(e -> reloadGrid());
+        btnSave.addClickListener(e -> saveAll());
+        HorizontalLayout baseLayout = new HorizontalLayout(filterText, btnReload, btnSave);
         String filteredValue = "";
         if (filterObjectId != -1)
             for (Object data :
@@ -595,7 +607,7 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
 
         // Set visibility based on isVehicle
         boolean isFilter = filterObjectId != -1;
-        filterText.setVisible(!isFilter);
+        baseLayout.setVisible(!isFilter);
         routeLayout.setVisible(isFilter);
 
         columns = new Button("Columns");
@@ -608,13 +620,20 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
         autoWidthSave.addValueChangeListener(e -> bSavedWidth = e.getValue());
         HorizontalLayout columnToolbar = new HorizontalLayout(autoWidthSave, columns);
         columnToolbar.setAlignItems(FlexComponent.Alignment.CENTER);
-        HorizontalLayout toolbar = new HorizontalLayout(filterText, routeLayout, columnToolbar);
+        HorizontalLayout toolbar = new HorizontalLayout(baseLayout, routeLayout, columnToolbar);
         toolbar.setWidthFull();
         toolbar.setJustifyContentMode(FlexComponent.JustifyContentMode.BETWEEN);
 
         toolbar.addClassName("aat-toolbar");
 
         return toolbar;
+    }
+
+    private void saveAll() {
+    }
+
+    private void reloadGrid() {
+        grid.reloadData();
     }
 
     private List<Integer> getColumnWidths() {
