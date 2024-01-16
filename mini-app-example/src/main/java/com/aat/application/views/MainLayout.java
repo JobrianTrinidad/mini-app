@@ -26,8 +26,8 @@ public class MainLayout extends CoreMainLayout {
         AppNavItem parent = new AppNavItem("Data");
         parent.setIcon(LineAwesomeIcon.FOLDER.create());
         nav.addItem(parent);
-        parent.addItem(new AppNavItem("Pricing Type", "pricing-type", LineAwesomeIcon.PRODUCT_HUNT.create())
-                .withParameter("entityClass", ZJTPricingType.class.getName())
+        parent.addItem(new AppNavItem("User", "user", LineAwesomeIcon.PRODUCT_HUNT.create())
+                .withParameter("entityClass", ZJTUser.class.getName())
                 .withParameter("layout", this.getClass().getName()));
         parent.addItem(new AppNavItem("Service Type", "service-type", LineAwesomeIcon.PRODUCT_HUNT.create())
                 .withParameter("entityClass", ZJTVehicleServiceType.class.getName())
@@ -45,6 +45,9 @@ public class MainLayout extends CoreMainLayout {
         parent.setIcon(LineAwesomeIcon.FOLDER.create());
         parent.addItem(new AppNavItem("Service Schedule", "service-schedule", LineAwesomeIcon.PRODUCT_HUNT.create())
                 .withParameter("entityClass", ZJTVehicleServiceSchedule.class.getName())
+                .withParameter("layout", this.getClass().getName()));
+        parent.addItem(new AppNavItem("Vehicle KM Reading", "vehiclekmreading", LineAwesomeIcon.PRODUCT_HUNT.create())
+                .withParameter("entityClass", ZJTVehicleKMReading.class.getName())
                 .withParameter("layout", this.getClass().getName()));
 
         nav.addItem(parent);
