@@ -223,7 +223,8 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
         grid = new TuiGrid();
         grid.addClassName("scheduler-grid");
         grid.setHeaders(headers);
-        grid.getStyle().setHeight("calc(100vh - 130px)");
+//        grid.getStyle().setHeight("calc(100vh - 130px)");
+        grid.setHeight("calc(100vh-200px)");
 //        grid.setHeight("calc(100vh - 200px)");
 
         String fieldName = "";
