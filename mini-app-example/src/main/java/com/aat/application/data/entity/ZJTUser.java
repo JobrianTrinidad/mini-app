@@ -1,5 +1,6 @@
 package com.aat.application.data.entity;
 
+import com.aat.application.annotations.ContentDisplayedInSelect;
 import com.aat.application.annotations.DisplayName;
 import com.aat.application.core.data.entity.ZJTEntity;
 import com.vaadin.flow.router.PageTitle;
@@ -22,6 +23,7 @@ public class ZJTUser implements ZJTEntity {
 
     @Column
     @DisplayName(value = "Name")
+    @ContentDisplayedInSelect(value = "name")
     private String name = "";
 
     @Override
@@ -36,7 +38,6 @@ public class ZJTUser implements ZJTEntity {
     public void setName(String name) {
         this.name = name;
     }
-
 
 
 }

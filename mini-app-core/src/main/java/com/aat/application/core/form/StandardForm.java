@@ -508,7 +508,6 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
             String headerName = headerNames.get(header);
             ColumnBaseOption baseOption = new ColumnBaseOption(nId++, headerName, header, colWidths.get(headers.indexOf(header)), "center", "");
             com.vaadin.componentfactory.tuigrid.model.Column column = new com.vaadin.componentfactory.tuigrid.model.Column(baseOption);
-            new Column(new ColumnBaseOption(4, "Date-TimePicker With tab", "timepickerwithtab", 150, "center", ""), true, "datePicker", new DateOption("yyyy-MM-dd HH:mm A", true, "tab", "spinbox"));
             column.setEditable(true);
             column.setSortable(true);
             column.setSortingType("asc");

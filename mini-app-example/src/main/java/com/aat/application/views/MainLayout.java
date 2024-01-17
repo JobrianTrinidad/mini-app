@@ -26,6 +26,9 @@ public class MainLayout extends CoreMainLayout {
         AppNavItem parent = new AppNavItem("Data");
         parent.setIcon(LineAwesomeIcon.FOLDER.create());
         nav.addItem(parent);
+        parent.addItem(new AppNavItem("User", "user", LineAwesomeIcon.PRODUCT_HUNT.create())
+                .withParameter("entityClass", ZJTUser.class.getName())
+                .withParameter("layout", this.getClass().getName()));
         parent.addItem(new AppNavItem("Pricing Type", "pricing-type", LineAwesomeIcon.PRODUCT_HUNT.create())
                 .withParameter("entityClass", ZJTPricingType.class.getName())
                 .withParameter("layout", this.getClass().getName()));
