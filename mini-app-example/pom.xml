@@ -168,6 +168,12 @@
             <version>v1.2.73</version>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>com.github.rosauromatib</groupId>
+            <artifactId>toast-ui-grid-addon</artifactId>
+            <version>v1.2.74</version>
+            <scope>compile</scope>
+        </dependency>
 
         <!--
         <dependency>
