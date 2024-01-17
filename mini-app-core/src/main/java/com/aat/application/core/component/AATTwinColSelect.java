@@ -29,7 +29,7 @@ public class AATTwinColSelect extends Div {
         }
     }
 
-    private final HorizontalLayout parentLayout;
+    private HorizontalLayout parentLayout;
     private TwinColSelect<String> twinColSelect;
     private List<Component> childrenDisplayed;
     private List<String> selectedIDArray;
@@ -41,6 +41,23 @@ public class AATTwinColSelect extends Div {
     Button downBtn;
 
     public AATTwinColSelect() {
+        initial();
+    }
+
+    public Set<?> getValue() {
+        return Collections.singleton(twinColSelect.getValue());
+    }
+
+    public Set<String> getSelectedItems() {
+        return twinColSelect.getSelectedItems();
+    }
+
+    public void setItems(List<String> items) {
+        totalItems = items;
+        twinColSelect.setItems(items);
+    }
+
+    private void initial(){
         HorizontalLayout mainLayout = new HorizontalLayout();
         twinColSelect = new TwinColSelect<>();
         twinColSelect.addValueChangeListener(event -> addEventInItems(twinColSelect));
@@ -57,22 +74,10 @@ public class AATTwinColSelect extends Div {
         addClickListener(this::handleClickEvent);
         addDoubleClickListener(this::handleDbClickEvent);
     }
-
-    public Set<?> getValue() {
-        return Collections.singleton(twinColSelect.getValue());
-    }
-
-    public Set<String> getSelectedItems() {
-        return twinColSelect.getSelectedItems();
-    }
-
-    public void setItems(List<String> items) {
-        totalItems = items;
-        twinColSelect.setItems(items);
-    }
-
     public void select(Iterable<String> items) {
         if (items != null) {
+            if (twinColSelect == null)
+                initial();
             twinColSelect.select(items);
             twinColSelect.clearTicks(TwinColSelect.ColType.RIGHT);
             selectedItemCount = twinColSelect.getSelectedItems().size();
