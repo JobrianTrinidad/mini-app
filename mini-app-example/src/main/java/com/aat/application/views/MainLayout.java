@@ -47,6 +47,10 @@ public class MainLayout extends CoreMainLayout {
                 .withParameter("entityClass", ZJTVehicleServiceSchedule.class.getName())
                 .withParameter("layout", this.getClass().getName()));
 
+        parent.addItem(new AppNavItem("Vehicle KM Reading", "vehiclekmreading", LineAwesomeIcon.PRODUCT_HUNT.create())
+                .withParameter("entityClass", ZJTVehicleKMReading.class.getName())
+                .withParameter("layout", this.getClass().getName()));
+
         nav.addItem(parent);
         return nav;
     }
