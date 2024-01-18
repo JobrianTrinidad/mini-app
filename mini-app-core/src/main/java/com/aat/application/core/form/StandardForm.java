@@ -13,8 +13,11 @@ import com.vaadin.componentfactory.tuigrid.model.*;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.checkbox.Checkbox;
+import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.icon.Icon;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -47,8 +50,8 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
     String fieldDisplayedInSelect;
     private ZJTTableInfo tableInfo;
     protected TextField filterText = new TextField();
-    private final Button btnReload = new Button("Reload");
-    private final Button btnSave = new Button("Save");
+    private final Button btnReload = new Button();
+    private final Button btnSave = new Button();
     private String groupName = "";
     protected Button columns;
     private Dialog twinColSelDialog;
@@ -63,8 +66,18 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
     List<Item> items = new ArrayList<>();
     List<T> tableData = new ArrayList<>();
     private boolean bSavedWidth = false;
-    private VerticalLayout verticalLayout;
-    private HorizontalLayout toolbar;
+
+    // this vertical layout contains all the components filled in vertical stack
+    private VerticalLayout formLayout = new VerticalLayout();
+
+    // the horizontal component containing all toolbar buttons
+    private HorizontalLayout toolbar = new HorizontalLayout();
+    private HorizontalLayout routeLayout = new HorizontalLayout();
+
+    private HorizontalLayout statusBar = new HorizontalLayout();
+    private Button btnInfo = new Button();
+    private TextField lblMessage = new TextField();
+    private Button  lblRowCount = new Button();
 
     public StandardForm(Class<T> entityClass, Class<T> filteredEntityClass,
                         S service, TableInfoService tableInfoService,
@@ -81,7 +94,10 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
 
         initColSelDialog(entityClass, groupName, filterObjectId);
 
+        add(routeLayout, toolbar);
         loadGrid(entityClass, groupName, filterObjectId);
+
+        addStatusBar();
 //        EventBus.getInstance().register(event -> {
 //            if ("DrawerToggleClicked".equals(event)) {
 //                getUI().ifPresent(ui -> ui.access(grid::refreshGrid));
@@ -89,13 +105,43 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
 //        });
     }
 
+    private void addStatusBar() {
+
+        HorizontalLayout left = new HorizontalLayout();
+        btnInfo.setIcon(new Icon(VaadinIcon.INFO));
+        left.setWidthFull();
+        left.add(lblMessage);
+        lblMessage.setWidthFull();
+
+        statusBar.add(btnInfo, left, lblRowCount);
+        statusBar.setHeight("40px");
+        statusBar.setWidthFull();
+
+        lblMessage.setValue("OK");
+        lblRowCount.setText("#");
+
+        btnInfo.addClickListener(e -> showMessageInDialog());
+
+        add(statusBar);
+    }
+
+    private void showMessageInDialog()
+    {
+        ConfirmDialog dialog = new ConfirmDialog();
+        dialog.setHeader("Status Message");
+        dialog.setText(lblMessage.getValue());
+
+        dialog.open();
+
+
+    }
     private void loadGrid(Class<T> entityClass, String groupName, int filterObjectId) {
 //        removeAll();
-        toolbar = getToolbar(groupName, filterObjectId);
-        if (!twinColSelect.getSelectedItems().isEmpty()) configureGrid(entityClass, groupName, filterObjectId);
-        verticalLayout = new VerticalLayout(toolbar);
-        if (grid != null) add(verticalLayout, grid);
-        else add(new VerticalLayout(verticalLayout));
+        if (!twinColSelect.getSelectedItems().isEmpty())
+            configureGrid(entityClass, groupName, filterObjectId);
+        getToolbar(groupName, filterObjectId);
+        if (grid != null)
+            add(grid);
     }
 
     private void initColSelDialog(Class<T> entityClass, String groupName, int filterObjectId) {
@@ -575,14 +621,20 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
         return columns;
     }
 
-    private HorizontalLayout getToolbar(String beforeRouteName, int filterObjectId) {
+    private void getToolbar(String beforeRouteName, int filterObjectId) {
         filterText.setPlaceholder("Filter by name...");
         filterText.setClearButtonVisible(true);
         filterText.setValueChangeMode(ValueChangeMode.LAZY);
         filterText.addValueChangeListener(e -> updateList());
+
+        btnReload.setIcon(new Icon(VaadinIcon.REFRESH));
+        btnReload.setTooltipText("Reload data");
         btnReload.addClickListener(e -> reloadGrid());
+
+        btnSave.setIcon(new Icon(VaadinIcon.DISC));
+        btnSave.setTooltipText("Force Save");
         btnSave.addClickListener(e -> saveAll());
-        HorizontalLayout baseLayout = new HorizontalLayout(btnReload, btnSave);
+        toolbar.add(btnReload, btnSave);
         String filteredValue = "";
         if (filterObjectId != -1)
             for (Object data :
@@ -599,8 +651,9 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
             }
         Span sp = new Span(">> " + filteredValue);
         Button btnGoOriginView = new Button(GlobalData.convertToStandard(beforeRouteName));
-        HorizontalLayout routeLayout = new HorizontalLayout(btnGoOriginView, sp);
-        routeLayout.setAlignItems(FlexComponent.Alignment.CENTER);
+        routeLayout.removeAll();
+        routeLayout.add(btnGoOriginView, sp);
+        routeLayout.setAlignItems(Alignment.START);
 
         btnGoOriginView.addClickListener(e -> {
             VaadinSession.getCurrent().setAttribute("entityClass", this.filteredEntityClass.getName());
@@ -627,13 +680,14 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
         autoWidthSave.addValueChangeListener(e -> bSavedWidth = e.getValue());
         HorizontalLayout columnToolbar = new HorizontalLayout(autoWidthSave, columns);
         columnToolbar.setAlignItems(FlexComponent.Alignment.CENTER);
-        HorizontalLayout toolbar = new HorizontalLayout(new HorizontalLayout(filterText, routeLayout, baseLayout), columnToolbar);
-        toolbar.setWidthFull();
-        toolbar.setJustifyContentMode(FlexComponent.JustifyContentMode.BETWEEN);
+//        HorizontalLayout toolbar = new HorizontalLayout(new HorizontalLayout(filterText, routeLayout, baseLayout), columnToolbar);
+//        toolbar.setWidthFull();
+//        toolbar.setJustifyContentMode(FlexComponent.JustifyContentMode.BETWEEN);
 
+        toolbar.add(columnToolbar);
         toolbar.addClassName("aat-toolbar");
 
-        return toolbar;
+        return;
     }
 
     private void saveAll() {
@@ -641,6 +695,16 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
 
     private void reloadGrid() {
         grid.reloadData();
+    }
+
+    public void setMessageStatus(String msg)
+    {
+        lblMessage.setValue(msg);
+    }
+
+    public void addCustomButton(Button button)
+    {
+        toolbar.add(button);
     }
 
     private List<Integer> getColumnWidths() {

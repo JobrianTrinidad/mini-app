@@ -10,6 +10,7 @@ import com.aat.application.data.service.TableInfoService;
 import com.aat.application.form.GridCommonForm;
 import com.aat.application.form.TimeLineCommonForm;
 import com.vaadin.componentfactory.tuigrid.model.AATContextMenu;
+import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.router.BeforeEnterEvent;
 
 import java.util.Optional;
@@ -61,6 +62,20 @@ public class StandardFormView<T extends ZJTEntity> extends CommonView<T> {
 
     protected void setContextMenu(AATContextMenu contextMenu) {
         this.contextMenu = contextMenu;
+    }
+
+    public void setMessageStatus(String msg)
+    {
+        if (form != null && form instanceof StandardForm) {
+            ((StandardForm) form).setMessageStatus(msg);
+        }
+    }
+
+    public void addCustomButton(Button button)
+    {
+        if (form != null && form instanceof StandardForm) {
+            ((StandardForm) form).addCustomButton(button);
+        }
     }
 
 }
