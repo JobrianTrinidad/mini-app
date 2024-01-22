@@ -39,15 +39,15 @@ public class VehicleView extends StandardFormView<ZJTEntity> implements HasUrlPa
             GridCommonForm<ZJTEntity> form = (GridCommonForm<ZJTEntity>) this.form;
 
             onAddEvent(ev -> {
-                form.save((GuiItem) ev.getItem());
+                form.onNewRecord((GuiItem) ev.getItem());
             });
 
             onUpdateEvent(ev -> {
-                form.onUpdateItem(ev.getRow(), ev.getColName(), ev.getColValue());
+                form.onCellUpdate(ev.getRow(), ev.getColName(), ev.getColValue());
             });
 
             onDeleteEvent(ev -> {
-                form.deleteCheckedRow();
+                form.onDeleteRecordChecked();
             });
         }
     }

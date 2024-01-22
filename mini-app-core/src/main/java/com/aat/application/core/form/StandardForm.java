@@ -344,7 +344,7 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
         grid.setContextMenu(contextMenu);
     }
 
-    public void onUpdateItem(int rowKey, String colName, String colVal ) {
+    public void onCellUpdate(int rowKey, String colName, String colVal ) {
 
         items = grid.getItems();
         if (filterText != null) tableData = service.findAll(filterText.getValue());
@@ -460,7 +460,7 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
         }
     }
 
-    public void save(GuiItem item) {
+    public void onNewRecord(GuiItem item) {
         T row = null;
         try {
             row = entityClass.getDeclaredConstructor().newInstance();
@@ -721,7 +721,7 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
         add(grid);
     }
 
-    public void deleteCheckedRow() {
+    public void onDeleteRecordChecked() {
         int[] checkedItems = grid.getCheckedItems();
         for (int checkedRow : checkedItems) {
             service.delete(tableData.get(checkedRow));
