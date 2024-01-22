@@ -7,12 +7,19 @@ import com.aat.application.core.form.TimeLineViewParameter;
 import com.aat.application.data.repository.BaseEntityRepository;
 import com.aat.application.data.service.BaseEntityService;
 import com.aat.application.data.service.TableInfoService;
+import com.aat.application.event.EntityAddEvent;
 import com.aat.application.form.GridCommonForm;
 import com.aat.application.form.TimeLineCommonForm;
+import com.vaadin.componentfactory.tuigrid.event.ItemAddEvent;
+import com.vaadin.componentfactory.tuigrid.event.ItemChangeEvent;
+import com.vaadin.componentfactory.tuigrid.event.ItemDeleteEvent;
 import com.vaadin.componentfactory.tuigrid.model.AATContextMenu;
+import com.vaadin.flow.component.ComponentEventListener;
+import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.router.BeforeEnterEvent;
 
 import java.util.Optional;
+import java.util.function.Consumer;
 
 //@Route(value = "common-view/:name", layout = CoreMainLayout.class)
 @SuppressWarnings("ALL")
@@ -23,6 +30,7 @@ public class StandardFormView<T extends ZJTEntity> extends CommonView<T> {
     private TimeLineViewParameter timeLineViewParameter;
     protected AATContextMenu contextMenu;
     private String name;
+    private boolean bGrid = true;
 
     public StandardFormView(BaseEntityRepository<T> repository,
                             TableInfoService tableInfoService) {
@@ -31,7 +39,7 @@ public class StandardFormView<T extends ZJTEntity> extends CommonView<T> {
         this.timeLineViewParameter = timeLineViewParameter;
     }
 
-    public void setTimeLineViewParameter(TimeLineViewParameter timeLineViewParameter){
+    public void setTimeLineViewParameter(TimeLineViewParameter timeLineViewParameter) {
         this.timeLineViewParameter = timeLineViewParameter;
     }
 
@@ -40,10 +48,12 @@ public class StandardFormView<T extends ZJTEntity> extends CommonView<T> {
 
         switch (strFilter) {
             case "timeline":
+                bGrid = false;
                 form = new TimeLineCommonForm<>(entityClass, this.timeLineViewParameter, filteredEntityClass, new BaseEntityService<>(repository), groupName, filterObjectId);
                 break;
             case "grid":
             default:
+                bGrid = true;
                 form = new GridCommonForm<>(entityClass, filteredEntityClass, new BaseEntityService<>(repository), tableInfoService, groupName, filterObjectId);
                 if (this.contextMenu != null)
                     ((StandardForm) form).setContextMenu(this.contextMenu);
@@ -63,4 +73,33 @@ public class StandardFormView<T extends ZJTEntity> extends CommonView<T> {
         this.contextMenu = contextMenu;
     }
 
+    public void setMessageStatus(String msg) {
+        if (form != null && form instanceof StandardForm) {
+            ((StandardForm) form).setMessageStatus(msg);
+        }
+    }
+
+    public void addCustomButton(Button button) {
+        if (form != null && form instanceof StandardForm) {
+            ((StandardForm) form).addCustomButton(button);
+        }
+    }
+
+    protected void onAddEvent(Consumer<ItemAddEvent> eventHandler) {
+        if (bGrid) {
+            ((GridCommonForm) this.form).grid.addItemAddListener(eventHandler::accept);
+        }
+    }
+
+    protected void onUpdateEvent(Consumer<ItemChangeEvent> eventHandler) {
+        if (bGrid) {
+            ((GridCommonForm) this.form).grid.addItemChangeListener(eventHandler::accept);
+        }
+    }
+
+    protected void onDeleteEvent(Consumer<ItemDeleteEvent> eventHandler) {
+        if (bGrid) {
+            ((GridCommonForm) this.form).grid.addItemDeleteListener(eventHandler::accept);
+        }
+    }
 }

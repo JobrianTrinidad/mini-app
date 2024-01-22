@@ -5,8 +5,11 @@ import com.aat.application.core.form.TimeLineViewParameter;
 import com.aat.application.data.entity.ZJTVehicleServiceSchedule;
 import com.aat.application.data.repository.BaseEntityRepository;
 import com.aat.application.data.service.TableInfoService;
+import com.aat.application.form.GridCommonForm;
 import com.vaadin.componentfactory.tuigrid.model.AATContextMenu;
+import com.vaadin.componentfactory.tuigrid.model.GuiItem;
 import com.vaadin.componentfactory.tuigrid.model.MenuItem;
+import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.router.BeforeEvent;
@@ -25,10 +28,30 @@ public class VehicleView extends StandardFormView<ZJTEntity> implements HasUrlPa
 
     public VehicleView(BaseEntityRepository<ZJTEntity> repository, TableInfoService tableInfoService) {
         super(repository, tableInfoService);
-        TimeLineViewParameter timeLineViewParameter =  new TimeLineViewParameter("vehicle.fleetid", "vehicle", "planDate", null, null, "ZJTVehicleServiceSchedule");
+        TimeLineViewParameter timeLineViewParameter = new TimeLineViewParameter("vehicle.fleetid", "vehicle", "planDate", null, null, "ZJTVehicleServiceSchedule");
         timeLineViewParameter.setWhereDefinition("vehicle.zjt_vehicle_id");
         super.setTimeLineViewParameter(timeLineViewParameter);
     }
+
+    @Override
+    protected void onAttach(AttachEvent attachEvent) {
+        if (this.form != null) {
+            GridCommonForm<ZJTEntity> form = (GridCommonForm<ZJTEntity>) this.form;
+
+            onAddEvent(ev -> {
+                form.save((GuiItem) ev.getItem());
+            });
+
+            onUpdateEvent(ev -> {
+                form.onUpdateItem(ev.getRow(), ev.getColName(), ev.getColValue());
+            });
+
+            onDeleteEvent(ev -> {
+                form.deleteCheckedRow();
+            });
+        }
+    }
+
 
     @Override
     public void setParameter(BeforeEvent event, @OptionalParameter String parameter) {

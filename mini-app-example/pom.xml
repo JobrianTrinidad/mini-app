@@ -145,36 +145,17 @@
             <artifactId>vaadin-notification-flow</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.github.rosauromatib</groupId>
-            <artifactId>toast-ui-grid-addon</artifactId>
-            <version>v1.2.68</version>
-            <scope>compile</scope>
+            <groupId>com.vaadin</groupId>
+            <artifactId>flow-server</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.github.rosauromatib</groupId>
-            <artifactId>toast-ui-grid-addon</artifactId>
-            <version>v1.2.69</version>
-            <scope>compile</scope>
+            <groupId>com.vaadin</groupId>
+            <artifactId>flow-server</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.github.rosauromatib</groupId>
-            <artifactId>toast-ui-grid-addon</artifactId>
-            <version>v1.2.72</version>
-            <scope>compile</scope>
+            <groupId>com.vaadin</groupId>
+            <artifactId>flow-server</artifactId>
         </dependency>
-        <dependency>
-            <groupId>com.github.rosauromatib</groupId>
-            <artifactId>toast-ui-grid-addon</artifactId>
-            <version>v1.2.73</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.github.rosauromatib</groupId>
-            <artifactId>toast-ui-grid-addon</artifactId>
-            <version>v1.2.74</version>
-            <scope>compile</scope>
-        </dependency>
-
         <!--
         <dependency>
             <groupId>com.github.JobrianTrinidad</groupId>

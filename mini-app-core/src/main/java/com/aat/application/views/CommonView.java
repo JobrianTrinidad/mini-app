@@ -2,7 +2,11 @@ package com.aat.application.views;
 
 import com.aat.application.core.data.entity.ZJTEntity;
 import com.aat.application.data.repository.BaseEntityRepository;
+import com.vaadin.componentfactory.tuigrid.event.ItemAddEvent;
+import com.vaadin.componentfactory.tuigrid.event.ItemChangeEvent;
+import com.vaadin.componentfactory.tuigrid.event.ItemDeleteEvent;
 import com.vaadin.componentfactory.tuigrid.model.Cell;
+import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -21,7 +25,7 @@ public abstract class CommonView<T extends ZJTEntity> extends VerticalLayout imp
     public Class<T> entityClass;
     protected Class<T> filteredEntityClass;
     protected Class<?> LayoutClass;
-    protected Class groupClass;
+    protected Class<T> groupClass;
     protected int filterObjectId = -1;
     protected String groupName;
     protected ArrayList<Cell> filterTemp;

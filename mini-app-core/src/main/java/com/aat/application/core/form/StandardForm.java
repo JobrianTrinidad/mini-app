@@ -13,12 +13,14 @@ import com.vaadin.componentfactory.tuigrid.model.*;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.checkbox.Checkbox;
+import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.icon.Icon;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.page.PendingJavaScriptResult;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.server.VaadinSession;
@@ -28,7 +30,6 @@ import java.io.Serial;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -54,7 +55,7 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
     private Dialog twinColSelDialog;
     AATTwinColSelect twinColSelect;
     Set<String> selectedItems;
-    protected TuiGrid grid;
+    public TuiGrid grid;
     protected S service;
     List<String> headers;
     LinkedHashMap<String, String> headerOptions = new LinkedHashMap<>();
@@ -63,8 +64,19 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
     List<Item> items = new ArrayList<>();
     List<T> tableData = new ArrayList<>();
     private boolean bSavedWidth = false;
-    private VerticalLayout verticalLayout;
-    private HorizontalLayout toolbar;
+
+    // this vertical layout contains all the components filled in vertical stack
+    private final VerticalLayout formLayout = new VerticalLayout();
+
+    // the horizontal component containing all toolbar buttons
+    private final HorizontalLayout toolbar = new HorizontalLayout();
+    private final HorizontalLayout routeLayout = new HorizontalLayout();
+
+    private final HorizontalLayout statusBar = new HorizontalLayout();
+    private final Button btnInfo = new Button();
+    private final TextField lblMessage = new TextField();
+    private final Button lblRowCount = new Button();
+
 
     public StandardForm(Class<T> entityClass, Class<T> filteredEntityClass,
                         S service, TableInfoService tableInfoService,
@@ -81,7 +93,10 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
 
         initColSelDialog(entityClass, groupName, filterObjectId);
 
+        add(routeLayout, toolbar);
         loadGrid(entityClass, groupName, filterObjectId);
+
+        addStatusBar();
 //        EventBus.getInstance().register(event -> {
 //            if ("DrawerToggleClicked".equals(event)) {
 //                getUI().ifPresent(ui -> ui.access(grid::refreshGrid));
@@ -89,13 +104,43 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
 //        });
     }
 
+    private void addStatusBar() {
+
+        HorizontalLayout left = new HorizontalLayout();
+        btnInfo.setIcon(new Icon(VaadinIcon.INFO));
+        left.setWidthFull();
+        left.add(lblMessage);
+        lblMessage.setWidthFull();
+
+        statusBar.add(btnInfo, left, lblRowCount);
+        statusBar.setHeight("40px");
+        statusBar.setWidthFull();
+
+        lblMessage.setValue("OK");
+        lblRowCount.setText("#");
+
+        btnInfo.addClickListener(e -> showMessageInDialog());
+
+        add(statusBar);
+    }
+
+    private void showMessageInDialog() {
+        ConfirmDialog dialog = new ConfirmDialog();
+        dialog.setHeader("Status Message");
+        dialog.setText(lblMessage.getValue());
+
+        dialog.open();
+
+
+    }
+
     private void loadGrid(Class<T> entityClass, String groupName, int filterObjectId) {
 //        removeAll();
-        toolbar = getToolbar(groupName, filterObjectId);
-        if (!twinColSelect.getSelectedItems().isEmpty()) configureGrid(entityClass, groupName, filterObjectId);
-        verticalLayout = new VerticalLayout(toolbar);
-        if (grid != null) add(verticalLayout, grid);
-        else add(new VerticalLayout(verticalLayout));
+        if (!twinColSelect.getSelectedItems().isEmpty())
+            configureGrid(entityClass, groupName, filterObjectId);
+        getToolbar(groupName, filterObjectId);
+        if (grid != null)
+            add(grid);
     }
 
     private void initColSelDialog(Class<T> entityClass, String groupName, int filterObjectId) {
@@ -199,6 +244,8 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
                 fieldNames.add(field.getName());
                 if (field.getType().getSimpleName().equals("LocalDateTime"))
                     headerOptions.put(field.getName(), "date");
+                else if (field.getType().getSimpleName().equals("boolean"))
+                    headerOptions.put(field.getName(), "check");
                 else
                     headerOptions.put(field.getName(), "input");
                 headerNames.put(field.getName(), field.getAnnotation(DisplayName.class).value());
@@ -220,7 +267,7 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
         return fieldNames;
     }
 
-    private  void configureGrid(Class<T> entityClass, String groupName, int filterObjectId) {
+    private void configureGrid(Class<T> entityClass, String groupName, int filterObjectId) {
         grid = new TuiGrid();
         grid.addClassName("scheduler-grid");
         grid.setHeaders(headers);
@@ -249,12 +296,12 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
         List<Column> columns = this.getColumns();
         grid.setColumns(columns);
 
-        List<Summary> summaries = List.of(
-                new Summary(columns.get(columns.size() - 1).getColumnBaseOption().getName(), Summary.OperationType.rowcount));
+//        List<Summary> summaries = List.of(
+//                new Summary(columns.get(columns.size() - 1).getColumnBaseOption().getName(), Summary.OperationType.rowcount));
 
-        grid.setSummaries(summaries);
+//        grid.setSummaries(summaries);
         grid.setHeaderHeight(100);
-        grid.setSummaryHeight(40);
+//        grid.setSummaryHeight(40);
 
         grid.setRowHeaders(List.of("checkbox"));
         grid.sethScroll(true);
@@ -285,46 +332,6 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
             }
         });
 
-        grid.addItemChangeListener(event -> {
-            items = grid.getItems();
-            if (filterText != null) tableData = service.findAll(filterText.getValue());
-            else tableData = service.findAll(null);
-
-            Comparator<T> comparator = Comparator.comparing(ZJTEntity::getId);
-            tableData.sort(comparator);
-
-            GuiItem item = (GuiItem) items.get(event.getRow());
-            String colName = event.getColName();
-            int columnIndex = item.getHeaders().indexOf(colName);
-            if (event.getRow() >= tableData.size()) {
-                try {
-                    if (tableData.isEmpty()) tableData.add(entityClass.getDeclaredConstructor().newInstance());
-                    else {
-                        T newRow = (T) tableData.get(0).getClass().getDeclaredConstructor().newInstance();
-                        tableData.add(newRow);
-                    }
-                } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
-                         NoSuchMethodException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-            T row = tableData.get(event.getRow());
-            if (columnIndex >= 0) {
-                this.save(row, colName, event.getColValue());
-                CompletableFuture.runAsync(() -> service.save(row));
-            }
-        });
-        grid.addItemDeleteListener(listener -> delete());
-        grid.addItemAddListener(event -> {
-            try {
-                T row = entityClass.getDeclaredConstructor().newInstance();
-                this.save(row, (GuiItem) event.getItem());
-            } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
-                     NoSuchMethodException e) {
-                throw new RuntimeException(e);
-            }
-        });
-
         grid.setAutoSave(true);
         grid.setHeaderHeight(50);
         grid.setSizeFull();
@@ -337,11 +344,42 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
         grid.setContextMenu(contextMenu);
     }
 
+    public void onUpdateItem(int rowKey, String colName, String colVal ) {
+
+        items = grid.getItems();
+        if (filterText != null) tableData = service.findAll(filterText.getValue());
+        else tableData = service.findAll(null);
+
+        Comparator<T> comparator = Comparator.comparing(ZJTEntity::getId);
+        tableData.sort(comparator);
+
+        GuiItem item = (GuiItem) items.get(rowKey);
+        int columnIndex = item.getHeaders().indexOf(colName);
+        if (rowKey >= tableData.size()) {
+            try {
+                if (tableData.isEmpty()) tableData.add(entityClass.getDeclaredConstructor().newInstance());
+                else {
+                    T newRow = (T) tableData.get(0).getClass().getDeclaredConstructor().newInstance();
+                    tableData.add(newRow);
+                }
+            } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
+                     NoSuchMethodException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        T row = tableData.get(rowKey);
+        if (columnIndex >= 0) {
+            this.save(row, colName, colVal);
+            CompletableFuture.runAsync(() -> service.save(row));
+        }
+    }
+
     private void save(T row, String header, String colValue) {
         try {
             Field field = row.getClass().getDeclaredField(header);
             field.setAccessible(true);
             switch (headerOptions.get(header)) {
+                case "check":
                 case "input":
                     String fieldType = field.getType().getSimpleName();
                     try {
@@ -358,10 +396,9 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
                             case "float":
                                 field.set(row, Float.parseFloat(colValue));
                                 break;
-                            case "LocalDateTime":
-                                LocalDate date = LocalDate.parse(colValue);
-                                LocalDateTime dateTime = date.atStartOfDay();
-                                field.set(row, dateTime);
+                            case "Boolean":
+                            case "boolean":
+                                field.set(row, Boolean.parseBoolean(colValue));
                                 break;
                             default:
                                 field.set(row, colValue); // Fallback for String and other types
@@ -373,7 +410,9 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
                 case "date":
                     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm a");
                     try {
-                        LocalDateTime dateTime = LocalDateTime.parse(colValue, formatter);
+                        LocalDateTime dateTime = LocalDateTime.now();
+                        if (!colValue.isEmpty())
+                            dateTime = LocalDateTime.parse(colValue, formatter);
                         field.set(row, dateTime);
                     } catch (DateTimeParseException e) {
                         e.printStackTrace();
@@ -421,13 +460,21 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
         }
     }
 
-    private void save(T row, GuiItem item) {
+    public void save(GuiItem item) {
+        T row = null;
+        try {
+            row = entityClass.getDeclaredConstructor().newInstance();
+        } catch (InstantiationException | IllegalAccessException |
+                 InvocationTargetException | NoSuchMethodException e) {
+            throw new RuntimeException(e);
+        }
         for (String header : item.getHeaders()) {
             String colValue = item.getRecordData().get(item.getHeaders().indexOf(header));
             this.save(row, header, colValue);
         }
 
-        CompletableFuture.runAsync(() -> service.save(row));
+        T finalRow = row;
+        CompletableFuture.runAsync(() -> service.save(finalRow));
     }
 
     private List<Item> getTableData(String fieldName, int filterId) {
@@ -454,6 +501,7 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
                     Object dataSel = headerField.get(data);
                     switch (headerOptions.get(header)) {
                         case "input":
+                        case "check":
                         case "date":
                             rowData.set(i, dataSel != null ? dataSel.toString() : "");
                             break;
@@ -491,6 +539,7 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
                     field.setAccessible(true);
                     if (field.getAnnotation(Id.class) != null) {
                         TableData.add(new GuiItem((Integer) field.get(data), rowData, headers));
+                        break;
                     }
                 }
             } catch (IllegalAccessException e) {
@@ -523,6 +572,9 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
             switch (headerOptions.get(header)) {
                 case "input":
                     column.setType("input");
+                    break;
+                case "check":
+                    column.setType("check");
                     break;
                 case "date":
                     column.setType("datePicker");
@@ -575,14 +627,14 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
         return columns;
     }
 
-    private HorizontalLayout getToolbar(String beforeRouteName, int filterObjectId) {
+    private void getToolbar(String beforeRouteName, int filterObjectId) {
         filterText.setPlaceholder("Filter by name...");
         filterText.setClearButtonVisible(true);
         filterText.setValueChangeMode(ValueChangeMode.LAZY);
         filterText.addValueChangeListener(e -> updateList());
         btnReload.addClickListener(e -> reloadGrid());
         btnSave.addClickListener(e -> saveAll());
-        HorizontalLayout baseLayout = new HorizontalLayout(btnReload, btnSave);
+        toolbar.add(btnReload, btnSave);
         String filteredValue = "";
         if (filterObjectId != -1)
             for (Object data :
@@ -627,13 +679,16 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
         autoWidthSave.addValueChangeListener(e -> bSavedWidth = e.getValue());
         HorizontalLayout columnToolbar = new HorizontalLayout(autoWidthSave, columns);
         columnToolbar.setAlignItems(FlexComponent.Alignment.CENTER);
-        HorizontalLayout toolbar = new HorizontalLayout(new HorizontalLayout(filterText, routeLayout, baseLayout), columnToolbar);
-        toolbar.setWidthFull();
-        toolbar.setJustifyContentMode(FlexComponent.JustifyContentMode.BETWEEN);
-
+        toolbar.add(columnToolbar);
         toolbar.addClassName("aat-toolbar");
+    }
 
-        return toolbar;
+    public void setMessageStatus(String msg) {
+        lblMessage.setValue(msg);
+    }
+
+    public void addCustomButton(Button button) {
+        toolbar.add(button);
     }
 
     private void saveAll() {
@@ -666,7 +721,7 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
         add(grid);
     }
 
-    private void delete() {
+    public void deleteCheckedRow() {
         int[] checkedItems = grid.getCheckedItems();
         for (int checkedRow : checkedItems) {
             service.delete(tableData.get(checkedRow));
