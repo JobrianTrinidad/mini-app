@@ -52,7 +52,6 @@ public class VehicleView extends StandardFormView<ZJTEntity> implements HasUrlPa
         }
     }
 
-
     @Override
     public void setParameter(BeforeEvent event, @OptionalParameter String parameter) {
         if (parameter != null) {
