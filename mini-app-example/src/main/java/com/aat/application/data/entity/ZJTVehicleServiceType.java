@@ -1,10 +1,13 @@
 package com.aat.application.data.entity;
 
+import com.aat.application.annotations.BaseItems;
 import com.aat.application.annotations.ContentDisplayedInSelect;
 import com.aat.application.annotations.DisplayName;
 import com.aat.application.core.data.entity.ZJTEntity;
 import com.vaadin.flow.router.PageTitle;
 import jakarta.persistence.*;
+
+import java.util.List;
 
 
 /**
@@ -85,4 +88,7 @@ public class ZJTVehicleServiceType implements ZJTEntity {
         this.km_interval = km_interval;
     }
 
+    @OneToMany(mappedBy = "servicetype", cascade = CascadeType.ALL)
+    @BaseItems
+    private List<ZJTServiceTypeKit> serviceTypeKits;
 }

@@ -2,6 +2,7 @@ package com.aat.application.views;
 
 import com.aat.application.core.data.entity.ZJTEntity;
 import com.aat.application.core.form.TimeLineViewParameter;
+import com.aat.application.data.entity.ZJTServiceTypeKit;
 import com.aat.application.data.entity.ZJTVehicleServiceSchedule;
 import com.aat.application.data.entity.ZJTVehicleServiceType;
 import com.aat.application.data.repository.BaseEntityRepository;
@@ -37,21 +38,29 @@ public class ServiceTypeView extends StandardFormView<ZJTEntity> implements HasU
 //        MenuItem fileItem = contextMenu.addItem("File");
 //        fileItem.addContextMenuClickListener(e -> Notification.show(fileItem.getCaption()));
 
-        MenuItem editItem = contextMenu.addItem("Service Schedule");
-        editItem.addContextMenuClickListener(e -> Notification.show(editItem.getCaption()));
-        MenuItem gridItem = editItem.addSubItem("Grid");
-        gridItem.addContextMenuClickListener(e -> {
-            VaadinSession.getCurrent().setAttribute("filteredEntityClass", this.entityClass.getName());
-            VaadinSession.getCurrent().setAttribute("filter", e.getRow());
-            VaadinSession.getCurrent().setAttribute("entityClass", ZJTVehicleServiceSchedule.class.getName());
-            UI.getCurrent().navigate("service-type/serviceschedule");
-        });
-        MenuItem timelineItem = editItem.addSubItem("Timeline");
-        timelineItem.addContextMenuClickListener(e -> {
-            VaadinSession.getCurrent().setAttribute("entityClass", ZJTVehicleServiceSchedule.class.getName());
-            VaadinSession.getCurrent().setAttribute("groupName", "serviceType");
-            VaadinSession.getCurrent().setAttribute("groupClass", ZJTVehicleServiceType.class.getName());
-            UI.getCurrent().navigate("timeline/service-type/serviceschedule");
+//        MenuItem editItem = contextMenu.addItem("Service Schedule");
+//        editItem.addContextMenuClickListener(e -> Notification.show(editItem.getCaption()));
+//        MenuItem gridItem = editItem.addSubItem("Grid");
+//        gridItem.addContextMenuClickListener(e -> {
+//            VaadinSession.getCurrent().setAttribute("filteredEntityClass", this.entityClass.getName());
+//            VaadinSession.getCurrent().setAttribute("filter", e.getRow());
+//            VaadinSession.getCurrent().setAttribute("entityClass", ZJTVehicleServiceSchedule.class.getName());
+//            UI.getCurrent().navigate("service-type/serviceschedule");
+//        });
+//        MenuItem timelineItem = editItem.addSubItem("Timeline");
+//        timelineItem.addContextMenuClickListener(e -> {
+//            VaadinSession.getCurrent().setAttribute("entityClass", ZJTVehicleServiceSchedule.class.getName());
+//            VaadinSession.getCurrent().setAttribute("groupName", "serviceType");
+//            VaadinSession.getCurrent().setAttribute("groupClass", ZJTVehicleServiceType.class.getName());
+//            UI.getCurrent().navigate("timeline/service-type/serviceschedule");
+//        });
+
+        MenuItem menuItem;
+
+        menuItem  = contextMenu.addItem("Service Kit");
+        menuItem.addContextMenuClickListener(e -> {
+            VaadinSession.getCurrent().setAttribute("entityClass", ZJTServiceTypeKit.class.getName());
+            UI.getCurrent().navigate("service-type/service-type-kit/grid/" + e.getRow().get(0).getRowKey());
         });
 
         this.setContextMenu(contextMenu);
