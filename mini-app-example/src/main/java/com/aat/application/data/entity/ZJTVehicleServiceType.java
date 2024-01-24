@@ -88,7 +88,7 @@ public class ZJTVehicleServiceType implements ZJTEntity {
         this.km_interval = km_interval;
     }
 
-    @OneToMany(mappedBy = "servicetype", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "serviceType", cascade = CascadeType.ALL)
     @BaseItems
     private List<ZJTServiceTypeKit> serviceTypeKits;
 }

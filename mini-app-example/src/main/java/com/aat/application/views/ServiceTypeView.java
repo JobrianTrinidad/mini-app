@@ -67,9 +67,10 @@ public class ServiceTypeView extends StandardFormView<ZJTEntity> implements HasU
     }
 
     @Override
-    public void setParameter(BeforeEvent beforeEvent, @OptionalParameter String parameter) {
+    public void setParameter(BeforeEvent event, @OptionalParameter String parameter) {
         if (parameter != null) {
             this.name = parameter;
-        }
+        } else
+            addMenu();
     }
 }
