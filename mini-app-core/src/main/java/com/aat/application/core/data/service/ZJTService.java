@@ -6,7 +6,10 @@ import java.util.List;
 
 public interface ZJTService<T> {
     List<T> findAll(String filter);
+
     List<ZJTItem> findByQuery(String query);
+
+    List<Object[]> findEntityByQuery(String query);
 
     <T> List<T> findRecordsByField(String fieldName, Object fieldValue);
 

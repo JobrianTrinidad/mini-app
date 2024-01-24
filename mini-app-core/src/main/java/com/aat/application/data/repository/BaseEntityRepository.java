@@ -16,7 +16,9 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Repository
 public class BaseEntityRepository<T> {
@@ -59,6 +61,7 @@ public class BaseEntityRepository<T> {
         }
     }
 
+    @SuppressWarnings("unchecked")
     public List<ZJTItem> findByQuery(String query) {
 //        String newQuery = query + " From " + entityClass.getSimpleName() + " as p";
 //        String newQuery = "SELECT p.timelineItemTitle as title, p.planDate as startDate FROM " + entityClass.getSimpleName() + " AS p";
@@ -92,6 +95,16 @@ public class BaseEntityRepository<T> {
         return items;
     }
 
+    public List<Object[]> findEntityByQuery(String query) {
+        Query customQuery = entityManager.createQuery(query);
+        List<Object[]> temp = customQuery.getResultList();
+//        temp.forEach(arr -> arr = Arrays.stream(arr)
+//                .filter(obj -> obj != null)
+//                .toArray());
+        return temp;
+    }
+
+    @SuppressWarnings("unchecked")
     public <T> List<T> findRecordsByField(String fieldName, Object fieldValue) {
         TypedQuery<T> query = (TypedQuery<T>) entityManager.createQuery(
                 "SELECT e FROM " + entityClass.getSimpleName() + " e WHERE e." + fieldName + " = :fieldValue",
@@ -100,6 +113,7 @@ public class BaseEntityRepository<T> {
         return query.getResultList();
     }
 
+    @SuppressWarnings("unchecked")
     public <T> List<T> findRecordsByFieldId(String fieldName, int fieldId) {
         TypedQuery<T> query = (TypedQuery<T>) entityManager.createQuery(
                 "SELECT e FROM " + getEntityClassName() + " e WHERE e." + fieldName + " = :fieldId", entityClass);
@@ -112,6 +126,7 @@ public class BaseEntityRepository<T> {
     }
 
     @Transactional
+    @SuppressWarnings("unchecked")
     public <T> T saveEntity(T entity) {
         Object objEntity = entity;
         ClassLoader originalClassLoader = Thread.currentThread().getContextClassLoader();
@@ -152,6 +167,4 @@ public class BaseEntityRepository<T> {
             e.printStackTrace();
         }
     }
-
-
 }

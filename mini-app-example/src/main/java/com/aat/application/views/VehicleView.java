@@ -1,7 +1,9 @@
 package com.aat.application.views;
 
 import com.aat.application.core.data.entity.ZJTEntity;
+import com.aat.application.core.form.GridViewParameter;
 import com.aat.application.core.form.TimeLineViewParameter;
+import com.aat.application.data.entity.ZJTVehicle;
 import com.aat.application.data.entity.ZJTVehicleServiceSchedule;
 import com.aat.application.data.repository.BaseEntityRepository;
 import com.aat.application.data.service.TableInfoService;
@@ -31,13 +33,14 @@ public class VehicleView extends StandardFormView<ZJTEntity> implements HasUrlPa
         TimeLineViewParameter timeLineViewParameter = new TimeLineViewParameter("vehicle.fleetid", "vehicle", "planDate", null, null, "ZJTVehicleServiceSchedule");
         timeLineViewParameter.setWhereDefinition("vehicle.zjt_vehicle_id");
         super.setTimeLineViewParameter(timeLineViewParameter);
+        GridViewParameter gridViewParameter = new GridViewParameter(ZJTVehicle.class, "");
+        super.setGridViewParameter(gridViewParameter);
     }
 
     @Override
     protected void onAttach(AttachEvent attachEvent) {
-        if (this.form != null) {
+        if (this.form != null && this.isbGrid()) {
             GridCommonForm<ZJTEntity> form = (GridCommonForm<ZJTEntity>) this.form;
-
             onAddEvent(ev -> {
                 form.onNewRecord((GuiItem) ev.getItem());
             });
@@ -54,6 +57,7 @@ public class VehicleView extends StandardFormView<ZJTEntity> implements HasUrlPa
 
     @Override
     public void setParameter(BeforeEvent event, @OptionalParameter String parameter) {
+
         if (parameter != null) {
             this.name = parameter;
         } else
@@ -69,7 +73,10 @@ public class VehicleView extends StandardFormView<ZJTEntity> implements HasUrlPa
         editItem.addContextMenuClickListener(e -> Notification.show(editItem.getCaption()));
         MenuItem gridItem = editItem.addSubItem("Grid");
         gridItem.addContextMenuClickListener(e -> {
-            VaadinSession.getCurrent().setAttribute("entityClass", ZJTVehicleServiceSchedule.class.getName());
+            GridViewParameter gridViewParameter = new GridViewParameter(ZJTVehicleServiceSchedule.class, "");
+            gridViewParameter.setGroupClass(ZJTVehicle.class);
+            gridViewParameter.setWhereDefinition("vehicle.zjt_vehicle_id");
+            super.setGridViewParameter(gridViewParameter);
             UI.getCurrent().navigate("vehicle/serviceschedule/grid/" + e.getRow().get(0).getRowKey());
         });
         MenuItem timelineItem = editItem.addSubItem("Timeline");

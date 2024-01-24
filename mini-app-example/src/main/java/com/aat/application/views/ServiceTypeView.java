@@ -41,16 +41,11 @@ public class ServiceTypeView extends StandardFormView<ZJTEntity> implements HasU
         editItem.addContextMenuClickListener(e -> Notification.show(editItem.getCaption()));
         MenuItem gridItem = editItem.addSubItem("Grid");
         gridItem.addContextMenuClickListener(e -> {
-            VaadinSession.getCurrent().setAttribute("filteredEntityClass", this.entityClass.getName());
             VaadinSession.getCurrent().setAttribute("filter", e.getRow());
-            VaadinSession.getCurrent().setAttribute("entityClass", ZJTVehicleServiceSchedule.class.getName());
             UI.getCurrent().navigate("service-type/serviceschedule");
         });
         MenuItem timelineItem = editItem.addSubItem("Timeline");
         timelineItem.addContextMenuClickListener(e -> {
-            VaadinSession.getCurrent().setAttribute("entityClass", ZJTVehicleServiceSchedule.class.getName());
-            VaadinSession.getCurrent().setAttribute("groupName", "serviceType");
-            VaadinSession.getCurrent().setAttribute("groupClass", ZJTVehicleServiceType.class.getName());
             UI.getCurrent().navigate("timeline/service-type/serviceschedule");
         });
 

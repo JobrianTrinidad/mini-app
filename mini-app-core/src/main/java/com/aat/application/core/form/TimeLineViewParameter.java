@@ -70,6 +70,7 @@ public class TimeLineViewParameter {
      * this assists the developer if the call is valid
      * @return
      */
+
     public boolean isValid()
     {
         boolean valid = titleFieldName != null;

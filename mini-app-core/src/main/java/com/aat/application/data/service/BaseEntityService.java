@@ -27,6 +27,10 @@ public class BaseEntityService<T> implements ZJTService<T> {
     public List<ZJTItem> findByQuery(String query) {
         return generalRepository.findByQuery(query);
     }
+    @Override
+    public List<Object[]> findEntityByQuery(String query) {
+        return generalRepository.findEntityByQuery(query);
+    }
 
     @Override
     public <T1> List<T1> findRecordsByField(String fieldName, Object fieldValue) {

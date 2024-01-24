@@ -2,6 +2,7 @@ package com.aat.application.views;
 
 import com.aat.application.core.data.entity.ZJTEntity;
 import com.aat.application.core.form.CommonForm;
+import com.aat.application.core.form.GridViewParameter;
 import com.aat.application.core.form.StandardForm;
 import com.aat.application.core.form.TimeLineViewParameter;
 import com.aat.application.data.repository.BaseEntityRepository;
@@ -14,6 +15,7 @@ import com.vaadin.componentfactory.tuigrid.event.ItemChangeEvent;
 import com.vaadin.componentfactory.tuigrid.event.ItemDeleteEvent;
 import com.vaadin.componentfactory.tuigrid.model.AATContextMenu;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.router.AfterNavigationEvent;
 import com.vaadin.flow.router.BeforeEnterEvent;
 
 import java.util.Optional;
@@ -25,6 +27,7 @@ public class StandardFormView<T extends ZJTEntity> extends CommonView<T> {
 
     protected CommonForm<T> form;
     private final TableInfoService tableInfoService;
+    private GridViewParameter gridViewParameter;
     private TimeLineViewParameter timeLineViewParameter;
     protected AATContextMenu contextMenu;
     private String name;
@@ -34,11 +37,14 @@ public class StandardFormView<T extends ZJTEntity> extends CommonView<T> {
                             TableInfoService tableInfoService) {
         super(repository);
         this.tableInfoService = tableInfoService;
-        this.timeLineViewParameter = timeLineViewParameter;
     }
 
     public void setTimeLineViewParameter(TimeLineViewParameter timeLineViewParameter) {
         this.timeLineViewParameter = timeLineViewParameter;
+    }
+
+    public void setGridViewParameter(GridViewParameter gridViewParameter) {
+        this.gridViewParameter = gridViewParameter;
     }
 
     private void configureForm(Optional<String> filter) {
@@ -47,14 +53,24 @@ public class StandardFormView<T extends ZJTEntity> extends CommonView<T> {
         switch (strFilter) {
             case "timeline":
                 bGrid = false;
-                form = new TimeLineCommonForm<>(entityClass, this.timeLineViewParameter, filteredEntityClass, new BaseEntityService<>(repository), groupName, filterObjectId);
+                form = new TimeLineCommonForm<>((Class<T>) gridViewParameter.getEntityClass(), this.timeLineViewParameter, (Class<T>) gridViewParameter.getGroupClass(), new BaseEntityService<>(repository), gridViewParameter.getGroupName(), filterObjectId);
                 break;
             case "grid":
+                bGrid = true;
+                gridViewParameter.setParameters(new Integer[]{filterObjectId});
+                form = new GridCommonForm<>(gridViewParameter, new BaseEntityService<>(repository), tableInfoService);
+                break;
             default:
                 bGrid = true;
-                form = new GridCommonForm<>(entityClass, filteredEntityClass, new BaseEntityService<>(repository), tableInfoService, groupName, filterObjectId);
-                if (this.contextMenu != null)
+                if (gridViewParameter.getGroupClass() != null) {
+                    gridViewParameter.setEntityClass(gridViewParameter.getGroupClass());
+                } else
+                    gridViewParameter.setGroupClass(gridViewParameter.getEntityClass());
+                gridViewParameter.setWhereDefinition(null);
+                form = new GridCommonForm<>(gridViewParameter, new BaseEntityService<>(repository), tableInfoService);
+                if (this.contextMenu != null) {
                     ((StandardForm) form).setContextMenu(this.contextMenu);
+                }
                 break;
         }
         setForm(form);
@@ -63,8 +79,7 @@ public class StandardFormView<T extends ZJTEntity> extends CommonView<T> {
     @Override
     public void beforeEnter(BeforeEnterEvent event) {
         super.beforeEnter(event);
-        if (entityClass != null)
-            configureForm(event.getRouteParameters().get("filter"));
+        configureForm(event.getRouteParameters().get("filter"));
     }
 
     protected void setContextMenu(AATContextMenu contextMenu) {
@@ -99,5 +114,9 @@ public class StandardFormView<T extends ZJTEntity> extends CommonView<T> {
         if (bGrid) {
             ((GridCommonForm) this.form).grid.addItemDeleteListener(eventHandler::accept);
         }
+    }
+
+    public boolean isbGrid() {
+        return bGrid;
     }
 }

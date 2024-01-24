@@ -17,7 +17,6 @@ import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.server.VaadinSession;
-import jakarta.persistence.Id;
 
 import java.io.Serial;
 import java.lang.annotation.Annotation;
@@ -104,6 +103,7 @@ public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>>
         return new VerticalLayout(itemKindLayout, routeLayout);
     }
 
+    @SuppressWarnings("unchecked")
     private void configureGroup() {
         Class<?> currentClass = this.groupClass;
         while (currentClass != null) {
@@ -118,18 +118,8 @@ public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>>
         }
     }
 
+    @SuppressWarnings("unchecked")
     private void configureTimeLine(int filterObjectId) {
-
-        String fieldName = "";
-        for (Field field : groupClass.getDeclaredFields()) {
-            if (field.getName().equals(groupName)) {
-                for (Field childField : field.getType().getDeclaredFields()) {
-                    if (childField.getAnnotation(Id.class) != null) {
-                        fieldName = groupName + "." + childField.getName();
-                    }
-                }
-            }
-        }
 
         List<Item> items;
         try {
@@ -137,7 +127,7 @@ public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>>
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        List<ItemGroup> itemGroups = getGroupItems((List<ZJTEntity>) GlobalData.listData.get(groupName), fieldName, filterObjectId);
+        List<ItemGroup> itemGroups = getGroupItems((List<ZJTEntity>) GlobalData.listData.get(groupName), filterObjectId);
         if (itemGroups == null)
             timeline = new Timeline(items);
         else
@@ -173,8 +163,8 @@ public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>>
      *
      * @param td           - Timeline view definition
      * @param parameters   - setParameters if applicable
-     * @param flushRecords - if true, flush existing items in timelime, otherwise just add it
-     * @return
+     * @param flushRecords - if true, flush existing items in timeline, otherwise just add it
+     * @return List<Item>
      */
     public List<Item> getItems(TimeLineViewParameter td, Object[] parameters, boolean flushRecords) throws Exception {
         List<Item> TableData = new ArrayList<>();
@@ -185,6 +175,24 @@ public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>>
             throw new Exception("Parameters are required, but not set");
         }
 
+        String query = getStandardQuery(td, parameters);
+
+        for (ZJTItem data :
+                service.findByQuery(query)) {
+            Item item = new Item();
+//            item.setId(data.getId().toString());
+            item.setContent(data.getTitle());
+            item.setClassName(data.getClassName());
+            item.setStart(data.getStartTime());
+            item.setEnd(data.getEndTime());
+            item.setGroup(data.getGroupId());
+
+            TableData.add(item);
+        }
+        return TableData;
+    }
+
+    private static String getStandardQuery(TimeLineViewParameter td, Object[] parameters) {
         String query = "SELECT "
                 + "p." + td.getTitleFieldName()
                 + ", p." + td.getGroupIDFieldName()
@@ -202,23 +210,10 @@ public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>>
             //TODO -set parameter
             query = query + " = " + parameters[0];
         }
-
-        for (ZJTItem data :
-                service.findByQuery(query)) {
-            Item item = new Item();
-//            item.setId(data.getId().toString());
-            item.setContent(data.getTitle());
-            item.setClassName(data.getClassName());
-            item.setStart(data.getStartTime());
-            item.setEnd(data.getEndTime());
-            item.setGroup(data.getGroupId());
-
-            TableData.add(item);
-        }
-        return TableData;
+        return query;
     }
 
-    private List<ItemGroup> getGroupItems(List<ZJTEntity> groupResults, String fieldName, int fieldId) {
+    private List<ItemGroup> getGroupItems(List<ZJTEntity> groupResults, int fieldId) {
         if (groupResults == null)
             return null;
         List<ItemGroup> itemGroups = new ArrayList<>();
