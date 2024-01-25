@@ -11,6 +11,8 @@ public interface ZJTService<T> {
 
     List<Object[]> findEntityByQuery(String query);
 
+    int updateEntityByQuery(String query, Object[] params);
+
     <T> List<T> findRecordsByField(String fieldName, Object fieldValue);
 
     void save(T record);

@@ -572,36 +572,24 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
         CompletableFuture.runAsync(() -> service.save(finalRow));
     }
 
-    @SuppressWarnings("unchecked")
-    public void onCellUpdate(int rowKey, String colName, String colVal) {
-
-        items = grid.getItems();
-        if (filterText != null) tableData = service.findAll(filterText.getValue());
-        else tableData = service.findAll(null);
-
-        Comparator<T> comparator = Comparator.comparing(ZJTEntity::getId);
-        tableData.sort(comparator);
-
-        GuiItem item = (GuiItem) items.get(rowKey);
-        int columnIndex = item.getHeaders().indexOf(colName);
-        if (rowKey >= tableData.size()) {
-            try {
-                if (tableData.isEmpty())
-                    tableData.add((T) this.gridViewParameter.getEntityClass().getDeclaredConstructor().newInstance());
-                else {
-                    T newRow = (T) tableData.get(0).getClass().getDeclaredConstructor().newInstance();
-                    tableData.add(newRow);
-                }
-            } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
-                     NoSuchMethodException e) {
-                throw new RuntimeException(e);
-            }
+    public int onCellUpdate(Object[] parameters) throws Exception {
+        if (!gridViewParameter.isValid()) {
+            throw new Exception("TuiGrid Definition is not valid.");
         }
-        T row = tableData.get(rowKey);
-        if (columnIndex >= 0) {
-            this.save(row, colName, colVal);
-            CompletableFuture.runAsync(() -> service.save(row));
+        if (gridViewParameter.isRequireParameter() && parameters == null) {
+            throw new Exception("Parameters are required, but not set");
         }
+
+        StringBuilder query = new StringBuilder("Update ").append(gridViewParameter.getFromDefinition());
+        query.append(" p SET p.")
+                .append(parameters[1]).append(" = ")
+                .append(":param1");
+        query.append(" WHERE ")
+                .append("p.").append(gridViewParameter.getPrimaryIdFieldName())
+                .append(" = ")
+                .append(":param2");
+
+        return service.updateEntityByQuery(query.toString(), parameters);
     }
 
     public void onDeleteRecordChecked() {

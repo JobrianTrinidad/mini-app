@@ -104,6 +104,14 @@ public class BaseEntityRepository<T> {
         return temp;
     }
 
+    @Transactional
+    public int updateEntityByQuery(String query, Object[] params) {
+        Query customQuery = entityManager.createQuery(query);
+        customQuery.setParameter("param1", params[2]);
+        customQuery.setParameter("param2", params[0]);
+        return customQuery.executeUpdate();
+    }
+
     @SuppressWarnings("unchecked")
     public <T> List<T> findRecordsByField(String fieldName, Object fieldValue) {
         TypedQuery<T> query = (TypedQuery<T>) entityManager.createQuery(

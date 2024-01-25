@@ -1,10 +1,13 @@
 package com.aat.application.data.entity;
 
+import com.aat.application.annotations.BaseItems;
 import com.aat.application.annotations.ContentDisplayedInSelect;
 import com.aat.application.annotations.DisplayName;
 import com.aat.application.core.data.entity.ZJTEntity;
 import com.vaadin.flow.router.PageTitle;
 import jakarta.persistence.*;
+
+import java.util.List;
 
 
 /**
@@ -37,6 +40,11 @@ public class ZJTVehicleServiceType implements ZJTEntity {
     @Column
     @DisplayName(value = "Interval (KM)")
     private int km_interval;
+
+    @ManyToOne
+    @JoinColumn(name = "id")
+    @DisplayName(value = "serviceKit")
+    private ZJTServiceKit serviceKit;
 
     public int getZjt_vehicleservicetype_id() {
         return zjt_vehicleservicetype_id;
@@ -84,5 +92,6 @@ public class ZJTVehicleServiceType implements ZJTEntity {
     public void setKm_interval(int km_interval) {
         this.km_interval = km_interval;
     }
+
 
 }
