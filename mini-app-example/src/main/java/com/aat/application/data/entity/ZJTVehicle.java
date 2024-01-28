@@ -89,7 +89,7 @@ public class ZJTVehicle implements ZJTEntity {
 
     @Column
     @DisplayName(value = "Purchase Date")
-    private LocalDate purchasedate;
+    private LocalDateTime purchasedate;
 
     @Column
     @DisplayName(value = "Vehicle ID")
@@ -105,8 +105,20 @@ public class ZJTVehicle implements ZJTEntity {
     @BaseItems
     private List<ZJTVehicleServiceSchedule> vehicleServiceSchedules;
 
+    @OneToMany(mappedBy = "vehicle", cascade = CascadeType.ALL)
+    @BaseItems
+    private List<ZJTVehicleKMReading> kmReadings;
+
     public int getZjt_vehicle_id() {
         return zjt_vehicle_id;
+    }
+
+    @PrePersist
+    public void prePersist() {
+        if (this.disposaldate == null)
+            this.disposaldate = LocalDateTime.now();
+        if (this.purchasedate == null)
+            this.purchasedate = LocalDateTime.now();
     }
 
     @Override
@@ -246,11 +258,11 @@ public class ZJTVehicle implements ZJTEntity {
         this.operational = operational;
     }
 
-    public LocalDate getPurchasedate() {
+    public LocalDateTime getPurchasedate() {
         return purchasedate;
     }
 
-    public void setPurchasedate(LocalDate purchasedate) {
+    public void setPurchasedate(LocalDateTime purchasedate) {
         this.purchasedate = purchasedate;
     }
 

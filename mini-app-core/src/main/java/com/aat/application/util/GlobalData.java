@@ -52,26 +52,6 @@ public class GlobalData {
         }
     }
 
-    public static List<?> getDataById(Class<?> entityClass, int id) {
-        EntityManagerFactory emf = Persistence.createEntityManagerFactory("aat_persistence_unit");
-        EntityManager em = emf.createEntityManager();
-        em.getTransaction().begin();
-        List<?> results = null;
-        try {
-            String queryString = "SELECT p FROM " + entityClass.getSimpleName() + " p WHERE p.id = :id";
-            TypedQuery<?> query = em.createQuery(queryString, entityClass);
-            query.setParameter("id", id);
-            results = query.getResultList();
-        } catch (Exception e) {
-            em.getTransaction().rollback();
-        } finally {
-            em.close();
-            emf.close();
-        }
-
-        return results;
-    }
-
     public static String getContentDisplayedInSelect(Object data) {
         String content = null;
         for (Field field : data.getClass().getDeclaredFields()) {
@@ -108,20 +88,6 @@ public class GlobalData {
             throw new RuntimeException(e);
         }
 
-//        try {
-//            if (entityData instanceof HibernateProxy) {
-//                Hibernate.initialize(entityData);
-//                entityData = ((HibernateProxy) entityData).getHibernateLazyInitializer().getImplementation();
-//            }
-//            ObjectMapper mapper = new ObjectMapper();
-//            mapper.registerModule(new Hibernate5Module());
-//            mapper.registerModule(new JavaTimeModule());
-//            mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-//            String json = mapper.writeValueAsString(entityData);
-//            return (T) mapper.readValue(json, zjtEntityClass);
-//        } catch (IOException e) {
-//            throw new RuntimeException(e);
-//        }
         return data;
     }
 
@@ -147,25 +113,6 @@ public class GlobalData {
             }
         }
         return fieldNames;
-    }
-
-    public static void addData(String header) {
-        String headerName = convertToStandard(header);
-        EntityManagerFactory emf = Persistence.createEntityManagerFactory("aat_persistence_unit");
-        EntityManager em = emf.createEntityManager();
-        em.getTransaction().begin();
-        try {
-            TypedQuery<ZJTEntity> query = em.createNamedQuery("findAll" + headerName, ZJTEntity.class);
-            List<ZJTEntity> results = query.getResultList();
-            listData.put(header, results);
-            em.getTransaction().commit();
-        } catch (Exception e) {
-            em.getTransaction().rollback();
-            throw e;
-        } finally {
-            em.close();
-            emf.close();
-        }
     }
 
     public static List<Component> findComponentsWithAttribute(Component parent, String attributeName, String attributeValue) {

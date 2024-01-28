@@ -27,13 +27,12 @@ import java.util.Optional;
 public class VehicleView extends StandardFormView<ZJTEntity> implements HasUrlParameter<String> {
 
     private String name;
+    GridViewParameter gridViewParameter;
 
     public VehicleView(BaseEntityRepository<ZJTEntity> repository, TableInfoService tableInfoService) {
         super(repository, tableInfoService);
-        TimeLineViewParameter timeLineViewParameter = new TimeLineViewParameter("vehicle.fleetid", "vehicle", "planDate", null, null, "ZJTVehicleServiceSchedule");
-        timeLineViewParameter.setWhereDefinition("vehicle.zjt_vehicle_id");
-        super.setTimeLineViewParameter(timeLineViewParameter);
-        GridViewParameter gridViewParameter = new GridViewParameter(ZJTVehicle.class, "");
+        gridViewParameter = new GridViewParameter(ZJTVehicle.class, "");
+        gridViewParameter.setSelectDefinition("fleetid");
         super.setGridViewParameter(gridViewParameter);
     }
 
@@ -43,23 +42,29 @@ public class VehicleView extends StandardFormView<ZJTEntity> implements HasUrlPa
             GridCommonForm<ZJTEntity> form = (GridCommonForm<ZJTEntity>) this.form;
             onAddEvent(ev -> {
                 form.onNewRecord((GuiItem) ev.getItem());
-                this.setMessageStatus("This is new added value " + ((GuiItem) ev.getItem()).getId());
+                this.setMessageStatus("This is new added value " + ((GuiItem) ev.getItem()).getRecordData().get(1));
             });
 
             onUpdateEvent(ev -> {
-                int count = 0;
+                int count;
                 try {
                     count = form.onCellUpdate(new Object[]{ev.getRow(), ev.getColName(), ev.getColValue()});
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
                 if (count > 0)
-                    this.setMessageStatus("This is updated value " + ev.getColValue());
+                    this.setMessageStatus(count + " rows is updated.");
             });
 
             onDeleteEvent(ev -> {
-                form.onDeleteRecordChecked();
-                this.setMessageStatus("This is deleted value " + ev.getRows());
+                int count;
+                try {
+                    count = form.onDeleteRecordChecked();
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+                if (count > 0)
+                    this.setMessageStatus(count + " rows is deleted.");
             });
         }
     }
@@ -68,7 +73,18 @@ public class VehicleView extends StandardFormView<ZJTEntity> implements HasUrlPa
     public void setParameter(BeforeEvent event, @OptionalParameter String parameter) {
 
         if (parameter != null) {
-            this.name = parameter;
+            if (event.getRouteParameters().get("subcategory").isPresent()
+                    && event.getRouteParameters().get("subcategory").get().equals("serviceschedule")) {
+                this.name = parameter;
+                gridViewParameter.setEntityClass(ZJTVehicleServiceSchedule.class);
+                gridViewParameter.setGroupClass(ZJTVehicle.class);
+                gridViewParameter.setWhereDefinition("vehicle.zjt_vehicle_id");
+                TimeLineViewParameter timeLineViewParameter = new TimeLineViewParameter("vehicle.fleetid", "vehicle", "planDate", null, null, "ZJTVehicleServiceSchedule");
+                timeLineViewParameter.setGroupClass(ZJTVehicle.class);
+                timeLineViewParameter.setSelectDefinition("fleetid");
+                timeLineViewParameter.setWhereDefinition("vehicle.zjt_vehicle_id");
+                super.setTimeLineViewParameter(timeLineViewParameter);
+            }
         } else
             addMenu(event.getRouteParameters().get("category"));
     }
@@ -82,10 +98,6 @@ public class VehicleView extends StandardFormView<ZJTEntity> implements HasUrlPa
         editItem.addContextMenuClickListener(e -> Notification.show(editItem.getCaption()));
         MenuItem gridItem = editItem.addSubItem("Grid");
         gridItem.addContextMenuClickListener(e -> {
-            GridViewParameter gridViewParameter = new GridViewParameter(ZJTVehicleServiceSchedule.class, "");
-            gridViewParameter.setGroupClass(ZJTVehicle.class);
-            gridViewParameter.setWhereDefinition("vehicle.zjt_vehicle_id");
-            super.setGridViewParameter(gridViewParameter);
             UI.getCurrent().navigate("vehicle/serviceschedule/grid/" + e.getRow().get(0).getRowKey());
         });
         MenuItem timelineItem = editItem.addSubItem("Timeline");

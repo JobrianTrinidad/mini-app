@@ -1,5 +1,6 @@
 package com.aat.application.core.data.service;
 
+import com.aat.application.core.data.entity.ZJTEntity;
 import com.aat.application.data.entity.ZJTItem;
 
 import java.util.List;
@@ -13,11 +14,16 @@ public interface ZJTService<T> {
 
     int updateEntityByQuery(String query, Object[] params);
 
+    int deleteEntityByQuery(String query);
+
+    <T> T addNewEntity(Class<?> entityClass);
+
     <T> List<T> findRecordsByField(String fieldName, Object fieldValue);
 
-    void save(T record);
+    <T> T save(T record);
 
     void delete(T t);
 
     <T> List<T> findRecordsByFieldId(String fieldName, int fieldId);
+
 }

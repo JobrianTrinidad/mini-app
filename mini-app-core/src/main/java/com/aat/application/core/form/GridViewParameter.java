@@ -18,7 +18,7 @@ public class GridViewParameter {
     private Class<?> groupClass;
     /**
      * Headers of the column to display in the content
-     * e.g  e.employeename
+     * e.g  e.employeeName
      */
     private List<String> headers;
     private String primaryIdFieldName;
@@ -33,29 +33,35 @@ public class GridViewParameter {
      * Name of the column for the class
      * Classname is the CSS name to control the appearance of the item
      */
-    private String classNameFieldName = null;
+    private String classNameFieldName;
 
     /**
      * In simple 1 table definition, it's the name of the table
      * but could be more complex if you use a join statement
      * e.g.
      * employee e
-     * inner join personaldetails pd on e.empid = pd.empid
-     * inner join department d on e.departmentid = d.departmentid
+     * inner join personalDetails pd on e.empId = pd.empId
+     * inner join department d on e.departmentId = d.departmentId
      */
     private String fromDefinition = null;
 
     /**
      * Add where condition if applicable
-     * e.g. d.orgid = ?
+     * e.g. d.orgId = ?
      */
     private String whereDefinition = null;
+
+    /**
+     * Add where condition if applicable
+     * e.g. d.orgId = ?
+     */
+    private String selectDefinition = null;
 
     /**
      * This is to test if the definition is valid or not
      * this assists the developer if the call is valid
      *
-     * @return
+     * @return boolean
      */
     public boolean isValid() {
         boolean valid = headers != null;
@@ -73,7 +79,7 @@ public class GridViewParameter {
     /**
      * This check if it requires filter parameter
      *
-     * @return
+     * @return boolean
      */
     public boolean isRequireParameter() {
         return whereDefinition != null;
@@ -86,7 +92,6 @@ public class GridViewParameter {
         this.fromDefinition = entityClass.getSimpleName();
     }
 
-    @SuppressWarnings("unchecked")
     private List<String> configureHeader(Class<?> entityClass) {
         Field[] fields = entityClass.getDeclaredFields();
 
@@ -122,8 +127,7 @@ public class GridViewParameter {
             if (field.getAnnotation(jakarta.persistence.JoinColumn.class) != null) {
                 fieldNames.add(field.getName());
                 headerNames.put(field.getName(), field.getAnnotation(DisplayName.class).value());
-                headerOptions.put(field.getName(), "select_class");
-                GlobalData.addData(field.getName(), (Class<? extends ZJTEntity>) field.getType());
+                headerOptions.put(field.getName(), field.getType().getName());
             }
         }
 
@@ -194,6 +198,14 @@ public class GridViewParameter {
 
     public void setClassNameFieldName(String classNameFieldName) {
         this.classNameFieldName = classNameFieldName;
+    }
+
+    public String getSelectDefinition() {
+        return selectDefinition;
+    }
+
+    public void setSelectDefinition(String selectDefinition) {
+        this.selectDefinition = selectDefinition;
     }
 
     public String getFromDefinition() {

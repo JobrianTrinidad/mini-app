@@ -41,6 +41,7 @@ public class StandardFormView<T extends ZJTEntity> extends CommonView<T> {
 
     public void setTimeLineViewParameter(TimeLineViewParameter timeLineViewParameter) {
         this.timeLineViewParameter = timeLineViewParameter;
+        this.timeLineViewParameter.setParameters(new Integer[]{this.filterObjectId});
     }
 
     public void setGridViewParameter(GridViewParameter gridViewParameter) {
@@ -53,7 +54,7 @@ public class StandardFormView<T extends ZJTEntity> extends CommonView<T> {
         switch (strFilter) {
             case "timeline":
                 bGrid = false;
-                form = new TimeLineCommonForm<>((Class<T>) gridViewParameter.getEntityClass(), this.timeLineViewParameter, (Class<T>) gridViewParameter.getGroupClass(), new BaseEntityService<>(repository), gridViewParameter.getGroupName(), filterObjectId);
+                form = new TimeLineCommonForm<>( this.timeLineViewParameter, new BaseEntityService<>(repository));
                 break;
             case "grid":
                 bGrid = true;

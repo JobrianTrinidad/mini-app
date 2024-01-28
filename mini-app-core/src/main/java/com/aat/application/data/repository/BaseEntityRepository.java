@@ -1,5 +1,6 @@
 package com.aat.application.data.repository;
 
+import com.aat.application.core.data.entity.ZJTEntity;
 import com.aat.application.data.entity.ZJTItem;
 import com.aat.application.util.GlobalData;
 import jakarta.persistence.*;
@@ -7,13 +8,11 @@ import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Root;
 import jakarta.transaction.Transactional;
+import jakarta.validation.ConstraintViolationException;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
+import java.lang.reflect.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -34,13 +33,18 @@ public class BaseEntityRepository<T> {
         this.entityClass = entityClass;
     }
 
+    @SuppressWarnings("unchecked")
     private Class<T> getEntityClass() {
         if (entityClass == null) {
             Type genericSuperclass = getClass().getGenericSuperclass();
             if (genericSuperclass instanceof ParameterizedType) {
                 Type[] actualTypeArguments = ((ParameterizedType) genericSuperclass).getActualTypeArguments();
-                @SuppressWarnings("unchecked")
-                Class<T> actualTypeArgument = (Class<T>) actualTypeArguments[0];
+                Class<T> actualTypeArgument = null;
+                try {
+                    actualTypeArgument = (Class<T>) Class.forName(actualTypeArguments[0].getTypeName());
+                } catch (ClassNotFoundException e) {
+                    throw new RuntimeException(e);
+                }
                 entityClass = actualTypeArgument;
             } else {
                 throw new IllegalArgumentException("Unable to determine entity class type.");
@@ -75,18 +79,10 @@ public class BaseEntityRepository<T> {
             if (result[0] != null) {
                 title = (String) result[0];
             }
-            if (result[1] != null && result[2] != null) {
-                for (Field field : result[1].getClass().getDeclaredFields()) {
-                    field.setAccessible(true);
-                    if (field.getAnnotation(Id.class) != null) {
-                        try {
-                            groupID = String.valueOf(field.get(result[1]));
-                        } catch (IllegalAccessException e) {
-                            throw new RuntimeException(e);
-                        }
-                        break;
-                    }
-                }
+            if (result[1] != null) {
+                groupID = String.valueOf(((ZJTEntity) result[1]).getId());
+            }
+            if (result[2] != null) {
                 startDate = (LocalDateTime) result[2];
                 ZJTItem item = new ZJTItem(title, groupID, startDate);
                 items.add(item);
@@ -97,11 +93,7 @@ public class BaseEntityRepository<T> {
 
     public List<Object[]> findEntityByQuery(String query) {
         Query customQuery = entityManager.createQuery(query);
-        List<Object[]> temp = customQuery.getResultList();
-//        temp.forEach(arr -> arr = Arrays.stream(arr)
-//                .filter(obj -> obj != null)
-//                .toArray());
-        return temp;
+        return customQuery.getResultList();
     }
 
     @Transactional
@@ -110,6 +102,30 @@ public class BaseEntityRepository<T> {
         customQuery.setParameter("param1", params[2]);
         customQuery.setParameter("param2", params[0]);
         return customQuery.executeUpdate();
+    }
+
+    @Transactional
+    public int deleteEntityByQuery(String query) {
+        Query deleteQuery = entityManager.createQuery(query);
+        try {
+            return deleteQuery.executeUpdate();
+        } catch (PersistenceException e) {
+            throw e; // rethrow the exception if it's not a constraint violation
+        }
+    }
+
+    @Transactional
+    @SuppressWarnings("unchecked")
+    public <T1> T1 addNewEntity(Class<?> entityClass) {
+        T1 newEntity = null;
+        try {
+            newEntity = (T1) entityClass.getConstructor().newInstance();
+        } catch (InstantiationException | IllegalAccessException
+                 | InvocationTargetException | NoSuchMethodException e) {
+            throw new RuntimeException(e);
+        }
+        entityManager.persist(newEntity);
+        return newEntity;
     }
 
     @SuppressWarnings("unchecked")
@@ -147,7 +163,7 @@ public class BaseEntityRepository<T> {
             Thread.currentThread().setContextClassLoader(entityClassLoader);
 
             entity = (T) GlobalData.convertToZJTEntity(entity, entityClass);
-            entityManager.merge(entity);
+            objEntity = entityManager.merge(entity);
             entityManager.flush();
 
         } catch (Exception e) {
@@ -175,4 +191,6 @@ public class BaseEntityRepository<T> {
             e.printStackTrace();
         }
     }
+
+
 }

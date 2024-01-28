@@ -39,6 +39,16 @@ public class BaseEntityService<T> implements ZJTService<T> {
     }
 
     @Override
+    public int deleteEntityByQuery(String query) {
+        return generalRepository.deleteEntityByQuery(query);
+    }
+
+    @Override
+    public <T1> T1 addNewEntity(Class<?> entityClass) {
+        return generalRepository.addNewEntity(entityClass);
+    }
+
+    @Override
     public <T1> List<T1> findRecordsByField(String fieldName, Object fieldValue) {
         if (fieldValue instanceof String) {
             return generalRepository.findRecordsByField(fieldName, fieldValue);
@@ -54,8 +64,8 @@ public class BaseEntityService<T> implements ZJTService<T> {
     }
 
     @Override
-    public void save(T record) {
-        generalRepository.saveEntity(record);
+    public <T> T save(T record) {
+        return generalRepository.saveEntity(record);
     }
 
     @Override

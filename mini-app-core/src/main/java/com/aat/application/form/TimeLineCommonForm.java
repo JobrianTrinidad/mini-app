@@ -8,13 +8,9 @@ import com.aat.application.data.repository.TimelineRepository;
 import com.aat.application.data.service.TimelineService;
 
 public class TimeLineCommonForm<T extends ZJTEntity> extends TimeLineForm<T, ZJTService<T>> {
-    public TimeLineCommonForm(Class<T> entityClass,
-                              TimeLineViewParameter timeLineViewParameter,
-                              Class<T> filteredEntityClass,
-                              ZJTService<T> service,
-                              String groupName,
-                              int filterObjectId) {
-        super(entityClass, timeLineViewParameter, filteredEntityClass, service, groupName, filterObjectId);
+    public TimeLineCommonForm(TimeLineViewParameter timeLineViewParameter,
+                              ZJTService<T> service) {
+        super(timeLineViewParameter, service);
         addClassName("demo-app-form");
     }
 }

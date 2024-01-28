@@ -26,22 +26,14 @@ import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.server.VaadinSession;
 
 import java.io.Serial;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>> extends CommonForm<T> {
 
     @Serial
     private static final long serialVersionUID = -5183438338263448739L;
-    private GridViewParameter gridViewParameter;
+    private final GridViewParameter gridViewParameter;
 
     protected TableInfoService tableInfoService;
     String fieldDisplayedInSelect;
@@ -56,15 +48,13 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
     public TuiGrid grid;
     protected S service;
     List<Item> items = new ArrayList<>();
-    List<T> tableData = new ArrayList<>();
     private boolean bSavedWidth = false;
     private final HorizontalLayout toolbar = new HorizontalLayout();
-    private HorizontalLayout routeLayout = new HorizontalLayout();
-
     private final HorizontalLayout statusBar = new HorizontalLayout();
     private final Button btnInfo = new Button();
     private final TextField lblMessage = new TextField();
     private final Button lblRowCount = new Button();
+    private AATContextMenu contextMenu;
 
     public StandardForm(GridViewParameter gridViewParameter,
                         S service, TableInfoService tableInfoService) {
@@ -76,7 +66,7 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
 
         initColSelDialog();
 
-        add(routeLayout, toolbar);
+        addComponentAtIndex(0, toolbar);
         loadGrid();
 
         addStatusBar();
@@ -99,7 +89,7 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
         lblRowCount.setId("rowcount");
         btnInfo.addClickListener(e -> showMessageInDialog());
 
-        add(statusBar);
+        addComponentAtIndex(2, statusBar);
     }
 
     protected void onAttach(AttachEvent attachEvent) {
@@ -107,23 +97,35 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
         grid.setRowCountOnElement("rowcount");
     }
 
-
     private void showMessageInDialog() {
         ConfirmDialog dialog = new ConfirmDialog();
         dialog.setHeader("Status Message");
         dialog.setText(lblMessage.getValue());
 
         dialog.open();
-
     }
 
     private void loadGrid() {
-//        removeAll();
-        if (!twinColSelect.getSelectedItems().isEmpty())
+        boolean bAttach = false;
+        if (!twinColSelect.getSelectedItems().isEmpty()) {
+            if (grid != null) {
+                remove(grid);
+                bAttach = true;
+            }
             configureGrid();
-        getToolbar();
+            if (this.contextMenu != null) {
+                this.contextMenu.setTarget(grid);
+                grid.setContextMenu(this.contextMenu);
+            }
+        }
+        if (!bAttach)
+            try {
+                getToolbar();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
         if (grid != null)
-            add(grid);
+            addComponentAtIndex(1, grid);
     }
 
     private void initColSelDialog() {
@@ -132,8 +134,6 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
         for (String header : this.gridViewParameter.getHeaders()) {
             tempHeaderNames.add(this.gridViewParameter.headerNames.get(header));
         }
-
-        twinColSelect.setItems(tempHeaderNames);
 
         tableInfo = tableInfoService.findByTableName(this.gridViewParameter.getEntityClass().getSimpleName());
         if (tableInfo == null) {
@@ -152,8 +152,14 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
             }
         }
 
-        twinColSelect.select(tempDisplayedHeaderNames);
+        List<String> sortedHeaderNames = new ArrayList<>(tempDisplayedHeaderNames);
+        for (String header : tempHeaderNames) {
+            if (!sortedHeaderNames.contains(header))
+                sortedHeaderNames.add(header);
+        }
 
+        twinColSelect.setItems(sortedHeaderNames);
+        twinColSelect.select(tempDisplayedHeaderNames);
 
         Button btnOk = new Button("OK");
         Button btnCancel = new Button("Cancel");
@@ -236,17 +242,6 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
         grid.sethScroll(true);
         grid.setvScroll(true);
 
-        Theme inputTheme = new Theme();
-        inputTheme.setBorder("1px solid #326f70");
-        inputTheme.setBackgroundColor("#66878858");
-        inputTheme.setOutline("none");
-        inputTheme.setWidth("90%");
-        inputTheme.setHeight("100%");
-        inputTheme.setOpacity(1);
-
-        grid.setInputTheme(inputTheme);
-        grid.setSelectTheme(inputTheme);
-
         grid.addColumnResizeListener(event -> {
             int colWidth = event.getColWidth();
             String colName = event.getColName();
@@ -270,8 +265,9 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
     }
 
     public void setContextMenu(AATContextMenu contextMenu) {
-        contextMenu.setTarget(grid);
-        grid.setContextMenu(contextMenu);
+        this.contextMenu = contextMenu;
+        this.contextMenu.setTarget(grid);
+        grid.setContextMenu(this.contextMenu);
     }
 
     private List<Item> getTableData(Object[] parameters, boolean flushRecords) throws Exception {
@@ -315,12 +311,19 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
         return TableData;
     }
 
-    @SuppressWarnings("unchecked")
     private List<com.vaadin.componentfactory.tuigrid.model.Column> getColumns() {
         List<com.vaadin.componentfactory.tuigrid.model.Column> columns = new ArrayList<>();
         int nId = 0;
 
         List<Integer> colWidths = getColumnWidths();
+
+        Theme inputTheme = new Theme();
+        inputTheme.setBorder("1px solid #326f70");
+        inputTheme.setBackgroundColor("#66878858");
+        inputTheme.setOutline("none");
+        inputTheme.setWidth("90%");
+        inputTheme.setHeight("100%");
+        inputTheme.setOpacity(1);
 
         for (String header : this.gridViewParameter.getHeaders()) {
             String headerName = this.gridViewParameter.getHeaderNames().get(header);
@@ -355,77 +358,77 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
                     }
                     column.setRelationOptions(elementsList);
                     break;
-                case "select_class":
+                default:
                     column.setType("select");
+                    column.setRoot(true);
                     column.setTarget("");
-                    List<ZJTEntity> results = (List<ZJTEntity>) GlobalData.listData.get(header);
-                    column.setRoot(!results.isEmpty());
-                    List<RelationOption> options = new ArrayList<>();
-                    for (Object result : results) {
-                        Class<?> currentClass = result.getClass();
-                        while (currentClass != null) {
-                            try {
-                                for (Field field : currentClass.getDeclaredFields()) {
-                                    for (Annotation annotation : field.getAnnotations()) {
-                                        if (annotation.annotationType().getName().equals(ContentDisplayedInSelect.class.getName())) {
-                                            field.setAccessible(true);
-                                            String name = (String) field.get(result);
-                                            try {
+                    Class<?> selectClass;
+                    try {
+                        selectClass = Class.forName(this.gridViewParameter.getHeaderOptions().get(header));
+                    } catch (ClassNotFoundException e) {
+                        throw new RuntimeException(e);
+                    }
 
-                                                RelationOption option = new RelationOption(name, String.valueOf(((T) GlobalData.convertToZJTEntity(result, this.getClass().getClassLoader().loadClass(result.getClass().getName()))).getId()));
-                                                options.add(option);
-                                            } catch (RuntimeException e) {
-                                                e.fillInStackTrace();
-                                            } catch (ClassNotFoundException e) {
-                                                throw new RuntimeException(e);
-                                            }
-                                        }
-                                    }
-                                }
-                            } catch (IllegalAccessException ignored) {
-                            }
-                            currentClass = currentClass.getSuperclass();
-                        }
+                    String annotatedField = GlobalData.getFieldNamesWithAnnotation(ContentDisplayedInSelect.class, selectClass).get(0);
+                    String pkField = GlobalData.getPrimaryKeyField(selectClass).getName();
+                    StringBuilder query = new StringBuilder("SELECT p.").append(pkField);
+                    query.append(", p.").append(annotatedField);
+
+                    query.append(" FROM ").append(selectClass.getSimpleName()).append(" as p");
+
+                    List<RelationOption> options = new ArrayList<>();
+                    for (Object[] data :
+                            service.findEntityByQuery(query.toString())) {
+                        RelationOption option = new RelationOption((String) data[1], String.valueOf(data[0]));
+                        options.add(option);
                     }
                     column.setRelationOptions(options);
-                    break;
-                default:
-                    break;
             }
+            column.setInputTheme(inputTheme);
+            column.setSelectTheme(inputTheme);
             columns.add(column);
         }
         return columns;
     }
 
-    private void getToolbar() {
+    private void getToolbar() throws Exception {
         filterText.setPlaceholder("Filter by name...");
         filterText.setClearButtonVisible(true);
         filterText.setValueChangeMode(ValueChangeMode.LAZY);
         filterText.addValueChangeListener(e -> updateList());
         btnReload.addClickListener(e -> reloadGrid());
         btnSave.addClickListener(e -> saveAll());
-        toolbar.add(btnReload, btnSave);
+//        toolbar.add(btnReload, btnSave);
         String filteredValue = "";
-        if (this.gridViewParameter.getWhereDefinition() != null)
-            for (Object data :
-                    GlobalData.listData.get(this.gridViewParameter.getGroupName())) {
-                Field pkFiled = GlobalData.getPrimaryKeyField(data.getClass());
-                pkFiled.setAccessible(true);
-                try {
-                    if ((int) pkFiled.get(data) == (int) this.gridViewParameter.getParameters()[0])
-                        filteredValue = GlobalData.getContentDisplayedInSelect(data);
-
-                } catch (IllegalAccessException e) {
-                    throw new RuntimeException(e);
-                }
+        if (this.gridViewParameter.getParameters() != null) {
+            if (!gridViewParameter.isValid()) {
+                throw new Exception("TuiGrid Definition is not valid.");
             }
+            if (gridViewParameter.isRequireParameter() && gridViewParameter.getSelectDefinition() == null) {
+                throw new Exception("Parameters are required, but not set");
+            }
+
+            StringBuilder query = new StringBuilder("SELECT p.").append(gridViewParameter.getSelectDefinition());
+
+            query.append(" FROM ").append(gridViewParameter.getGroupClass().getSimpleName()).append(" as p");
+
+            if (gridViewParameter.getWhereDefinition() != null && (int) gridViewParameter.getParameters()[0] != -1) {
+                String[] whereDefinition = gridViewParameter.getWhereDefinition().split("\\.");
+                query.append(" WHERE ").append("p.").append(whereDefinition[1]);
+                //TODO -set parameter
+                query.append(" = ").append(gridViewParameter.getParameters()[0]);
+            }
+
+            filteredValue = String.valueOf(service.findEntityByQuery(query.toString()).get(0));
+        }
+
         Span sp = new Span(">> " + filteredValue);
         Button btnGoOriginView = new Button(GlobalData.convertToStandard(this.gridViewParameter.groupName));
-        routeLayout = new HorizontalLayout(btnGoOriginView, sp);
+        HorizontalLayout routeLayout = new HorizontalLayout(btnGoOriginView, sp);
         routeLayout.setAlignItems(FlexComponent.Alignment.CENTER);
 
         btnGoOriginView.addClickListener(e -> {
-            VaadinSession.getCurrent().setAttribute("entityClass", this.gridViewParameter.getGroupClass().getName());
+            this.gridViewParameter.setParameters(new Integer[]{-1});
             String previousView = (String) VaadinSession.getCurrent().getAttribute("previousView");
             if (previousView != null) {
                 UI.getCurrent().navigate(previousView);
@@ -453,7 +456,7 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
         autoWidthSave.addValueChangeListener(e -> bSavedWidth = e.getValue());
         HorizontalLayout columnToolbar = new HorizontalLayout(autoWidthSave, columns);
         columnToolbar.setAlignItems(FlexComponent.Alignment.CENTER);
-        toolbar.add(columnToolbar);
+        toolbar.add(filterText, routeLayout, btnReload, btnSave, columnToolbar);
         toolbar.addClassName("aat-toolbar");
     }
 
@@ -465,111 +468,9 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
         toolbar.add(button);
     }
 
-    private void save(T row, String header, String colValue) {
-        try {
-            Field field = row.getClass().getDeclaredField(header);
-            field.setAccessible(true);
-            switch (this.gridViewParameter.getHeaderOptions().get(header)) {
-                case "check":
-                case "input":
-                    String fieldType = field.getType().getSimpleName();
-                    try {
-                        switch (fieldType) {
-                            case "Integer":
-                            case "int":
-                                field.set(row, Integer.parseInt(colValue));
-                                break;
-                            case "Double":
-                            case "double":
-                                field.set(row, Double.parseDouble(colValue));
-                                break;
-                            case "Float":
-                            case "float":
-                                field.set(row, Float.parseFloat(colValue));
-                                break;
-                            case "Boolean":
-                            case "boolean":
-                                field.set(row, Boolean.parseBoolean(colValue));
-                                break;
-                            case "LocalDate":
-                                field.set(row, LocalDate.now());
-                                break;
-                            default:
-                                field.set(row, colValue); // Fallback for String and other types
-                        }
-                    } catch (NumberFormatException e) {
-                        System.out.println("Cannot parse to " + fieldType + ": " + colValue);
-                    }
-                    break;
-                case "date":
-                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm a");
-                    try {
-                        LocalDateTime dateTime = LocalDateTime.now();
-                        if (!colValue.isEmpty())
-                            dateTime = LocalDateTime.parse(colValue, formatter);
-                        field.set(row, dateTime);
-                    } catch (DateTimeParseException ignored) {
-                    }
-                    break;
-                case "select_enum":
-                    Class<?> enumTypes = this.gridViewParameter.getHeaderTypeOptions().get(header);
-                    if (enumTypes.isEnum()) {
-                        Enum<?>[] enumConstants = getEnumConstants(enumTypes);
-                        int ordinal = Integer.parseInt(colValue.substring(0, 1)) - 1;
-                        if (ordinal >= 0 && ordinal < enumConstants.length) {
-                            Enum<?> enumValue = enumConstants[ordinal];
-                            field.set(row, enumValue);
-                        }
-                    }
-                    break;
-                case "select_class":
-                    if (colValue.equals("All")) break;
-
-                    int ordinal = -1;
-
-                    if (!colValue.isEmpty()) ordinal = Integer.parseInt(colValue.substring(0, 1)) - 1;
-
-                    Object dataSel = field.get(row);
-                    if (dataSel == null) dataSel = field.getType().getDeclaredConstructor().newInstance();
-
-                    int index = 0;
-
-                    for (Object result : GlobalData.listData.get(header)) {
-                        try {
-                            if (index++ == ordinal) {
-                                field.set(row, GlobalData.convertToZJTEntity(result, dataSel.getClass()));
-                                break;
-                            }
-                        } catch (RuntimeException ignored) {
-                        }
-                    }
-                    break;
-                default:
-                    break;
-            }
-        } catch (NoSuchFieldException | IllegalAccessException | InvocationTargetException | InstantiationException |
-                 NoSuchMethodException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @SuppressWarnings("unchecked")
     public void onNewRecord(GuiItem item) {
-        T row;
-        try {
-            row = (T) this.gridViewParameter.getEntityClass().getDeclaredConstructor().newInstance();
-        } catch (InstantiationException | IllegalAccessException |
-                 InvocationTargetException | NoSuchMethodException e) {
-            throw new RuntimeException(e);
-        }
-        for (String header : item.getHeaders()) {
-            String colValue = item.getRecordData().get(item.getHeaders().indexOf(header));
-            this.save(row, header, colValue);
-        }
-
-        T finalRow = row;
-        grid.setRowCountOnElement("rowcount");
-        CompletableFuture.runAsync(() -> service.save(finalRow));
+        T entityData = service.addNewEntity(this.gridViewParameter.getEntityClass());
+        grid.setIDToGridRow(item.getId(), entityData.getId());
     }
 
     public int onCellUpdate(Object[] parameters) throws Exception {
@@ -580,7 +481,8 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
             throw new Exception("Parameters are required, but not set");
         }
 
-        StringBuilder query = new StringBuilder("Update ").append(gridViewParameter.getFromDefinition());
+        StringBuilder query = new StringBuilder("UPDATE ")
+                .append(gridViewParameter.getFromDefinition());
         query.append(" p SET p.")
                 .append(parameters[1]).append(" = ")
                 .append(":param1");
@@ -592,12 +494,29 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
         return service.updateEntityByQuery(query.toString(), parameters);
     }
 
-    public void onDeleteRecordChecked() {
+    public int onDeleteRecordChecked() throws Exception {
         int[] checkedItems = grid.getCheckedItems();
-        for (int checkedRow : checkedItems) {
-            service.delete(tableData.get(checkedRow));
+
+        if (!gridViewParameter.isValid()) {
+            throw new Exception("TuiGrid Definition is not valid.");
         }
+        if (gridViewParameter.isRequireParameter()) {
+            throw new Exception("Parameters are required, but not set");
+        }
+
+        StringBuilder query = new StringBuilder("DELETE FROM ")
+                .append(gridViewParameter.getFromDefinition())
+                .append(" p WHERE ");
+        for (int i = 0; i < checkedItems.length; i++) {
+            if (i != 0)
+                query.append(" OR ");
+            query.append("p.").append(gridViewParameter.getPrimaryIdFieldName())
+                    .append(" = ")
+                    .append(checkedItems[i]);
+        }
+
         grid.setRowCountOnElement("rowcount");
+        return service.deleteEntityByQuery(query.toString());
     }
 
     private void saveAll() {
