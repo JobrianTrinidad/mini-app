@@ -1,16 +1,45 @@
 package com.aat.application.form;
 
-import com.aat.application.core.data.entity.ZJTEntity;
 import com.aat.application.core.data.service.ZJTService;
 import com.aat.application.core.form.TimeLineForm;
 import com.aat.application.core.form.TimeLineViewParameter;
-import com.aat.application.data.repository.TimelineRepository;
-import com.aat.application.data.service.TimelineService;
+import com.vaadin.componentfactory.tuigrid.model.AATContextMenu;
+import com.vaadin.componentfactory.tuigrid.model.GuiItem;
+import com.vaadin.flow.component.button.Button;
 
-public class TimeLineCommonForm<T extends ZJTEntity> extends TimeLineForm<T, ZJTService<T>> {
+public class TimeLineCommonForm extends TimeLineForm<ZJTService> {
     public TimeLineCommonForm(TimeLineViewParameter timeLineViewParameter,
-                              ZJTService<T> service) {
+                              ZJTService service) {
         super(timeLineViewParameter, service);
         addClassName("demo-app-form");
+    }
+
+    @Override
+    public void onNewItem(GuiItem item) {
+    }
+
+    @Override
+    public int onUpdateItem(Object[] objects) {
+        return 0;
+    }
+
+    @Override
+    public int onDeleteItemChecked() {
+        return 0;
+    }
+
+    @Override
+    public void setContextMenu(AATContextMenu contextMenu) {
+
+    }
+
+    @Override
+    public void setMessageStatus(String msg) {
+
+    }
+
+    @Override
+    public void addCustomButton(Button button) {
+
     }
 }

@@ -16,9 +16,9 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.VaadinSession;
 
 @Route(value = "user/:subcategory?/:filter?", layout = MainLayout.class)
-public class UserView extends StandardFormView<ZJTEntity> implements HasUrlParameter<String> {
+public class UserView extends StandardFormView implements HasUrlParameter<String> {
 
-    public UserView(BaseEntityRepository<ZJTEntity> repository, TableInfoService tableInfoService) {
+    public UserView(BaseEntityRepository repository, TableInfoService tableInfoService) {
         super(repository, tableInfoService);
     }
 

@@ -1,6 +1,5 @@
 package com.aat.application.core.form;
 
-import com.aat.application.core.data.entity.ZJTEntity;
 import com.aat.application.core.data.service.ZJTService;
 import com.aat.application.data.entity.ZJTItem;
 import com.aat.application.util.GlobalData;
@@ -20,7 +19,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>> extends CommonForm<T> {
+public abstract class TimeLineForm<S extends ZJTService> extends CommonForm {
 
     @Serial
     private static final long serialVersionUID = -5183438338263448740L;
@@ -154,7 +153,7 @@ public abstract class TimeLineForm<T extends ZJTEntity, S extends ZJTService<T>>
             zjtItem.setGroupId(e.getItem().getGroup());
             zjtItem.setClassName(e.getItem().getClassName());
 
-            service.save((T) zjtItem);
+//            service.save((T) zjtItem);
         });
 
         timeline.addItemUpdateTitle(e -> {

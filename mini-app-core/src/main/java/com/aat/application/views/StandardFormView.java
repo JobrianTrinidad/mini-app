@@ -1,6 +1,5 @@
 package com.aat.application.views;
 
-import com.aat.application.core.data.entity.ZJTEntity;
 import com.aat.application.core.form.CommonForm;
 import com.aat.application.core.form.GridViewParameter;
 import com.aat.application.core.form.StandardForm;
@@ -15,17 +14,14 @@ import com.vaadin.componentfactory.tuigrid.event.ItemChangeEvent;
 import com.vaadin.componentfactory.tuigrid.event.ItemDeleteEvent;
 import com.vaadin.componentfactory.tuigrid.model.AATContextMenu;
 import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.router.AfterNavigationEvent;
 import com.vaadin.flow.router.BeforeEnterEvent;
 
 import java.util.Optional;
 import java.util.function.Consumer;
 
-//@Route(value = "common-view/:name", layout = CoreMainLayout.class)
-@SuppressWarnings("ALL")
-public class StandardFormView<T extends ZJTEntity> extends CommonView<T> {
+public class StandardFormView extends CommonView {
 
-    protected CommonForm<T> form;
+    protected CommonForm form;
     private final TableInfoService tableInfoService;
     private GridViewParameter gridViewParameter;
     private TimeLineViewParameter timeLineViewParameter;
@@ -33,7 +29,7 @@ public class StandardFormView<T extends ZJTEntity> extends CommonView<T> {
     private String name;
     private boolean bGrid = true;
 
-    public StandardFormView(BaseEntityRepository<T> repository,
+    public StandardFormView(BaseEntityRepository repository,
                             TableInfoService tableInfoService) {
         super(repository);
         this.tableInfoService = tableInfoService;
@@ -49,12 +45,12 @@ public class StandardFormView<T extends ZJTEntity> extends CommonView<T> {
     }
 
     private void configureForm(Optional<String> filter) {
-        String strFilter = !filter.equals(Optional.empty()) ? filter.get() : "";
+        String strFilter = filter.orElse("");
 
         switch (strFilter) {
             case "timeline":
                 bGrid = false;
-                form = new TimeLineCommonForm<>( this.timeLineViewParameter, new BaseEntityService<>(repository));
+                form = new TimeLineCommonForm(this.timeLineViewParameter, new BaseEntityService<>(repository));
                 break;
             case "grid":
                 bGrid = true;
@@ -70,7 +66,7 @@ public class StandardFormView<T extends ZJTEntity> extends CommonView<T> {
                 gridViewParameter.setWhereDefinition(null);
                 form = new GridCommonForm<>(gridViewParameter, new BaseEntityService<>(repository), tableInfoService);
                 if (this.contextMenu != null) {
-                    ((StandardForm) form).setContextMenu(this.contextMenu);
+                    form.setContextMenu(this.contextMenu);
                 }
                 break;
         }
@@ -89,31 +85,31 @@ public class StandardFormView<T extends ZJTEntity> extends CommonView<T> {
 
     public void setMessageStatus(String msg) {
         if (form != null && form instanceof StandardForm) {
-            ((StandardForm) form).setMessageStatus(msg);
+            form.setMessageStatus(msg);
         }
     }
 
     public void addCustomButton(Button button) {
         if (form != null && form instanceof StandardForm) {
-            ((StandardForm) form).addCustomButton(button);
+            form.addCustomButton(button);
         }
     }
 
     protected void onAddEvent(Consumer<ItemAddEvent> eventHandler) {
         if (bGrid) {
-            ((GridCommonForm) this.form).grid.addItemAddListener(eventHandler::accept);
+            form.grid.addItemAddListener(eventHandler::accept);
         }
     }
 
     protected void onUpdateEvent(Consumer<ItemChangeEvent> eventHandler) {
         if (bGrid) {
-            ((GridCommonForm) this.form).grid.addItemChangeListener(eventHandler::accept);
+            form.grid.addItemChangeListener(eventHandler::accept);
         }
     }
 
     protected void onDeleteEvent(Consumer<ItemDeleteEvent> eventHandler) {
         if (bGrid) {
-            ((GridCommonForm) this.form).grid.addItemDeleteListener(eventHandler::accept);
+            form.grid.addItemDeleteListener(eventHandler::accept);
         }
     }
 

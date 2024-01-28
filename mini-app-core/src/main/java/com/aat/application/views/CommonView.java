@@ -1,32 +1,21 @@
 package com.aat.application.views;
 
-import com.aat.application.core.data.entity.ZJTEntity;
 import com.aat.application.data.repository.BaseEntityRepository;
-import com.vaadin.componentfactory.tuigrid.event.ItemAddEvent;
-import com.vaadin.componentfactory.tuigrid.event.ItemChangeEvent;
-import com.vaadin.componentfactory.tuigrid.event.ItemDeleteEvent;
-import com.vaadin.componentfactory.tuigrid.model.Cell;
-import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.*;
 import com.vaadin.flow.server.VaadinSession;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
 
-public abstract class CommonView<T extends ZJTEntity> extends VerticalLayout implements RouterLayout, BeforeEnterObserver, HasDynamicTitle {
+public abstract class CommonView extends VerticalLayout implements RouterLayout, BeforeEnterObserver, HasDynamicTitle {
 
-    protected final BaseEntityRepository<T> repository;
+    protected final BaseEntityRepository repository;
     protected Class<?> LayoutClass;
     protected int filterObjectId = -1;
-    private String title = "";
 
-    public CommonView(BaseEntityRepository<T> repository) {
+    public CommonView(BaseEntityRepository repository) {
         this.repository = repository;
     }
 
@@ -62,13 +51,13 @@ public abstract class CommonView<T extends ZJTEntity> extends VerticalLayout imp
         }
 
         if (event.getRouteParameters().getParameterNames().size() > 1) {
-            filterObjectId = Integer.parseInt(event.getRouteParameters().get("___url_parameter").get());
+            filterObjectId = Integer.parseInt(event.getRouteParameters().get("___url_parameter").orElse(""));
         } else
             filterObjectId = -1;
     }
 
     @Override
     public String getPageTitle() {
-        return title;
+        return "";
     }
 }

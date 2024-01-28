@@ -1,9 +1,7 @@
 package com.aat.application.views;
 
-import com.aat.application.core.data.entity.ZJTEntity;
 import com.aat.application.core.form.GridViewParameter;
 import com.aat.application.core.form.TimeLineViewParameter;
-import com.aat.application.data.entity.ZJTVehicle;
 import com.aat.application.data.entity.ZJTVehicleServiceSchedule;
 import com.aat.application.data.repository.BaseEntityRepository;
 import com.aat.application.data.service.TableInfoService;
@@ -12,9 +10,9 @@ import com.vaadin.flow.router.HasUrlParameter;
 import com.vaadin.flow.router.Route;
 
 @Route(value = "service-schedule/:filter?", layout = MainLayout.class)
-public class VehicleServiceScheduleView extends StandardFormView<ZJTEntity> implements HasUrlParameter<String> {
+public class VehicleServiceScheduleView extends StandardFormView implements HasUrlParameter<String> {
 
-    public VehicleServiceScheduleView(BaseEntityRepository<ZJTEntity> repository, TableInfoService tableInfoService) {
+    public VehicleServiceScheduleView(BaseEntityRepository repository, TableInfoService tableInfoService) {
         super(repository, tableInfoService);
         TimeLineViewParameter timeLineViewParameter = new TimeLineViewParameter("timelineItemTitle", "vehicle", "planDate", null, null, "ZJTVehicleServiceSchedule");
         timeLineViewParameter.setWhereDefinition("vehicle.zjt_vehicle_id");

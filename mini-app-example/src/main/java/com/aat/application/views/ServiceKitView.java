@@ -9,9 +9,9 @@ import com.vaadin.flow.router.OptionalParameter;
 import com.vaadin.flow.router.Route;
 
 @Route(value = "service-kit/:subcategory?/:filter?", layout = MainLayout.class)
-public class ServiceKitView extends StandardFormView<ZJTEntity> implements HasUrlParameter<String> {
+public class ServiceKitView extends StandardFormView implements HasUrlParameter<String> {
 
-    public ServiceKitView(BaseEntityRepository<ZJTEntity> repository, TableInfoService tableInfoService) {
+    public ServiceKitView(BaseEntityRepository repository, TableInfoService tableInfoService) {
         super(repository, tableInfoService);
     }
 

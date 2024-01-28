@@ -29,7 +29,7 @@ import java.io.Serial;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>> extends CommonForm<T> {
+public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService> extends CommonForm {
 
     @Serial
     private static final long serialVersionUID = -5183438338263448739L;
@@ -45,7 +45,6 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
     private Dialog twinColSelDialog;
     AATTwinColSelect twinColSelect;
     Set<String> selectedItems;
-    public TuiGrid grid;
     protected S service;
     List<Item> items = new ArrayList<>();
     private boolean bSavedWidth = false;
@@ -468,12 +467,12 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
         toolbar.add(button);
     }
 
-    public void onNewRecord(GuiItem item) {
+    public void onNewItem(GuiItem item) {
         T entityData = service.addNewEntity(this.gridViewParameter.getEntityClass());
         grid.setIDToGridRow(item.getId(), entityData.getId());
     }
 
-    public int onCellUpdate(Object[] parameters) throws Exception {
+    public int onUpdateItem(Object[] parameters) throws Exception {
         if (!gridViewParameter.isValid()) {
             throw new Exception("TuiGrid Definition is not valid.");
         }
@@ -494,7 +493,7 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService<T>>
         return service.updateEntityByQuery(query.toString(), parameters);
     }
 
-    public int onDeleteRecordChecked() throws Exception {
+    public int onDeleteItemChecked() throws Exception {
         int[] checkedItems = grid.getCheckedItems();
 
         if (!gridViewParameter.isValid()) {

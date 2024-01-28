@@ -9,18 +9,13 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-public class BaseEntityService<T> implements ZJTService<T> {
+public class BaseEntityService<T> implements ZJTService {
 
-    private final BaseEntityRepository<T> generalRepository;
+    private final BaseEntityRepository generalRepository;
 
     @Autowired
-    public BaseEntityService(BaseEntityRepository<T> generalRepository) {
+    public BaseEntityService(BaseEntityRepository generalRepository) {
         this.generalRepository = generalRepository;
-    }
-
-    @Override
-    public List<T> findAll(String filter) {
-        return generalRepository.findAll(filter);
     }
 
     @Override
@@ -46,35 +41,5 @@ public class BaseEntityService<T> implements ZJTService<T> {
     @Override
     public <T1> T1 addNewEntity(Class<?> entityClass) {
         return generalRepository.addNewEntity(entityClass);
-    }
-
-    @Override
-    public <T1> List<T1> findRecordsByField(String fieldName, Object fieldValue) {
-        if (fieldValue instanceof String) {
-            return generalRepository.findRecordsByField(fieldName, fieldValue);
-        } else if (fieldValue instanceof Boolean) {
-            return generalRepository.findRecordsByField(fieldName, fieldValue);
-        } else if (fieldValue instanceof Integer) {
-            return generalRepository.findRecordsByField(fieldName, fieldValue);
-        }
-        // Handle other types as needed
-        else {
-            throw new IllegalArgumentException("Unsupported field value type: " + fieldValue.getClass());
-        }
-    }
-
-    @Override
-    public <T> T save(T record) {
-        return generalRepository.saveEntity(record);
-    }
-
-    @Override
-    public void delete(T record) {
-        generalRepository.deleteEntity(record);
-    }
-
-    @Override
-    public <T1> List<T1> findRecordsByFieldId(String fieldName, int filterId) {
-        return generalRepository.findRecordsByFieldId(fieldName, filterId);
     }
 }

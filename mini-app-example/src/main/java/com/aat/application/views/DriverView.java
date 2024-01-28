@@ -14,10 +14,10 @@ import com.vaadin.flow.router.HasUrlParameter;
 import com.vaadin.flow.server.VaadinSession;
 
 //@Route(value = "driver/:subcategory?/:filter?", layout = MainLayout.class)
-public class DriverView<T extends ZJTEntity> extends StandardFormView<ZJTEntity> implements HasUrlParameter<String> {
+public class DriverView<T extends ZJTEntity> extends StandardFormView implements HasUrlParameter<String> {
     private String name;
 
-    public DriverView(BaseEntityRepository<ZJTEntity> repository, TableInfoService tableInfoService) {
+    public DriverView(BaseEntityRepository repository, TableInfoService tableInfoService) {
         super(repository, tableInfoService);
         TimeLineViewParameter timeLineViewParameter =  new TimeLineViewParameter("timelineItemTitle", "vehicle", "planDate", null, null, "ZJTVehicleServiceSchedule");
         timeLineViewParameter.setWhereDefinition("vehicle.zjt_vehicle_id");

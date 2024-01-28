@@ -18,11 +18,11 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.VaadinSession;
 
 @Route(value = "service-type", layout = CoreMainLayout.class)
-public class ServiceTypeView extends StandardFormView<ZJTEntity> implements HasUrlParameter<String> {
+public class ServiceTypeView extends StandardFormView implements HasUrlParameter<String> {
 
     private String name;
 
-    public ServiceTypeView(BaseEntityRepository<ZJTEntity> repository, TableInfoService tableInfoService) {
+    public ServiceTypeView(BaseEntityRepository repository, TableInfoService tableInfoService) {
         super(repository, tableInfoService);
         TimeLineViewParameter timeLineViewParameter = new TimeLineViewParameter("timelineItemTitle", "vehicle", "planDate", null, null, "ZJTVehicleServiceSchedule");
         timeLineViewParameter.setWhereDefinition("vehicle.zjt_vehicle_id");

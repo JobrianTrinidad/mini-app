@@ -5,5 +5,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 @Primary
-public class StandardFormRepository<T> extends BaseEntityRepository<T>{
+public class StandardFormRepository extends BaseEntityRepository{
 }
