@@ -67,15 +67,19 @@ public interface ZJTEntity {
      *              }
      *          2. Set gridview parameter.
      *          e.g.
-     *              GridViewParameter gridViewParameter = new GridViewParameter(ZJTUser.class, "");
-     *              super.setGridViewParameter(gridViewParameter);
+     *                  gridViewParameter = new GridViewParameter(ZJTServiceKit.class, "");
+     *                  gridViewParameter.setSelectDefinition("name");
+     *                  super.setGridViewParameter(gridViewParameter);
      *          3. If displaying Entity in here is displayed as dropdown in other View,
      *          please define TimelineView parameter.
      *          e.g.
-     *              TimeLineViewParameter timeLineViewParameter = new TimeLineViewParameter("user.name", "user", "loginDate", null, null, "ZJTUser");
-     *              timeLineViewParameter.setWhereDefinition("user.zjt_user_id");
+     *                  TimeLineViewParameter timeLineViewParameter = new TimeLineViewParameter("user.name", "user", "loginDate", null, null, "ZJTUser");
+     *                  timeLineViewParameter.setWhereDefinition("user.zjt_user_id");
+     *                  timeLineViewParameter.setGroupClass(ZJTVehicle.class);
+     *                  timeLineViewParameter.setSelectDefinition("fleetid");
+     *                  super.setTimeLineViewParameter(timeLineViewParameter);
      *           - In here, TimeLineViewParameter is structured as the following.
-     *              public TimeLineViewParameter(String titleFieldName,    // The field name selected as the title in timeline
+     *                  public TimeLineViewParameter(String titleFieldName,    // The field name selected as the title in timeline
      *                                          String groupIDFieldName,   // The field name selected as the group in timeline
      *                                          String startDateFieldName, // The field name selected as start date in timeline
      *                                          String endDateFieldName,   // The field name selected as end date in timeline
@@ -83,38 +87,49 @@ public interface ZJTEntity {
      *                                          String classNameFieldName, // The field name selected as the className in timeline
      *                                                                     // It may be null.
      *                                          String fromDefinition) {   // Entity name used query
+     *
      *   D. Override Function onAttach
      *          1. Handle event process. This is the same in all Views.
      *          e.g.
-     *          if (this.form != null && this.isbGrid()) {
-     *             GridCommonForm<ZJTEntity> form = (GridCommonForm<ZJTEntity>) this.form;
-     *             onAddEvent(ev -> {
-     *                 form.onNewRecord((GuiItem) ev.getItem());
-     *             });
+     *                  if (this.form != null && this.isbGrid()) {
+     *                     CommonForm form =  this.form;
+     *                     onAddEvent(ev -> {
+     *                         form.onNewItem((GuiItem) ev.getItem());
+     *                         this.setMessageStatus("This is new added value " + ((GuiItem) ev.getItem()).getRecordData().get(1));
+     *                     });
      *
-     *             onUpdateEvent(ev -> {
-     *                 form.onCellUpdate(ev.getRow(), ev.getColName(), ev.getColValue());
-     *             });
+     *                     onUpdateEvent(ev -> {
+     *                         int count;
+     *                         try {
+     *                             count = form.onUpdateItem(new Object[]{ev.getRow(), ev.getColName(), ev.getColValue()});
+     *                         } catch (Exception e) {
+     *                             throw new RuntimeException(e);
+     *                         }
+     *                         if (count > 0)
+     *                             this.setMessageStatus(count + " rows is updated.");
+     *                     });
      *
-     *             onDeleteEvent(ev -> {
-     *                 form.onDeleteRecordChecked();
-     *             });
-     *         }
+     *                     onDeleteEvent(ev -> {
+     *                         int count;
+     *                         try {
+     *                             count = form.onDeleteItemChecked();
+     *                         } catch (Exception e) {
+     *                             throw new RuntimeException(e);
+     *                         }
+     *                         if (count > 0)
+     *                             this.setMessageStatus(count + " rows is deleted.");
+     *                     });
+     *
      *   E. Define function addMenu
      *      In here, define custom context menu.
      *            1. can define menu about grid
      *            e.g.
      *                MenuItem gridItem = editItem.addSubItem("Grid");
-     *                gridItem.addContextMenuClickListener(e -> {
-     *                    GridViewParameter gridViewParameter = new GridViewParameter(ZJTVehicleServiceSchedule.class, "");
-     *                    gridViewParameter.setGroupClass(ZJTVehicle.class);
-     *                    gridViewParameter.setWhereDefinition("vehicle.zjt_vehicle_id");
-     *                    super.setGridViewParameter(gridViewParameter);
-     *                    UI.getCurrent().navigate("vehicle/serviceschedule/grid/" + e.getRow().get(0).getRowKey());
-     *                });
+     *                gridItem.addContextMenuClickListener(e -> UI.getCurrent().navigate("vehicle/serviceschedule/grid/" + e.getRow().get(0).getRowKey()));
      *                In here, ZJTVehicleServiceSchedule is parent Entity and ZJTVehicle is child Entity.
      *              2. can define menu about timeline
      *              e.g.
+     *                  timelineItem.addContextMenuClickListener(e -> UI.getCurrent().navigate("vehicle/serviceschedule/timeline/" + e.getRow().get(0).getRowKey()));
      **********  Construct MainLayout andAdding item on MainLayout  ************
      *  A. MainLayout should be extended CoreMainLayout
      *       1. Overrides function getNavigation.
