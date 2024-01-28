@@ -23,7 +23,6 @@ import java.util.Optional;
 @Route(value = "vehicle/:subcategory?/:filter?", layout = MainLayout.class)
 public class VehicleView extends StandardFormView implements HasUrlParameter<String> {
 
-    private String name;
     GridViewParameter gridViewParameter;
 
     public VehicleView(BaseEntityRepository repository, TableInfoService tableInfoService) {
@@ -72,7 +71,6 @@ public class VehicleView extends StandardFormView implements HasUrlParameter<Str
         if (parameter != null) {
             if (event.getRouteParameters().get("subcategory").isPresent()
                     && event.getRouteParameters().get("subcategory").get().equals("serviceschedule")) {
-                this.name = parameter;
                 gridViewParameter.setEntityClass(ZJTVehicleServiceSchedule.class);
                 gridViewParameter.setGroupClass(ZJTVehicle.class);
                 gridViewParameter.setWhereDefinition("vehicle.zjt_vehicle_id");
