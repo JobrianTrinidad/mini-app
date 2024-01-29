@@ -2,15 +2,19 @@ package com.aat.application.views;
 
 import com.aat.application.core.form.GridViewParameter;
 import com.aat.application.core.form.TimeLineViewParameter;
+import com.aat.application.data.entity.ZJTVehicle;
 import com.aat.application.data.entity.ZJTVehicleServiceSchedule;
 import com.aat.application.data.repository.BaseEntityRepository;
 import com.aat.application.data.service.TableInfoService;
 import com.vaadin.flow.router.BeforeEvent;
 import com.vaadin.flow.router.HasUrlParameter;
+import com.vaadin.flow.router.OptionalParameter;
 import com.vaadin.flow.router.Route;
 
-@Route(value = "service-schedule/:filter?", layout = MainLayout.class)
+@Route(value = "service-schedule", layout = MainLayout.class)
 public class VehicleServiceScheduleView extends StandardFormView implements HasUrlParameter<String> {
+
+    String name;
 
     public VehicleServiceScheduleView(BaseEntityRepository repository, TableInfoService tableInfoService) {
         super(repository, tableInfoService);
@@ -21,7 +25,7 @@ public class VehicleServiceScheduleView extends StandardFormView implements HasU
     }
 
     @Override
-    public void setParameter(BeforeEvent beforeEvent, String s) {
-
+    public void setParameter(BeforeEvent beforeEvent, @OptionalParameter String s) {
+        name = s;
     }
 }

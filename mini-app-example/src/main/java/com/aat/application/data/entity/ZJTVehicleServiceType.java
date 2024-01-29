@@ -7,6 +7,7 @@ import com.aat.application.core.data.entity.ZJTEntity;
 import com.vaadin.flow.router.PageTitle;
 import jakarta.persistence.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 
@@ -41,10 +42,14 @@ public class ZJTVehicleServiceType implements ZJTEntity {
     @DisplayName(value = "Interval (KM)")
     private int km_interval;
 
-    @ManyToOne
-    @JoinColumn(name = "id")
-    @DisplayName(value = "serviceKit")
-    private ZJTServiceKit serviceKit;
+    @Column
+    @DisplayName(value = "Plan Date")
+    private LocalDateTime planDate;
+
+    @OneToMany(mappedBy = "serviceType", cascade = CascadeType.ALL)
+    @BaseItems
+    private List<ZJTServiceTypeKit> serviceTypeKits;
+
 
     public int getZjt_vehicleservicetype_id() {
         return zjt_vehicleservicetype_id;

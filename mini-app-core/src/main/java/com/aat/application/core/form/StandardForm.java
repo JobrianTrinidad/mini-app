@@ -468,8 +468,12 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService> ex
     }
 
     public void onNewItem(GuiItem item) {
-        T entityData = service.addNewEntity(this.gridViewParameter.getEntityClass());
-        grid.setIDToGridRow(item.getId(), entityData.getId());
+        try {
+            T entityData = service.addNewEntity(this.gridViewParameter.getEntityClass());
+            grid.setIDToGridRow(item.getId(), entityData.getId());
+        } catch (RuntimeException e) {
+            e.fillInStackTrace();
+        }
     }
 
     public int onUpdateItem(Object[] parameters) throws Exception {

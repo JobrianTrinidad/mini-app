@@ -1,14 +1,19 @@
 package com.aat.application.views;
 
 import com.aat.application.core.data.entity.ZJTEntity;
+import com.aat.application.core.form.CommonForm;
+import com.aat.application.core.form.GridViewParameter;
 import com.aat.application.core.form.TimeLineViewParameter;
 import com.aat.application.data.entity.ZJTServiceTypeKit;
+import com.aat.application.data.entity.ZJTVehicle;
 import com.aat.application.data.entity.ZJTVehicleServiceSchedule;
 import com.aat.application.data.entity.ZJTVehicleServiceType;
 import com.aat.application.data.repository.BaseEntityRepository;
 import com.aat.application.data.service.TableInfoService;
 import com.vaadin.componentfactory.tuigrid.model.AATContextMenu;
+import com.vaadin.componentfactory.tuigrid.model.GuiItem;
 import com.vaadin.componentfactory.tuigrid.model.MenuItem;
+import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.router.BeforeEvent;
@@ -17,56 +22,53 @@ import com.vaadin.flow.router.OptionalParameter;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.VaadinSession;
 
-@Route(value = "service-type", layout = CoreMainLayout.class)
+@Route(value = "service-type/:subcategory?/:filter?", layout = MainLayout.class)
 public class ServiceTypeView extends StandardFormView implements HasUrlParameter<String> {
 
-    private String name;
+    GridViewParameter gridViewParameter;
 
     public ServiceTypeView(BaseEntityRepository repository, TableInfoService tableInfoService) {
         super(repository, tableInfoService);
-        TimeLineViewParameter timeLineViewParameter = new TimeLineViewParameter("timelineItemTitle", "vehicle", "planDate", null, null, "ZJTVehicleServiceSchedule");
-        timeLineViewParameter.setWhereDefinition("vehicle.zjt_vehicle_id");
-        super.setTimeLineViewParameter(timeLineViewParameter);
-        this.getElement().getStyle().set("overflow-x", "hidden");
-        addMenu();
+        gridViewParameter = new GridViewParameter(ZJTVehicleServiceType.class, "");
+        gridViewParameter.setSelectDefinition("name");
+        super.setGridViewParameter(gridViewParameter);
     }
 
-    private void addMenu() {
-        AATContextMenu contextMenu = new AATContextMenu();
-        contextMenu.setOpenOnClick(true);
+    @Override
+    protected void onAttach(AttachEvent attachEvent) {
+        if (this.form != null && this.isbGrid()) {
+            CommonForm form = this.form;
+            onAddEvent(ev -> {
+                form.onNewItem((GuiItem) ev.getItem());
+                this.setMessageStatus("This is new added value " + ((GuiItem) ev.getItem()).getRecordData().get(1));
+            });
 
-//        MenuItem fileItem = contextMenu.addItem("File");
-//        fileItem.addContextMenuClickListener(e -> Notification.show(fileItem.getCaption()));
+            onUpdateEvent(ev -> {
+                int count;
+                try {
+                    count = form.onUpdateItem(new Object[]{ev.getRow(), ev.getColName(), ev.getColValue()});
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+                if (count > 0)
+                    this.setMessageStatus(count + " rows is updated.");
+            });
 
-//        MenuItem editItem = contextMenu.addItem("Service Schedule");
-//        editItem.addContextMenuClickListener(e -> Notification.show(editItem.getCaption()));
-//        MenuItem gridItem = editItem.addSubItem("Grid");
-//        gridItem.addContextMenuClickListener(e -> {
-//            VaadinSession.getCurrent().setAttribute("filter", e.getRow());
-//            UI.getCurrent().navigate("service-type/serviceschedule");
-//        });
-//        MenuItem timelineItem = editItem.addSubItem("Timeline");
-//        timelineItem.addContextMenuClickListener(e -> {
-//            UI.getCurrent().navigate("timeline/service-type/serviceschedule");
-//        });
-//
-//        this.setContextMenu(contextMenu);
-
-        MenuItem menuItem;
-
-        menuItem = contextMenu.addItem("Service Kit");
-        menuItem.addContextMenuClickListener(e -> {
-            VaadinSession.getCurrent().setAttribute("entityClass", ZJTServiceTypeKit.class.getName());
-            UI.getCurrent().navigate("service-type/service-type-kit/grid/" + e.getRow().get(0).getRowKey());
-        });
-
-        this.setContextMenu(contextMenu);
+            onDeleteEvent(ev -> {
+                int count;
+                try {
+                    count = form.onDeleteItemChecked();
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+                if (count > 0)
+                    this.setMessageStatus(count + " rows is deleted.");
+            });
+        }
     }
 
     @Override
     public void setParameter(BeforeEvent beforeEvent, @OptionalParameter String parameter) {
-        if (parameter != null) {
-            this.name = parameter;
-        }
     }
+
 }

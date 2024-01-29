@@ -3,16 +3,22 @@ package com.aat.application.views;
 import com.aat.application.core.data.entity.ZJTEntity;
 import com.aat.application.core.form.CommonForm;
 import com.aat.application.core.form.GridViewParameter;
-import com.aat.application.data.entity.ZJTServiceKit;
-import com.aat.application.data.entity.ZJTVehicle;
+import com.aat.application.core.form.TimeLineViewParameter;
+import com.aat.application.data.entity.*;
 import com.aat.application.data.repository.BaseEntityRepository;
 import com.aat.application.data.service.TableInfoService;
+import com.vaadin.componentfactory.tuigrid.model.AATContextMenu;
 import com.vaadin.componentfactory.tuigrid.model.GuiItem;
+import com.vaadin.componentfactory.tuigrid.model.MenuItem;
 import com.vaadin.flow.component.AttachEvent;
+import com.vaadin.flow.component.UI;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.router.BeforeEvent;
 import com.vaadin.flow.router.HasUrlParameter;
 import com.vaadin.flow.router.OptionalParameter;
 import com.vaadin.flow.router.Route;
+
+import java.util.Optional;
 
 @Route(value = "service-kit/:subcategory?/:filter?", layout = MainLayout.class)
 public class ServiceKitView extends StandardFormView implements HasUrlParameter<String> {
@@ -48,7 +54,7 @@ public class ServiceKitView extends StandardFormView implements HasUrlParameter<
             onDeleteEvent(ev -> {
                 int count;
                 try {
-                    count = form.onDeleteItemChecked();
+                     count = form.onDeleteItemChecked();
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
@@ -58,8 +64,38 @@ public class ServiceKitView extends StandardFormView implements HasUrlParameter<
         }
     }
 
+
     @Override
     public void setParameter(BeforeEvent event, @OptionalParameter String parameter) {
+        if (parameter != null) {
+            if (event.getRouteParameters().get("subcategory").isPresent()
+                    && event.getRouteParameters().get("subcategory").get().equals("servicetype")) {
+                gridViewParameter.setEntityClass(ZJTServiceTypeKit.class);
+                gridViewParameter.setGroupClass(ZJTServiceKit.class);
+                gridViewParameter.setWhereDefinition("serviceKit.zjt_servicekit_id");
+                TimeLineViewParameter timeLineViewParameter = new TimeLineViewParameter("serviceKit.name", "serviceKit", "planDate", null, null, "ZJTServiceTypeKit");
+                timeLineViewParameter.setGroupClass(ZJTServiceKit.class);
+                timeLineViewParameter.setSelectDefinition("name");
+                timeLineViewParameter.setWhereDefinition("serviceKit.zjt_servicekit_id");
+                super.setTimeLineViewParameter(timeLineViewParameter);
+            }
+        } else
+            addMenu(event.getRouteParameters().get("category"));
+    }
+
+    private void addMenu(Optional<String> category) {
+        AATContextMenu contextMenu = new AATContextMenu();
+        contextMenu.setOpenOnClick(true);
+
+
+        MenuItem editItem = contextMenu.addItem("Service Type");
+        editItem.addContextMenuClickListener(e -> Notification.show(editItem.getCaption()));
+        MenuItem gridItem = editItem.addSubItem("Grid");
+        gridItem.addContextMenuClickListener(e -> UI.getCurrent().navigate("service-kit/servicetype/grid/" + e.getRow().get(0).getRowKey()));
+        MenuItem timelineItem = editItem.addSubItem("Timeline");
+        timelineItem.addContextMenuClickListener(e -> UI.getCurrent().navigate("service-kit/servicetype/timeline/" + e.getRow().get(0).getRowKey()));
+
+        this.setContextMenu(contextMenu);
     }
 
 

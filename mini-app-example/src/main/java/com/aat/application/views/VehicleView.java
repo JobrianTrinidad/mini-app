@@ -70,7 +70,7 @@ public class VehicleView extends StandardFormView implements HasUrlParameter<Str
 
         if (parameter != null) {
             if (event.getRouteParameters().get("subcategory").isPresent()
-                    && event.getRouteParameters().get("subcategory").get().equals("serviceschedule")) {
+                    && event.getRouteParameters().get("subcategory").get().equals("service-schedule")) {
                 gridViewParameter.setEntityClass(ZJTVehicleServiceSchedule.class);
                 gridViewParameter.setGroupClass(ZJTVehicle.class);
                 gridViewParameter.setWhereDefinition("vehicle.zjt_vehicle_id");
@@ -92,9 +92,9 @@ public class VehicleView extends StandardFormView implements HasUrlParameter<Str
         MenuItem editItem = contextMenu.addItem("Service Schedule");
         editItem.addContextMenuClickListener(e -> Notification.show(editItem.getCaption()));
         MenuItem gridItem = editItem.addSubItem("Grid");
-        gridItem.addContextMenuClickListener(e -> UI.getCurrent().navigate("vehicle/serviceschedule/grid/" + e.getRow().get(0).getRowKey()));
+        gridItem.addContextMenuClickListener(e -> UI.getCurrent().navigate("vehicle/service-schedule/grid/" + e.getRow().get(0).getRowKey()));
         MenuItem timelineItem = editItem.addSubItem("Timeline");
-        timelineItem.addContextMenuClickListener(e -> UI.getCurrent().navigate("vehicle/serviceschedule/timeline/" + e.getRow().get(0).getRowKey()));
+        timelineItem.addContextMenuClickListener(e -> UI.getCurrent().navigate("vehicle/service-schedule/timeline/" + e.getRow().get(0).getRowKey()));
 
         this.setContextMenu(contextMenu);
     }

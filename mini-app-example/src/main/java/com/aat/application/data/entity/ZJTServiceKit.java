@@ -20,7 +20,7 @@ public class ZJTServiceKit implements ZJTEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    @Column(name = "id")
+    @Column(name = "zjt_servicekit_id")
     protected int zjt_servicekit_id;
 
     @Override
@@ -39,7 +39,7 @@ public class ZJTServiceKit implements ZJTEntity {
 
     @OneToMany(mappedBy = "serviceKit", cascade = CascadeType.ALL)
     @BaseItems
-    private List<ZJTVehicleServiceType> vehicleServiceTypes;
+    private List<ZJTServiceTypeKit> serviceTypeKits;
 
     public String getName() {
         return name;
