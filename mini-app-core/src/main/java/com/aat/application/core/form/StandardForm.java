@@ -23,7 +23,6 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.value.ValueChangeMode;
-import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.server.VaadinSession;
 
 import java.io.Serial;
@@ -511,7 +510,7 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService> ex
             throw new Exception("Parameters are required, but not set");
         }
 
-        String colType = this.gridViewParameter.getHeaderOptions().get(parameters[1]);
+        String colType = this.gridViewParameter.getHeaderOptions().get(parameters[1].toString());
         if (!(colType.equals("input") || colType.equals("date")
                 || colType.equals("check") || colType.equals("select_enum"))) {
             Class<?> selectClass;
