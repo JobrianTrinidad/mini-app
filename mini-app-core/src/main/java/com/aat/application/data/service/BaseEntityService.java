@@ -1,5 +1,6 @@
 package com.aat.application.data.service;
 
+import com.aat.application.core.data.entity.ZJTEntity;
 import com.aat.application.core.data.service.ZJTService;
 import com.aat.application.data.entity.ZJTItem;
 import com.aat.application.data.repository.BaseEntityRepository;
@@ -41,5 +42,10 @@ public class BaseEntityService<T> implements ZJTService {
     @Override
     public <T1> T1 addNewEntity(Class<?> entityClass) {
         return generalRepository.addNewEntity(entityClass);
+    }
+
+    @Override
+    public ZJTEntity addNewEntity(ZJTEntity entity) {
+        return generalRepository.addNewEntity(entity);
     }
 }

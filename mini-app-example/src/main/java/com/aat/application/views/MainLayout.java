@@ -41,6 +41,9 @@ public class MainLayout extends CoreMainLayout {
         parent.addItem(new AppNavItem("Service Type kit", "service-type-kit", LineAwesomeIcon.PRODUCT_HUNT.create())
                 .withParameter("entityClass", ZJTServiceTypeKit.class.getName())
                 .withParameter("layout", this.getClass().getName()));
+        parent.addItem(new AppNavItem("Service Type Task", "service-type-task", LineAwesomeIcon.PRODUCT_HUNT.create())
+                .withParameter("entityClass", ZJTServiceTypeTask.class.getName())
+                .withParameter("layout", this.getClass().getName()));
 
 //        parent.addItem(new AppNavItem("Service Type Kit", "service-type-kit", LineAwesomeIcon.PRODUCT_HUNT.create())
 //                .withParameter("entityClass", ZJTServiceTypeKit.class.getName())

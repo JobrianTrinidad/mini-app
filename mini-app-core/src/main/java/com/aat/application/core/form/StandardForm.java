@@ -23,6 +23,7 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.value.ValueChangeMode;
+import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.server.VaadinSession;
 
 import java.io.Serial;
@@ -54,6 +55,7 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService> ex
     private final TextField lblMessage = new TextField();
     private final Button lblRowCount = new Button();
     private AATContextMenu contextMenu;
+    private String filteredValue = "";
 
     public StandardForm(GridViewParameter gridViewParameter,
                         S service, TableInfoService tableInfoService) {
@@ -93,6 +95,8 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService> ex
 
     protected void onAttach(AttachEvent attachEvent) {
         super.onAttach(attachEvent);
+
+        grid.setFilter(gridViewParameter.groupName, filteredValue);
         grid.setRowCountOnElement("rowcount");
     }
 
@@ -219,6 +223,8 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService> ex
         grid = new TuiGrid();
         grid.addClassName("scheduler-grid");
         grid.setHeaders(this.gridViewParameter.getHeaders());
+        if (this.gridViewParameter.getParameters() != null)
+            grid.setFilterId((int) this.gridViewParameter.getParameters()[0]);
 
         try {
             items = this.getTableData(this.gridViewParameter.getParameters(), false);
@@ -282,7 +288,16 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService> ex
 
         StringBuilder query = new StringBuilder("SELECT p.").append(gridViewParameter.getPrimaryIdFieldName());
         for (String header : gridViewParameter.getHeaders()) {
-            query.append(", p.").append(header);
+            String colType = this.gridViewParameter.getHeaderOptions().get(header);
+            if (!header.equals("id")) {
+                if (!(colType.equals("input") || colType.equals("date")
+                        || colType.equals("check") || colType.equals("select_enum")))
+                    query.append(", COALESCE(p.").append(header).append(", -1)");
+                else
+                    query.append(", p.").append(header);
+            } else
+                query.append(", p.").append(header);
+
         }
 
         query.append(" FROM ").append(gridViewParameter.getFromDefinition()).append(" as p");
@@ -398,7 +413,7 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService> ex
         btnReload.addClickListener(e -> reloadGrid());
         btnSave.addClickListener(e -> saveAll());
 //        toolbar.add(btnReload, btnSave);
-        String filteredValue = "";
+
         if (this.gridViewParameter.getParameters() != null) {
             if (!gridViewParameter.isValid()) {
                 throw new Exception("TuiGrid Definition is not valid.");
@@ -457,6 +472,7 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService> ex
         columnToolbar.setAlignItems(FlexComponent.Alignment.CENTER);
         toolbar.add(filterText, routeLayout, btnReload, btnSave, columnToolbar);
         toolbar.addClassName("aat-toolbar");
+
     }
 
     public void setMessageStatus(String msg) {
@@ -469,8 +485,19 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService> ex
 
     public void onNewItem(GuiItem item) {
         try {
+            grid.setRowCountOnElement("rowcount");
             T entityData = service.addNewEntity(this.gridViewParameter.getEntityClass());
             grid.setIDToGridRow(item.getId(), entityData.getId());
+        } catch (RuntimeException e) {
+            e.fillInStackTrace();
+        }
+    }
+
+    public void onNewItem(ZJTEntity entity, int itemId) {
+        try {
+            grid.setRowCountOnElement("rowcount");
+            ZJTEntity entityData = service.addNewEntity(entity);
+            grid.setIDToGridRow(itemId, entityData.getId());
         } catch (RuntimeException e) {
             e.fillInStackTrace();
         }
@@ -484,6 +511,20 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService> ex
             throw new Exception("Parameters are required, but not set");
         }
 
+        String colType = this.gridViewParameter.getHeaderOptions().get(parameters[1]);
+        if (!(colType.equals("input") || colType.equals("date")
+                || colType.equals("check") || colType.equals("select_enum"))) {
+            Class<?> selectClass;
+            try {
+                selectClass = Class.forName(colType);
+            } catch (ClassNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+            String pkField = GlobalData.getPrimaryKeyField(selectClass).getName();
+            parameters[1] = parameters[1] + "." + pkField;
+        }
+
+
         StringBuilder query = new StringBuilder("UPDATE ")
                 .append(gridViewParameter.getFromDefinition());
         query.append(" p SET p.")
@@ -493,6 +534,7 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService> ex
                 .append("p.").append(gridViewParameter.getPrimaryIdFieldName())
                 .append(" = ")
                 .append(":param2");
+        grid.setRowCountOnElement("rowcount");
 
         return service.updateEntityByQuery(query.toString(), parameters);
     }
@@ -503,10 +545,6 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService> ex
         if (!gridViewParameter.isValid()) {
             throw new Exception("TuiGrid Definition is not valid.");
         }
-        if (gridViewParameter.isRequireParameter()) {
-            throw new Exception("Parameters are required, but not set");
-        }
-
         StringBuilder query = new StringBuilder("DELETE FROM ")
                 .append(gridViewParameter.getFromDefinition())
                 .append(" p WHERE ");

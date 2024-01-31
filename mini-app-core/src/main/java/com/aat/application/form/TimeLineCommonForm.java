@@ -1,5 +1,6 @@
 package com.aat.application.form;
 
+import com.aat.application.core.data.entity.ZJTEntity;
 import com.aat.application.core.data.service.ZJTService;
 import com.aat.application.core.form.TimeLineForm;
 import com.aat.application.core.form.TimeLineViewParameter;
@@ -16,6 +17,11 @@ public class TimeLineCommonForm extends TimeLineForm<ZJTService> {
 
     @Override
     public void onNewItem(GuiItem item) {
+    }
+
+    @Override
+    public void onNewItem(ZJTEntity entity, int id) {
+
     }
 
     @Override

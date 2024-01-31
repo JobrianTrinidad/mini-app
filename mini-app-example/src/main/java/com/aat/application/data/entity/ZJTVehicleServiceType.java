@@ -50,6 +50,10 @@ public class ZJTVehicleServiceType implements ZJTEntity {
     @BaseItems
     private List<ZJTServiceTypeKit> serviceTypeKits;
 
+    @OneToMany(mappedBy = "serviceType", cascade = CascadeType.ALL)
+    @BaseItems
+    private List<ZJTServiceTypeTask> zjtServiceTypeTasks;
+
 
     public int getZjt_vehicleservicetype_id() {
         return zjt_vehicleservicetype_id;

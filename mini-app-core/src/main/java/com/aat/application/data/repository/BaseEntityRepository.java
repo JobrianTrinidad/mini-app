@@ -8,11 +8,14 @@ import org.springframework.stereotype.Repository;
 
 import java.lang.reflect.*;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
+import java.util.Optional;
 
 @Repository
-public class BaseEntityRepository{
+public class BaseEntityRepository {
     @PersistenceContext
     private EntityManager entityManager;
 
@@ -54,7 +57,23 @@ public class BaseEntityRepository{
     @Transactional
     public int updateEntityByQuery(String query, Object[] params) {
         Query customQuery = entityManager.createQuery(query);
-        customQuery.setParameter("param1", params[2]);
+        String paramType = customQuery.getParameter("param1").getParameterType().getSimpleName();
+        switch (paramType) {
+            case "Boolean":
+            case "boolean":
+                customQuery.setParameter("param1", Boolean.parseBoolean(params[2].toString()));
+                break;
+            case "LocalDateTime":
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd h:mm a", Locale.ENGLISH);
+                customQuery.setParameter("param1", LocalDateTime.parse(params[2].toString(), formatter));
+                break;
+            default:
+                customQuery.setParameter("param1", params[2]);
+                break;
+        }
+
+        if (customQuery.getParameter("param1").getParameterType().equals(String.class))
+            customQuery.setParameter("param1", params[2]);
         customQuery.setParameter("param2", params[0]);
         return customQuery.executeUpdate();
     }
@@ -81,5 +100,15 @@ public class BaseEntityRepository{
         }
         entityManager.persist(newEntity);
         return newEntity;
+    }
+
+    @Transactional
+    public ZJTEntity addNewEntity(ZJTEntity entity) {
+        entityManager.persist(entity);
+        return entity;
+    }
+
+    public ZJTEntity findEntityById(Class<?> entityClass, int nEntityID) {
+        return (ZJTEntity) entityManager.find(entityClass, nEntityID);
     }
 }

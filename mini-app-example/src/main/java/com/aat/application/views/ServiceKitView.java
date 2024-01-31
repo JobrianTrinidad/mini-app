@@ -22,7 +22,6 @@ import java.util.Optional;
 
 @Route(value = "service-kit/:subcategory?/:filter?", layout = MainLayout.class)
 public class ServiceKitView extends StandardFormView implements HasUrlParameter<String> {
-
     GridViewParameter gridViewParameter;
     public ServiceKitView(BaseEntityRepository repository, TableInfoService tableInfoService) {
         super(repository, tableInfoService);
@@ -30,7 +29,6 @@ public class ServiceKitView extends StandardFormView implements HasUrlParameter<
         gridViewParameter.setSelectDefinition("name");
         super.setGridViewParameter(gridViewParameter);
     }
-
     @Override
     protected void onAttach(AttachEvent attachEvent) {
         if (this.form != null && this.isbGrid()) {
@@ -54,7 +52,7 @@ public class ServiceKitView extends StandardFormView implements HasUrlParameter<
             onDeleteEvent(ev -> {
                 int count;
                 try {
-                     count = form.onDeleteItemChecked();
+                    count = form.onDeleteItemChecked();
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
@@ -69,11 +67,11 @@ public class ServiceKitView extends StandardFormView implements HasUrlParameter<
     public void setParameter(BeforeEvent event, @OptionalParameter String parameter) {
         if (parameter != null) {
             if (event.getRouteParameters().get("subcategory").isPresent()
-                    && event.getRouteParameters().get("subcategory").get().equals("servicetype")) {
+                    && event.getRouteParameters().get("subcategory").get().equals("service-type-kit")) {
                 gridViewParameter.setEntityClass(ZJTServiceTypeKit.class);
                 gridViewParameter.setGroupClass(ZJTServiceKit.class);
                 gridViewParameter.setWhereDefinition("serviceKit.zjt_servicekit_id");
-                TimeLineViewParameter timeLineViewParameter = new TimeLineViewParameter("serviceKit.name", "serviceKit", "planDate", null, null, "ZJTServiceTypeKit");
+                TimeLineViewParameter timeLineViewParameter = new TimeLineViewParameter("serviceKit.name", "serviceKit", "planDate", null, null, "ZJTServiceKit");
                 timeLineViewParameter.setGroupClass(ZJTServiceKit.class);
                 timeLineViewParameter.setSelectDefinition("name");
                 timeLineViewParameter.setWhereDefinition("serviceKit.zjt_servicekit_id");
@@ -88,12 +86,12 @@ public class ServiceKitView extends StandardFormView implements HasUrlParameter<
         contextMenu.setOpenOnClick(true);
 
 
-        MenuItem editItem = contextMenu.addItem("Service Type");
+        MenuItem editItem = contextMenu.addItem("Service Type Kit");
         editItem.addContextMenuClickListener(e -> Notification.show(editItem.getCaption()));
         MenuItem gridItem = editItem.addSubItem("Grid");
-        gridItem.addContextMenuClickListener(e -> UI.getCurrent().navigate("service-kit/servicetype/grid/" + e.getRow().get(0).getRowKey()));
+        gridItem.addContextMenuClickListener(e -> UI.getCurrent().navigate("service-kit/service-type-kit/grid/" + e.getRow().get(0).getRowKey()));
         MenuItem timelineItem = editItem.addSubItem("Timeline");
-        timelineItem.addContextMenuClickListener(e -> UI.getCurrent().navigate("service-kit/servicetype/timeline/" + e.getRow().get(0).getRowKey()));
+        timelineItem.addContextMenuClickListener(e -> UI.getCurrent().navigate("service-kit/service-type-kit/timeline/" + e.getRow().get(0).getRowKey()));
 
         this.setContextMenu(contextMenu);
     }
