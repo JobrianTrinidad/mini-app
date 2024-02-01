@@ -109,6 +109,10 @@ public class ZJTVehicle implements ZJTEntity {
     @BaseItems
     private List<ZJTVehicleKMReading> kmReadings;
 
+    @OneToMany(mappedBy = "vehicle", cascade = CascadeType.ALL)
+    @BaseItems
+    private List<ZJTVehicleServiceJob> vehicleServiceJobs;
+
     public int getZjt_vehicle_id() {
         return zjt_vehicle_id;
     }

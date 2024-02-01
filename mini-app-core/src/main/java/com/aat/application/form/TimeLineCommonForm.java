@@ -20,8 +20,9 @@ public class TimeLineCommonForm extends TimeLineForm<ZJTService> {
     }
 
     @Override
-    public void onNewItem(ZJTEntity entity, int id) {
+    public ZJTEntity onNewItem(ZJTEntity entity, int id) {
 
+        return entity;
     }
 
     @Override

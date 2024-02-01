@@ -27,22 +27,24 @@ public class MainLayout extends CoreMainLayout {
         parent.setIcon(LineAwesomeIcon.FOLDER.create());
         nav.addItem(parent);
         parent.addItem(new AppNavItem("User", "user", LineAwesomeIcon.PRODUCT_HUNT.create())
-                .withParameter("entityClass", ZJTUser.class.getName())
                 .withParameter("layout", this.getClass().getName()));
         parent.addItem(new AppNavItem("Service Kit", "service-kit", LineAwesomeIcon.PRODUCT_HUNT.create())
-                .withParameter("entityClass", ZJTServiceKit.class.getName())
                 .withParameter("layout", this.getClass().getName()));
         parent.addItem(new AppNavItem("Pricing Type", "pricing-type", LineAwesomeIcon.PRODUCT_HUNT.create())
-                .withParameter("entityClass", ZJTPricingType.class.getName())
                 .withParameter("layout", this.getClass().getName()));
         parent.addItem(new AppNavItem("Service Type", "service-type", LineAwesomeIcon.PRODUCT_HUNT.create())
-                .withParameter("entityClass", ZJTVehicleServiceType.class.getName())
                 .withParameter("layout", this.getClass().getName()));
         parent.addItem(new AppNavItem("Service Type kit", "service-type-kit", LineAwesomeIcon.PRODUCT_HUNT.create())
-                .withParameter("entityClass", ZJTServiceTypeKit.class.getName())
                 .withParameter("layout", this.getClass().getName()));
         parent.addItem(new AppNavItem("Service Type Task", "service-type-task", LineAwesomeIcon.PRODUCT_HUNT.create())
-                .withParameter("entityClass", ZJTServiceTypeTask.class.getName())
+                .withParameter("layout", this.getClass().getName()));
+        parent.addItem(new AppNavItem("Service Job", "service-job", LineAwesomeIcon.PRODUCT_HUNT.create())
+                .withParameter("layout", this.getClass().getName()));
+        parent.addItem(new AppNavItem("Service Job & Service Type", "servicejob-servicetype", LineAwesomeIcon.PRODUCT_HUNT.create())
+                .withParameter("layout", this.getClass().getName()));
+        parent.addItem(new AppNavItem("Service Job Task", "service-job-task", LineAwesomeIcon.PRODUCT_HUNT.create())
+                .withParameter("layout", this.getClass().getName()));
+        parent.addItem(new AppNavItem("Service Job & Service Kit", "servicejob-servicekit", LineAwesomeIcon.PRODUCT_HUNT.create())
                 .withParameter("layout", this.getClass().getName()));
 
 //        parent.addItem(new AppNavItem("Service Type Kit", "service-type-kit", LineAwesomeIcon.PRODUCT_HUNT.create())
@@ -50,20 +52,16 @@ public class MainLayout extends CoreMainLayout {
 //                .withParameter("layout", this.getClass().getName()));
 
         parent.addItem(new AppNavItem("Vehicle", "vehicle", LineAwesomeIcon.PRODUCT_HUNT.create())
-                .withParameter("entityClass", ZJTVehicle.class.getName())
                 .withParameter("layout", this.getClass().getName()));
 
         parent.addItem(new AppNavItem("Vehicle Part", "vehicle-parts", LineAwesomeIcon.PRODUCT_HUNT.create())
-                .withParameter("entityClass", ZJTVehiclePart.class.getName())
                 .withParameter("layout", this.getClass().getName()));
 
         parent = new AppNavItem("Transaction");
         parent.setIcon(LineAwesomeIcon.FOLDER.create());
         parent.addItem(new AppNavItem("Service Schedule", "service-schedule", LineAwesomeIcon.PRODUCT_HUNT.create())
-                .withParameter("entityClass", ZJTVehicleServiceSchedule.class.getName())
                 .withParameter("layout", this.getClass().getName()));
         parent.addItem(new AppNavItem("Vehicle KM Reading", "vehiclekmreading", LineAwesomeIcon.PRODUCT_HUNT.create())
-                .withParameter("entityClass", ZJTVehicleKMReading.class.getName())
                 .withParameter("layout", this.getClass().getName()));
 
         nav.addItem(parent);

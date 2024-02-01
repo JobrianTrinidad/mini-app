@@ -69,10 +69,6 @@ public class AppNavItem extends Component {
         setLabel(label);
         routePath = path;
         setIcon(icon);
-        getElement().addEventListener("click", event -> {
-            // Set session attribute here
-            VaadinSession.getCurrent().setAttribute("entityClass", this.parameters.get("entityClass"));
-        });
     }
 
     /**
@@ -87,10 +83,6 @@ public class AppNavItem extends Component {
         setLabel(label);
         setIcon(icon);
         parameters = new HashMap<>();
-        getElement().addEventListener("click", event -> {
-            // Set session attribute here
-            VaadinSession.getCurrent().setAttribute("entityClass", this.parameters.get("entityClass"));
-        });
     }
 
     /**
@@ -176,7 +168,7 @@ public class AppNavItem extends Component {
      * @return this instance for chaining
      */
     public AppNavItem setPath(String path) {
-        if (this.parameters != null && this.parameters.size() == 2) {
+        if (this.parameters != null && this.parameters.size() == 1) {
             VaadinSession.getCurrent().setAttribute("layout", this.parameters.get("layout"));
         }
         getElement().setAttribute("path", path);
@@ -191,7 +183,7 @@ public class AppNavItem extends Component {
      */
     public AppNavItem setPath(Class<? extends Component> view) {
 
-        if (this.parameters != null && this.parameters.size() == 2) {
+        if (this.parameters != null && this.parameters.size() == 1) {
             VaadinSession.getCurrent().setAttribute("layout", this.parameters.get("layout"));
         }
         String url = RouteConfiguration.forRegistry(getRouter().getRegistry()).getUrl(view);

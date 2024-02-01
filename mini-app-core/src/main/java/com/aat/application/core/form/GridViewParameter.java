@@ -2,8 +2,6 @@ package com.aat.application.core.form;
 
 import com.aat.application.annotations.ContentDisplayedInSelect;
 import com.aat.application.annotations.DisplayName;
-import com.aat.application.core.data.entity.ZJTEntity;
-import com.aat.application.util.GlobalData;
 import jakarta.persistence.Id;
 
 import java.lang.reflect.Field;

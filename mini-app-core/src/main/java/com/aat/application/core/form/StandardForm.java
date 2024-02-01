@@ -471,7 +471,6 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService> ex
         columnToolbar.setAlignItems(FlexComponent.Alignment.CENTER);
         toolbar.add(filterText, routeLayout, btnReload, btnSave, columnToolbar);
         toolbar.addClassName("aat-toolbar");
-
     }
 
     public void setMessageStatus(String msg) {
@@ -492,14 +491,16 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService> ex
         }
     }
 
-    public void onNewItem(ZJTEntity entity, int itemId) {
+    public ZJTEntity onNewItem(ZJTEntity entity, int itemId) {
         try {
             grid.setRowCountOnElement("rowcount");
             ZJTEntity entityData = service.addNewEntity(entity);
             grid.setIDToGridRow(itemId, entityData.getId());
+            return entityData;
         } catch (RuntimeException e) {
             e.fillInStackTrace();
         }
+        return null;
     }
 
     public int onUpdateItem(Object[] parameters) throws Exception {

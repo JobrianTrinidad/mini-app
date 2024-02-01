@@ -33,6 +33,10 @@ public class ZJTUser implements ZJTEntity {
     @BaseItems
     private List<ZJTVehicleKMReading> kmReadings;
 
+    @OneToMany(mappedBy = "performedBy", cascade = CascadeType.ALL)
+    @BaseItems
+    private List<ZJTVehicleServiceJob> vehicleServiceJobs;
+
     @Override
     public int getId() {
         return zjt_user_id;

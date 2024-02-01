@@ -1,11 +1,10 @@
 package com.aat.application.data.entity;
 
+import com.aat.application.annotations.ContentDisplayedInSelect;
 import com.aat.application.annotations.DisplayName;
 import com.aat.application.core.data.entity.ZJTEntity;
 import com.vaadin.flow.router.PageTitle;
 import jakarta.persistence.*;
-
-import java.math.BigDecimal;
 
 /**
  * Service kit is the holder for the BOM parts in Ampere
@@ -22,9 +21,10 @@ public class ZJTServiceTypeTask implements ZJTEntity {
 
     @Column
     @DisplayName(value = "Seq No")
-    private String seqno;
+    private int seqNo;
 
     @Column
+    @ContentDisplayedInSelect
     @DisplayName(value = "Name")
     private String name;
 
@@ -50,12 +50,12 @@ public class ZJTServiceTypeTask implements ZJTEntity {
         this.serviceType = serviceType;
     }
 
-    public String getSeqno() {
-        return seqno;
+    public int getSeqNo() {
+        return seqNo;
     }
 
-    public void setSeqno(String seqno) {
-        this.seqno = seqno;
+    public void setSeqNo(int seqno) {
+        this.seqNo = seqno;
     }
 
     public String getName() {

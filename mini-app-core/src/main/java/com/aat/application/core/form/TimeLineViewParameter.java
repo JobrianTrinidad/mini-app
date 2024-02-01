@@ -108,6 +108,11 @@ public class TimeLineViewParameter {
         this.classNameFieldName = classNameFieldName;
         this.fromDefinition = fromDefinition;
     }
+    public TimeLineViewParameter(String titleFieldName, String groupIDFieldName, String startDateFieldName) {
+        this.titleFieldName = titleFieldName;
+        this.groupIDFieldName = groupIDFieldName;
+        this.startDateFieldName = startDateFieldName;
+    }
 
     public String getTitleFieldName() {
         return titleFieldName;
