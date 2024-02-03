@@ -3,6 +3,9 @@ package com.aat.application.data.repository;
 import com.aat.application.core.data.entity.ZJTEntity;
 import com.aat.application.data.entity.ZJTItem;
 import jakarta.persistence.*;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Root;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Repository;
 
@@ -20,6 +23,15 @@ public class BaseEntityRepository {
 
     public BaseEntityRepository() {
 
+    }
+
+    public List<ZJTEntity> findAll(Class<?> entity) {
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<ZJTEntity> cq = cb.createQuery(ZJTEntity.class);
+        Root<ZJTEntity> root = (Root<ZJTEntity>) cq.from(entity);
+        cq.select(root);
+        TypedQuery<ZJTEntity> query = entityManager.createQuery(cq);
+        return query.getResultList();
     }
 
     @SuppressWarnings("unchecked")

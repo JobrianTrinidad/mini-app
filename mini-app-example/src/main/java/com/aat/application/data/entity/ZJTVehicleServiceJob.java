@@ -24,7 +24,6 @@ public class ZJTVehicleServiceJob implements ZJTEntity {
     protected int zjt_vehicleservicejob_id;
 
     @Column
-    @ContentDisplayedInSelect
     @DisplayName(value = "Comments")
     private String comments;
 
@@ -43,6 +42,7 @@ public class ZJTVehicleServiceJob implements ZJTEntity {
     private boolean isComplete;
 
     @ManyToOne
+    @ContentDisplayedInSelect
     @JoinColumn(name = "zjt_vehicle_id")
     @DisplayName(value = "Vehicle")
     private ZJTVehicle vehicle;

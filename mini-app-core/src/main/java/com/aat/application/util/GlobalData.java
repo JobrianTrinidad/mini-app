@@ -1,5 +1,6 @@
 package com.aat.application.util;
 
+import com.aat.application.core.data.entity.ZJTEntity;
 import com.vaadin.flow.component.Component;
 import jakarta.persistence.*;
 
@@ -22,12 +23,15 @@ public class GlobalData {
         return getPrimaryKeyField(clazz.getSuperclass());
     }
 
-    public static List<String> getFieldNamesWithAnnotation(Class<? extends Annotation> annotation, Class<?> entityClass) {
+    public static List<String> getFieldNamesWithAnnotation(Class<? extends Annotation> annotation, Class<?> entityClass, boolean root) {
         List<String> fieldNames = new ArrayList<>();
         for (Field field : entityClass.getDeclaredFields()) {
             field.setAccessible(true);
             if (field.isAnnotationPresent(annotation)) {
-                fieldNames.add(field.getName());
+                if (root && !(field.getType() == String.class))
+                    fieldNames.add(field.getName() + "." + getFieldNamesWithAnnotation(annotation, field.getType(), root).get(0));
+                else
+                    fieldNames.add(field.getName());
             }
         }
         return fieldNames;

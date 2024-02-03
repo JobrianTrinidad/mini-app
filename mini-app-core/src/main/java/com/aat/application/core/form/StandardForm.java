@@ -382,7 +382,7 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService> ex
                         throw new RuntimeException(e);
                     }
 
-                    String annotatedField = GlobalData.getFieldNamesWithAnnotation(ContentDisplayedInSelect.class, selectClass).get(0);
+                    String annotatedField = GlobalData.getFieldNamesWithAnnotation(ContentDisplayedInSelect.class, selectClass, true).get(0);
                     String pkField = GlobalData.getPrimaryKeyField(selectClass).getName();
                     StringBuilder query = new StringBuilder("SELECT p.").append(pkField);
                     query.append(", p.").append(annotatedField);
@@ -427,7 +427,17 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService> ex
 
             if (gridViewParameter.getWhereDefinition() != null && (int) gridViewParameter.getParameters()[0] != -1) {
                 String[] whereDefinition = gridViewParameter.getWhereDefinition().split("\\.");
-                query.append(" WHERE ").append("p.").append(whereDefinition[1]);
+                switch (gridViewParameter.getWhereDefinition().split("\\.").length) {
+                    case 1:
+                        query.append(" WHERE ").append("p.").append(whereDefinition[1]);
+                        break;
+                    case 2:
+                        query.append(" WHERE ").append("p.").append(gridViewParameter.getWhereDefinition());
+                        break;
+                    case 3:
+                        query.append(" WHERE ").append("p.").append(whereDefinition[1]).append(".").append(whereDefinition[2]);
+                        break;
+                }
                 //TODO -set parameter
                 query.append(" = ").append(gridViewParameter.getParameters()[0]);
             }

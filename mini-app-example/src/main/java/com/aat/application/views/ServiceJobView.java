@@ -52,7 +52,6 @@ public class ServiceJobView extends StandardFormView implements HasUrlParameter<
                 } else
                     entity = new ZJTVehicleServiceJob();
 
-//                form.onNewItem((GuiItem) ev.getItem());
                 form.onNewItem(entity, ((GuiItem) ev.getItem()).getId());
                 this.setMessageStatus("This is new added value " + ((GuiItem) ev.getItem()).getRecordData().get(1));
             });
