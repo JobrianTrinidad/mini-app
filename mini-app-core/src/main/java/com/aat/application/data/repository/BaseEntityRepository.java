@@ -53,6 +53,9 @@ public class BaseEntityRepository {
             }
             if (result[2] != null) {
                 startDate = (LocalDateTime) result[2];
+                DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy h:mm a", Locale.ENGLISH);
+                String formattedDate = startDate.format(inputFormatter);
+                startDate = LocalDateTime.parse(formattedDate, inputFormatter);
                 ZJTItem item = new ZJTItem(title, groupID, startDate);
                 items.add(item);
             }
@@ -75,7 +78,7 @@ public class BaseEntityRepository {
                 customQuery.setParameter("param1", Boolean.parseBoolean(params[2].toString()));
                 break;
             case "LocalDateTime":
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd h:mm a", Locale.ENGLISH);
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy h:mm a", Locale.ENGLISH);
                 customQuery.setParameter("param1", LocalDateTime.parse(params[2].toString(), formatter));
                 break;
             default:

@@ -26,6 +26,8 @@ import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.server.VaadinSession;
 
 import java.io.Serial;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -312,6 +314,9 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService> ex
                     .map(obj -> {
                         if (obj instanceof ZJTEntity) {
                             return String.valueOf(((ZJTEntity) obj).getId());
+                        } else if (obj instanceof LocalDateTime) {
+                            DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy h:mm a", Locale.ENGLISH);
+                            return ((LocalDateTime) obj).format(inputFormatter);
                         } else {
                             return Objects.toString(obj, "");
                         }
