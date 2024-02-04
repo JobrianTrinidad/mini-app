@@ -2,7 +2,7 @@ package com.aat.application.views;
 
 import com.aat.application.core.data.entity.ZJTEntity;
 import com.aat.application.core.form.TimeLineViewParameter;
-import com.aat.application.data.entity.*;
+import com.aat.application.data.entity.ZJTVehicleServiceSchedule;
 import com.aat.application.data.repository.BaseEntityRepository;
 import com.aat.application.data.service.TableInfoService;
 import com.vaadin.componentfactory.tuigrid.model.AATContextMenu;
@@ -11,14 +11,13 @@ import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.router.BeforeEvent;
 import com.vaadin.flow.router.HasUrlParameter;
-import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.VaadinSession;
 
 //@Route(value = "driver/:subcategory?/:filter?", layout = MainLayout.class)
-public class DriverView<T extends ZJTEntity> extends StandardFormView<ZJTEntity> implements HasUrlParameter<String> {
+public class DriverView<T extends ZJTEntity> extends StandardFormView implements HasUrlParameter<String> {
     private String name;
 
-    public DriverView(BaseEntityRepository<ZJTEntity> repository, TableInfoService tableInfoService) {
+    public DriverView(BaseEntityRepository repository, TableInfoService tableInfoService) {
         super(repository, tableInfoService);
         TimeLineViewParameter timeLineViewParameter =  new TimeLineViewParameter("timelineItemTitle", "vehicle", "planDate", null, null, "ZJTVehicleServiceSchedule");
         timeLineViewParameter.setWhereDefinition("vehicle.zjt_vehicle_id");

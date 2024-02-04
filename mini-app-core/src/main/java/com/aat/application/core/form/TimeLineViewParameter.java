@@ -1,7 +1,7 @@
 package com.aat.application.core.form;
 
 /**
- *  Class definition to create the mapping for the timeline
+ * Class definition to create the mapping for the timeline
  */
 public class TimeLineViewParameter {
 
@@ -52,10 +52,10 @@ public class TimeLineViewParameter {
     /**
      * In simple 1 table definition, it's the name of the table
      * but could be more complex if you use a join statement
-     *  e.g.
-     *      employee e
-     *      inner join personaldetails pd on e.empid = pd.empid
-     *      inner join department d on e.departmentid = d.departmentid
+     * e.g.
+     * employee e
+     * inner join personaldetails pd on e.empid = pd.empid
+     * inner join department d on e.departmentid = d.departmentid
      */
     private String fromDefinition = null;
 
@@ -64,14 +64,20 @@ public class TimeLineViewParameter {
      * e.g. d.orgid = ?
      */
     private String whereDefinition = null;
+    private String selectDefinition = null;
+
+    private Class<?> groupClass;
+    String groupName;
+    private Object[] parameters;
 
     /**
      * This is to test if the definition is valid or not
      * this assists the developer if the call is valid
+     *
      * @return
      */
-    public boolean isValid()
-    {
+
+    public boolean isValid() {
         boolean valid = titleFieldName != null;
         //TODO - add some logging or notification to developer for missing definition
 
@@ -86,10 +92,10 @@ public class TimeLineViewParameter {
 
     /**
      * This check if it requires filter parameter
+     *
      * @return
      */
-    public boolean isRequireParameter()
-    {
+    public boolean isRequireParameter() {
         return whereDefinition != null;
     }
 
@@ -101,6 +107,11 @@ public class TimeLineViewParameter {
         this.endDateFieldName = endDateFieldName;
         this.classNameFieldName = classNameFieldName;
         this.fromDefinition = fromDefinition;
+    }
+    public TimeLineViewParameter(String titleFieldName, String groupIDFieldName, String startDateFieldName) {
+        this.titleFieldName = titleFieldName;
+        this.groupIDFieldName = groupIDFieldName;
+        this.startDateFieldName = startDateFieldName;
     }
 
     public String getTitleFieldName() {
@@ -159,4 +170,35 @@ public class TimeLineViewParameter {
         this.whereDefinition = whereDefinition;
     }
 
+    public String getSelectDefinition() {
+        return selectDefinition;
+    }
+
+    public void setSelectDefinition(String selectDefinition) {
+        this.selectDefinition = selectDefinition;
+    }
+
+    public Class<?> getGroupClass() {
+        return groupClass;
+    }
+
+    public void setGroupClass(Class<?> groupClass) {
+        this.groupClass = groupClass;
+    }
+
+    public String getGroupName() {
+        return groupName;
+    }
+
+    public void setGroupName(String groupName) {
+        this.groupName = groupName;
+    }
+
+    public Object[] getParameters() {
+        return parameters;
+    }
+
+    public void setParameters(Object[] parameters) {
+        this.parameters = parameters;
+    }
 }

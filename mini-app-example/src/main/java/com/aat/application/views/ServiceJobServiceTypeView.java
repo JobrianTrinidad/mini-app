@@ -1,33 +1,28 @@
 package com.aat.application.views;
 
-import com.aat.application.core.form.CommonForm;
 import com.aat.application.core.form.GridViewParameter;
-import com.aat.application.data.entity.ZJTServiceTypeKit;
-import com.aat.application.data.entity.ZJTVehicleServiceType;
+import com.aat.application.data.entity.*;
 import com.aat.application.data.repository.BaseEntityRepository;
 import com.aat.application.data.service.TableInfoService;
+import com.vaadin.componentfactory.tuigrid.model.AATContextMenu;
 import com.vaadin.componentfactory.tuigrid.model.GuiItem;
-import com.vaadin.flow.component.AttachEvent;
-import com.vaadin.flow.router.BeforeEvent;
-import com.vaadin.flow.router.HasUrlParameter;
-import com.vaadin.flow.router.OptionalParameter;
-import com.vaadin.flow.router.Route;
+import com.vaadin.flow.router.*;
 
-@Route(value = "service-type-kit/:subcategory?/:filter?", layout = MainLayout.class)
-public class ServiceTypeKitView extends StandardFormView implements HasUrlParameter<String> {
+import java.util.Optional;
+
+@Route(value = "servicejob-servicetype/:subcategory?/:filter?", layout = MainLayout.class)
+public class ServiceJobServiceTypeView extends StandardFormView implements HasUrlParameter<String> {
 
     GridViewParameter gridViewParameter;
 
-    public ServiceTypeKitView(BaseEntityRepository repository, TableInfoService tableInfoService) {
+    public ServiceJobServiceTypeView(BaseEntityRepository repository, TableInfoService tableInfoService) {
         super(repository, tableInfoService);
-        gridViewParameter = new GridViewParameter(ZJTServiceTypeKit.class, "");
+        gridViewParameter = new GridViewParameter(ZJTVehicleServiceJobServiceType.class, "");
         super.setGridViewParameter(gridViewParameter);
     }
 
-    @Override
-    protected void onAttach(AttachEvent attachEvent) {
-        if (this.form != null && this.isbGrid()) {
-            CommonForm form = this.form;
+    private void processEvent(Optional<String> subcategory, Optional<Integer> urlParameter) {
+        if (this.isbGrid()) {
             onAddEvent(ev -> {
                 form.onNewItem((GuiItem) ev.getItem());
                 this.setMessageStatus("This is new added value " + ((GuiItem) ev.getItem()).getRecordData().get(1));
@@ -36,7 +31,6 @@ public class ServiceTypeKitView extends StandardFormView implements HasUrlParame
             onUpdateEvent(ev -> {
                 int count;
                 try {
-                    gridViewParameter.getHeaderTypeOptions().get(ev.getColName());
                     count = form.onUpdateItem(new Object[]{ev.getRow(), ev.getColName(), ev.getColValue()});
                 } catch (Exception e) {
                     throw new RuntimeException(e);
@@ -59,7 +53,25 @@ public class ServiceTypeKitView extends StandardFormView implements HasUrlParame
     }
 
     @Override
-    public void setParameter(BeforeEvent beforeEvent, @OptionalParameter String parameter) {
+    public void setParameter(BeforeEvent event, @OptionalParameter String parameter) {
+        if (parameter != null) {
+            if (event.getRouteParameters().get("subcategory").isPresent()) {
+            }
+        } else
+            addMenu(event.getRouteParameters().get("category"));
+    }
+
+    private void addMenu(Optional<String> category) {
+        AATContextMenu contextMenu = new AATContextMenu();
+        contextMenu.setOpenOnClick(true);
+        this.setContextMenu(contextMenu);
+    }
+
+    @Override
+    public void beforeEnter(BeforeEnterEvent event) {
+        super.beforeEnter(event);
+        processEvent(event.getRouteParameters().get("subcategory"),
+                event.getRouteParameters().getInteger("___url_parameter"));
     }
 
 }

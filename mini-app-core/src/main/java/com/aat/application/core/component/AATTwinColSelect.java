@@ -57,7 +57,7 @@ public class AATTwinColSelect extends Div {
         twinColSelect.setItems(items);
     }
 
-    private void initial(){
+    private void initial() {
         HorizontalLayout mainLayout = new HorizontalLayout();
         twinColSelect = new TwinColSelect<>();
         twinColSelect.addValueChangeListener(event -> addEventInItems(twinColSelect));
@@ -74,6 +74,7 @@ public class AATTwinColSelect extends Div {
         addClickListener(this::handleClickEvent);
         addDoubleClickListener(this::handleDbClickEvent);
     }
+
     public void select(Iterable<String> items) {
         if (items != null) {
             if (twinColSelect == null)
@@ -220,18 +221,15 @@ public class AATTwinColSelect extends Div {
                 Field itemField = getItemField(child);
                 itemField.setAccessible(true);
                 orderedItems.add((String) itemField.get(child));
-            } catch (IllegalAccessException e) {
+            } catch (IllegalAccessException | NoSuchFieldException e) {
                 // Log the exception
+                continue;
             }
         }
     }
 
-    private Field getItemField(Component component) {
-        try {
-            return component.getClass().getDeclaredField("item");
-        } catch (NoSuchFieldException e) {
-            throw new RuntimeException(e);
-        }
+    private Field getItemField(Component component) throws NoSuchFieldException {
+        return component.getClass().getDeclaredField("item");
     }
 
     private List<String> getOrderedTotalItems(List<String> newOrder) {

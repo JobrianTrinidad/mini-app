@@ -18,7 +18,7 @@ public class ZJTServiceTypeKit implements ZJTEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "id")
+    @Column(name = "zjt_servicetypekit_id")
     protected int zjt_servicetypekit_id;
 
     @Override
@@ -30,19 +30,10 @@ public class ZJTServiceTypeKit implements ZJTEntity {
         this.zjt_servicetypekit_id = zjt_servicetypekit_id;
     }
 
-
     @ManyToOne
     @JoinColumn(name = "zjt_servicekit_id")
     @DisplayName(value = "Service Kit")
     private ZJTServiceKit serviceKit;
-
-    public ZJTServiceKit getServiceKit() {
-        return serviceKit;
-    }
-
-    public void setServiceKit(ZJTServiceKit serviceKit) {
-        this.serviceKit = serviceKit;
-    }
 
     @ManyToOne
     @JoinColumn(name = "zjt_vehicleservicetype_id")
@@ -57,6 +48,13 @@ public class ZJTServiceTypeKit implements ZJTEntity {
         this.serviceType = serviceType;
     }
 
+    public ZJTServiceKit getServiceKit() {
+        return serviceKit;
+    }
+
+    public void setServiceKit(ZJTServiceKit serviceKit) {
+        this.serviceKit = serviceKit;
+    }
 
     @Column
     @DisplayName(value = "Qty")

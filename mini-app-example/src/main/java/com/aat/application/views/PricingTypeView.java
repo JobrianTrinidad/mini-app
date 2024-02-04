@@ -20,11 +20,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.Optional;
 
 @Route(value = "pricing-type/:subcategory?/:filter?", layout = MainLayout.class)
-public class PricingTypeView extends StandardFormView<ZJTEntity> implements HasUrlParameter<String> {
+public class PricingTypeView extends StandardFormView implements HasUrlParameter<String> {
     private String name;
 
     @Autowired
-    public PricingTypeView(BaseEntityRepository<ZJTEntity> repository, TableInfoService tableInfoService) {
+    public PricingTypeView(BaseEntityRepository repository, TableInfoService tableInfoService) {
         super(repository, tableInfoService);
         TimeLineViewParameter timeLineViewParameter = new TimeLineViewParameter("timelineItemTitle", "vehicle", "planDate", null, null, "ZJTVehicleServiceSchedule");
         timeLineViewParameter.setWhereDefinition("vehicle.zjt_vehicle_id");

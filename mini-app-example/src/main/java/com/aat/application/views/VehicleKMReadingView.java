@@ -9,12 +9,10 @@ import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.router.*;
 
 @Route(value = "vehiclekmreading/:subcategory?/:filter?", layout = MainLayout.class)
-public class VehicleKMReadingView extends StandardFormView<ZJTEntity> implements HasUrlParameter<String> {
+public class VehicleKMReadingView extends StandardFormView implements HasUrlParameter<String> {
 
-    public VehicleKMReadingView(BaseEntityRepository<ZJTEntity> repository, TableInfoService tableInfoService) {
+    public VehicleKMReadingView(BaseEntityRepository repository, TableInfoService tableInfoService) {
         super(repository, tableInfoService);
-
-
     }
 
 
@@ -37,8 +35,8 @@ public class VehicleKMReadingView extends StandardFormView<ZJTEntity> implements
         this.addCustomButton(button);
     }
 
-    private void importTele()
-    {
+    private void importTele() {
         this.setMessageStatus("Import tele successful!!!");
     }
+
 }

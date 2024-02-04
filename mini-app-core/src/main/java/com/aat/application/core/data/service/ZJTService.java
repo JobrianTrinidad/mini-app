@@ -1,18 +1,20 @@
 package com.aat.application.core.data.service;
 
+import com.aat.application.core.data.entity.ZJTEntity;
 import com.aat.application.data.entity.ZJTItem;
 
 import java.util.List;
 
-public interface ZJTService<T> {
-    List<T> findAll(String filter);
+public interface ZJTService {
     List<ZJTItem> findByQuery(String query);
 
-    <T> List<T> findRecordsByField(String fieldName, Object fieldValue);
+    List<Object[]> findEntityByQuery(String query);
 
-    void save(T record);
+    int updateEntityByQuery(String query, Object[] params);
 
-    void delete(T t);
+    int deleteEntityByQuery(String query);
 
-    <T> List<T> findRecordsByFieldId(String fieldName, int fieldId);
+    <T> T addNewEntity(Class<?> entityClass);
+
+    ZJTEntity addNewEntity(ZJTEntity entity);
 }

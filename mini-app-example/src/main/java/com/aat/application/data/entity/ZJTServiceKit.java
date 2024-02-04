@@ -1,5 +1,6 @@
 package com.aat.application.data.entity;
 
+import com.aat.application.annotations.BaseItems;
 import com.aat.application.annotations.ContentDisplayedInSelect;
 import com.aat.application.annotations.DisplayName;
 import com.aat.application.core.data.entity.ZJTEntity;
@@ -18,8 +19,8 @@ import java.util.List;
 public class ZJTServiceKit implements ZJTEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "id")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @Column(name = "zjt_servicekit_id")
     protected int zjt_servicekit_id;
 
     @Override
@@ -35,6 +36,10 @@ public class ZJTServiceKit implements ZJTEntity {
     @ContentDisplayedInSelect(value = "name")
     @DisplayName(value = "Name")
     private String name = "";
+
+    @OneToMany(mappedBy = "serviceKit", cascade = CascadeType.ALL)
+    @BaseItems
+    private List<ZJTServiceTypeKit> serviceTypeKits;
 
     public String getName() {
         return name;
