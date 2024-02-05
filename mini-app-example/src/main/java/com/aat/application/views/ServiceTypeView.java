@@ -82,25 +82,27 @@ public class ServiceTypeView extends StandardFormView implements HasUrlParameter
     public void setParameter(BeforeEvent event, @OptionalParameter String parameter) {
         if (parameter != null) {
             if (event.getRouteParameters().get("subcategory").isPresent()) {
-                if (event.getRouteParameters().get("subcategory").get().equals("service-type-kit")) {
-                    gridViewParameter.setEntityClass(ZJTServiceTypeKit.class);
-                    gridViewParameter.setGroupClass(ZJTVehicleServiceType.class);
-                    gridViewParameter.setWhereDefinition("serviceType.zjt_vehicleservicetype_id");
-                    TimeLineViewParameter timeLineViewParameter = new TimeLineViewParameter("serviceType.name", "serviceType", "planDate", null, null, "ZJTServiceTypeKit");
-                    timeLineViewParameter.setGroupClass(ZJTVehicleServiceType.class);
-                    timeLineViewParameter.setSelectDefinition("name");
-                    timeLineViewParameter.setWhereDefinition("serviceType.zjt_vehicleservicetype_id");
-                    super.setTimeLineViewParameter(timeLineViewParameter);
-                } else if (event.getRouteParameters().get("subcategory").get().equals("service-type-task")) {
-                    gridViewParameter.setEntityClass(ZJTServiceTypeTask.class);
-                    gridViewParameter.setGroupClass(ZJTVehicleServiceType.class);
-                    gridViewParameter.setWhereDefinition("serviceType.zjt_vehicleservicetype_id");
-                    TimeLineViewParameter timeLineViewParameter = new TimeLineViewParameter("serviceType.name", "serviceType", "planDate", null, null, "ZJTServiceTypeTask");
-                    timeLineViewParameter.setGroupClass(ZJTVehicleServiceType.class);
-                    timeLineViewParameter.setSelectDefinition("name");
-                    timeLineViewParameter.setWhereDefinition("serviceType.zjt_vehicleservicetype_id");
-                    super.setTimeLineViewParameter(timeLineViewParameter);
+                TimeLineViewParameter timeLineViewParameter = new TimeLineViewParameter("vehicleServiceJob.comments", "vehicleServiceJob", "planDate");
+                timeLineViewParameter.setGroupClass(ZJTVehicleServiceJob.class);
+                timeLineViewParameter.setSelectDefinition("comments");
+                timeLineViewParameter.setWhereDefinition("vehicleServiceJob.zjt_vehicleservicejob_id");
+
+                switch (event.getRouteParameters().get("subcategory").get()) {
+                    case "service-type-kit":
+                        gridViewParameter.setEntityClass(ZJTServiceTypeKit.class);
+                        timeLineViewParameter.setFromDefinition(ZJTServiceTypeKit.class.getSimpleName());
+                        break;
+                    case "service-type-task":
+                        gridViewParameter.setEntityClass(ZJTServiceTypeTask.class);
+                        timeLineViewParameter.setFromDefinition(ZJTServiceTypeTask.class.getSimpleName());
+                        break;
+                    default:
+                        break;
                 }
+                super.setTimeLineViewParameter(timeLineViewParameter);
+                gridViewParameter.setGroupClass(ZJTVehicleServiceType.class);
+                gridViewParameter.setFilterClass(ZJTVehicleServiceType.class);
+                gridViewParameter.setWhereDefinition("serviceType.zjt_vehicleservicetype_id");
             }
         } else
             addMenu(event.getRouteParameters().get("category"));
