@@ -25,4 +25,6 @@ public abstract class CommonForm extends VerticalLayout {
 
     abstract public void addCustomButton(Button button);
 
+    abstract public String getHamburgerText();
+    abstract public String getOriginViewText();
 }

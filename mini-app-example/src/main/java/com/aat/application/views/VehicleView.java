@@ -30,6 +30,7 @@ public class VehicleView extends StandardFormView implements HasUrlParameter<Str
         gridViewParameter = new GridViewParameter(ZJTVehicle.class, "");
         gridViewParameter.setSelectDefinition("fleetid");
         super.setGridViewParameter(gridViewParameter);
+
     }
 
     @Override

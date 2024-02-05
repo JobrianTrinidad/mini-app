@@ -1,5 +1,6 @@
 package com.aat.application.views;
 
+import com.aat.application.core.form.CommonForm;
 import com.aat.application.data.repository.BaseEntityRepository;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.html.Div;
@@ -12,17 +13,21 @@ import java.lang.reflect.InvocationTargetException;
 public abstract class CommonView extends VerticalLayout implements RouterLayout, BeforeEnterObserver, HasDynamicTitle {
 
     protected final BaseEntityRepository repository;
+    protected CoreMainLayout layout;
     protected Class<?> LayoutClass;
     protected int filterObjectId = -1;
+
 
     public CommonView(BaseEntityRepository repository) {
         this.repository = repository;
     }
 
-    protected void setForm(VerticalLayout form) {
+    protected void setForm(CommonForm form) {
         try {
-            CoreMainLayout layout = (CoreMainLayout) LayoutClass.getDeclaredConstructor().newInstance();
+            layout = (CoreMainLayout) LayoutClass.getDeclaredConstructor().newInstance();
             layout.setContent(form);
+            layout.setHamburgerTitle(form.getHamburgerText());
+            layout.setGoOriginText(form.getOriginViewText());
             Div outlet = new Div();
             outlet.setId("outlet");
             outlet.add(layout);

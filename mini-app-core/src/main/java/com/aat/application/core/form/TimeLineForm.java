@@ -124,7 +124,7 @@ public abstract class TimeLineForm<S extends ZJTService> extends CommonForm {
 
         List<Item> items;
         try {
-            items = getItems( false);
+            items = getItems(false);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -238,5 +238,16 @@ public abstract class TimeLineForm<S extends ZJTService> extends CommonForm {
             itemGroups.add(itemGroup);
         }
         return itemGroups;
+    }
+
+    @Override
+    public String getHamburgerText() {
+        return ">> ";
+    }
+
+    @Override
+    public String getOriginViewText() {
+//        return GlobalData.convertToStandard(this.gridViewParameter.groupName);
+        return "";
     }
 }

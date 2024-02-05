@@ -61,6 +61,7 @@ public class StandardFormView extends CommonView {
                 break;
             default:
                 bGrid = true;
+                gridViewParameter.setParameters(new Integer[]{filterObjectId});
                 if (gridViewParameter.getGroupClass() != null) {
                     gridViewParameter.setEntityClass(gridViewParameter.getGroupClass());
                 } else

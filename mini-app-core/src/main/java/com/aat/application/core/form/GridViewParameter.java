@@ -2,6 +2,7 @@ package com.aat.application.core.form;
 
 import com.aat.application.annotations.ContentDisplayedInSelect;
 import com.aat.application.annotations.DisplayName;
+import com.vaadin.flow.router.PageTitle;
 import jakarta.persistence.Id;
 
 import java.lang.reflect.Field;
@@ -26,6 +27,7 @@ public class GridViewParameter {
     Dictionary<String, Class<?>> headerTypeOptions = new Hashtable<>();
     String fieldDisplayedInSelect;
     String groupName;
+    String pageName;
     Object[] parameters;
 
     /**
@@ -86,7 +88,7 @@ public class GridViewParameter {
 
     public GridViewParameter(Class<?> entityClass, String classNameFieldName) {
         this.classNameFieldName = classNameFieldName;
-        this.entityClass = entityClass;
+        this.setEntityClass(entityClass);
         this.headers = configureHeader(entityClass);
         this.fromDefinition = entityClass.getSimpleName();
     }
@@ -147,6 +149,7 @@ public class GridViewParameter {
 
     public void setEntityClass(Class<?> entityClass) {
         this.entityClass = entityClass;
+        pageName = entityClass.getAnnotation(PageTitle.class).value();
         this.headers = configureHeader(entityClass);
         this.fromDefinition = entityClass.getSimpleName();
     }
@@ -260,5 +263,13 @@ public class GridViewParameter {
 
     public void setGroupName(String groupName) {
         this.groupName = groupName;
+    }
+
+    public String getPageName() {
+        return pageName;
+    }
+
+    public void setPageName(String pageName) {
+        this.pageName = pageName;
     }
 }
