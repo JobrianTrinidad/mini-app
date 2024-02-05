@@ -35,6 +35,7 @@ public class ZJTVehicleServiceJob implements ZJTEntity {
     @DisplayName(value = "KM Reading")
     private int kmReading;
     @Column
+    @ContentDisplayedInSelect(sequence = 20)
     @DisplayName(value = "Performed Date")
     private LocalDateTime performedDate;
     @Column
@@ -42,7 +43,7 @@ public class ZJTVehicleServiceJob implements ZJTEntity {
     private boolean isComplete;
 
     @ManyToOne
-    @ContentDisplayedInSelect
+    @ContentDisplayedInSelect(sequence = 10)
     @JoinColumn(name = "zjt_vehicle_id")
     @DisplayName(value = "Vehicle")
     private ZJTVehicle vehicle;

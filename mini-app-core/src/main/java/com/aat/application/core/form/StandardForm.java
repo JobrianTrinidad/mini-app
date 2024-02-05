@@ -387,17 +387,26 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService> ex
                         throw new RuntimeException(e);
                     }
 
-                    String annotatedField = GlobalData.getFieldNamesWithAnnotation(ContentDisplayedInSelect.class, selectClass, true).get(0);
+                    List<String> annotatedFields = GlobalData.getFieldNamesWithAnnotation(ContentDisplayedInSelect.class, selectClass, true);
                     String pkField = GlobalData.getPrimaryKeyField(selectClass).getName();
                     StringBuilder query = new StringBuilder("SELECT p.").append(pkField);
-                    query.append(", p.").append(annotatedField);
+                    for (String annotatedField : annotatedFields)
+                        query.append(", p.").append(annotatedField);
 
                     query.append(" FROM ").append(selectClass.getSimpleName()).append(" as p");
 
                     List<RelationOption> options = new ArrayList<>();
                     for (Object[] data :
                             service.findEntityByQuery(query.toString())) {
-                        RelationOption option = new RelationOption((String) data[1], String.valueOf(data[0]));
+                        StringBuilder content = new StringBuilder();
+                        for (int i = 1; i <= annotatedFields.size(); i++) {
+                            if (data[i] instanceof LocalDateTime) {
+                                DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy h:mm a", Locale.ENGLISH);
+                                content.append(" - ").append(((LocalDateTime) data[i]).format(inputFormatter));
+                            } else
+                                content.append(data[i]);
+                        }
+                        RelationOption option = new RelationOption(content.toString(), String.valueOf(data[0]));
                         options.add(option);
                     }
                     column.setRelationOptions(options);
