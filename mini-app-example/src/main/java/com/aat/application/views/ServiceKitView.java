@@ -1,6 +1,5 @@
 package com.aat.application.views;
 
-import com.aat.application.core.data.entity.ZJTEntity;
 import com.aat.application.core.form.CommonForm;
 import com.aat.application.core.form.GridViewParameter;
 import com.aat.application.core.form.TimeLineViewParameter;
@@ -61,7 +60,6 @@ public class ServiceKitView extends StandardFormView implements HasUrlParameter<
             });
         }
     }
-
 
     @Override
     public void setParameter(BeforeEvent event, @OptionalParameter String parameter) {
