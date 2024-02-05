@@ -14,6 +14,7 @@ public class GridViewParameter {
 
     private Class<?> entityClass;
     private Class<?> groupClass;
+    private Class<?> filterClass;
     /**
      * Headers of the column to display in the content
      * e.g  e.employeeName
@@ -243,6 +244,14 @@ public class GridViewParameter {
                 break;
             }
         }
+    }
+
+    public Class<?> getFilterClass() {
+        return filterClass;
+    }
+
+    public void setFilterClass(Class<?> filterClass) {
+        this.filterClass = filterClass;
     }
 
     public String getGroupName() {
