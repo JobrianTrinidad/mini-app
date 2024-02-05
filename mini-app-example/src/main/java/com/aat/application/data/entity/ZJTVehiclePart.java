@@ -1,5 +1,6 @@
 package com.aat.application.data.entity;
 
+import com.aat.application.annotations.ContentDisplayedInSelect;
 import com.aat.application.annotations.DisplayName;
 import com.aat.application.core.data.entity.ZJTEntity;
 import com.vaadin.flow.router.PageTitle;
@@ -21,6 +22,7 @@ public class ZJTVehiclePart implements ZJTEntity {
     private int zjt_vehiclepart_id;
 
     @Column
+    @ContentDisplayedInSelect(value = "name")
     @DisplayName (value = "Name")
     private String name = "";
 
