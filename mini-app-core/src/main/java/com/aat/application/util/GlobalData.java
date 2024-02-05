@@ -1,13 +1,14 @@
 package com.aat.application.util;
 
+import com.aat.application.annotations.ContentDisplayedInSelect;
 import com.aat.application.core.data.entity.ZJTEntity;
 import com.vaadin.flow.component.Component;
 import jakarta.persistence.*;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.List;
+import java.time.LocalDateTime;
+import java.util.*;
 
 public class GlobalData {
     public static Field getPrimaryKeyField(Class<?> clazz) {
@@ -25,14 +26,30 @@ public class GlobalData {
 
     public static List<String> getFieldNamesWithAnnotation(Class<? extends Annotation> annotation, Class<?> entityClass, boolean root) {
         List<String> fieldNames = new ArrayList<>();
+        Map<String, Integer> fieldNameSequenceMap = new HashMap<>();
         for (Field field : entityClass.getDeclaredFields()) {
             field.setAccessible(true);
             if (field.isAnnotationPresent(annotation)) {
-                if (root && !(field.getType() == String.class))
-                    fieldNames.add(field.getName() + "." + getFieldNamesWithAnnotation(annotation, field.getType(), root).get(0));
-                else
-                    fieldNames.add(field.getName());
+
+                if (root) {
+                    if (field.getType() == String.class
+                            || field.getType() == LocalDateTime.class
+                            || field.getType() == Integer.class) {
+                        fieldNames.add(field.getName());
+                    } else {
+                        fieldNames.add(field.getName() + "." + getFieldNamesWithAnnotation(annotation, field.getType(), root).get(0));
+                    }
+                    if (annotation.getSimpleName().equals("ContentDisplayedInSelect")) {
+                        ContentDisplayedInSelect contentAnnotation = field.getAnnotation(ContentDisplayedInSelect.class);
+                        if (contentAnnotation != null) {
+                            fieldNameSequenceMap.put(fieldNames.get(fieldNames.size() - 1), contentAnnotation.sequence());
+                        }
+                    }
+                }
             }
+        }
+        if (annotation.getSimpleName().equals("ContentDisplayedInSelect")) {
+            fieldNames.sort(Comparator.comparingInt(fieldNameSequenceMap::get));
         }
         return fieldNames;
     }

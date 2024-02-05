@@ -150,8 +150,10 @@ public class VehicleServiceScheduleView extends StandardFormView implements HasU
                 gridViewParameter.setGroupName("VehicelServiceSchedule");
 
             }
-        } else
+        } else {
             addMenu(event.getRouteParameters().get("category"));
+            gridViewParameter.setParameters(null);
+        }
     }
 
     private void addMenu(Optional<String> category) {
