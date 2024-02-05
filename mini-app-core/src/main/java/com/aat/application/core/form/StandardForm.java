@@ -501,7 +501,7 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService> ex
         if (filteredValue.isEmpty()) {
             return "";
         }
-        return ">> " + filteredValue;
+        return ">> " + gridViewParameter.getPageName() + filteredValue;
     }
 
     @Override
