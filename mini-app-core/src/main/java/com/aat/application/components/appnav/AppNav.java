@@ -6,14 +6,16 @@ import com.vaadin.flow.component.HasStyle;
 import com.vaadin.flow.component.Tag;
 import com.vaadin.flow.component.dependency.JsModule;
 import com.vaadin.flow.component.dependency.NpmPackage;
+import com.vaadin.flow.component.shared.Tooltip;
 import com.vaadin.flow.dom.Element;
 
+import java.util.Objects;
 import java.util.Optional;
 
 /**
  * A navigation menu with support for hierarchical and flat menus.
  * <p>
- * Items can be added using {@link #addItem(AppNavItem)} and hierarchy can be
+ * Items can be added using  and hierarchy can be
  * created by adding {@link AppNavItem} instances to other {@link AppNavItem}
  * instances.
  */

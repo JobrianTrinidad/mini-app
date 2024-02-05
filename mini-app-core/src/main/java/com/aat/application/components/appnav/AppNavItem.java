@@ -3,6 +3,7 @@ package com.aat.application.components.appnav;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.Tag;
 import com.vaadin.flow.component.dependency.JsModule;
+import com.vaadin.flow.component.shared.Tooltip;
 import com.vaadin.flow.dom.Element;
 import com.vaadin.flow.internal.StateTree;
 import com.vaadin.flow.router.*;
@@ -69,6 +70,9 @@ public class AppNavItem extends Component {
         setLabel(label);
         routePath = path;
         setIcon(icon);
+        Tooltip tooltip = Tooltip.forComponent(this)
+                .withText(label)
+                .withPosition(Tooltip.TooltipPosition.TOP_START);
     }
 
     /**

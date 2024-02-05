@@ -1,6 +1,8 @@
 package com.aat.application.views;
 
 import com.aat.application.data.entity.*;
+import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.shared.Tooltip;
 import org.vaadin.lineawesome.LineAwesomeIcon;
 
 import com.aat.application.components.appnav.AppNav;

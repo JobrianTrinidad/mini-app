@@ -5,6 +5,7 @@ import com.aat.application.components.appnav.AppNav;
 import com.aat.application.core.event.EventBus;
 import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.UI;
+import com.vaadin.flow.component.Unit;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
 import com.vaadin.flow.component.button.Button;
@@ -63,23 +64,20 @@ public class CoreMainLayout extends AppLayout implements RouterLayout, BeforeEnt
             EventBus.getInstance().post("DrawerToggleClicked");
         });
 
-
         viewTitle = new H2();
         viewTitle.addClassNames(LumoUtility.FontSize.LARGE, LumoUtility.Margin.NONE);
-
-        content = new Div();
-        content.setId("content");
-        addToNavbar(true, layout, viewTitle);
-
-        setContent(content);
+        addToNavbar(false, layout, viewTitle);
     }
 
     private void addDrawerContent(String strAppName) {
         H1 appName = new H1(strAppName);
         appName.addClassNames(LumoUtility.FontSize.LARGE, LumoUtility.Margin.NONE);
         Header header = new Header(appName);
-        Scroller scroller = new Scroller(createNavigation());
-        addToDrawer(header, scroller, createFooter());
+        addToDrawer(header, createNavigation(), createFooter());
+        content = new Div();
+        content.setId("content");
+        content.setWidth("100%");
+        setContent(content);
     }
 
     protected AppNav createNavigation() {
