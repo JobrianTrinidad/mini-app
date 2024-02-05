@@ -122,23 +122,29 @@ public class VehicleServiceScheduleView extends StandardFormView implements HasU
                 timeLineViewParameter.setSelectDefinition("vehicle.fleetid");
                 timeLineViewParameter.setWhereDefinition("vehicle.zjt_vehicle_id");
 
+                gridViewParameter.setFilterClass(ZJTVehicleServiceJob.class);
                 gridViewParameter.setWhereDefinition("vehicleServiceJob.vehicle.zjt_vehicle_id");
                 switch (event.getRouteParameters().get("subcategory").get()) {
                     case "service-job":
                         gridViewParameter.setEntityClass(ZJTVehicleServiceJob.class);
+                        gridViewParameter.setFilterClass(ZJTVehicle.class);
                         gridViewParameter.setWhereDefinition("vehicle.zjt_vehicle_id");
+                        gridViewParameter.setGroupName("vehicle");
                         timeLineViewParameter.setFromDefinition(ZJTVehicleServiceJob.class.getSimpleName());
                         break;
                     case "servicetype":
                         gridViewParameter.setEntityClass(ZJTVehicleServiceJobServiceType.class);
+                        gridViewParameter.setGroupName("vehicleServiceJob");
                         timeLineViewParameter.setFromDefinition(ZJTVehicleServiceJobServiceType.class.getSimpleName());
                         break;
                     case "task":
                         gridViewParameter.setEntityClass(ZJTVehicleServiceJobTask.class);
+                        gridViewParameter.setGroupName("vehicleServiceJob");
                         timeLineViewParameter.setFromDefinition(ZJTVehicleServiceJobTask.class.getSimpleName());
                         break;
                     case "servicekit":
                         gridViewParameter.setEntityClass(ZJTVehicleServiceJobServiceKit.class);
+                        gridViewParameter.setGroupName("vehicleServiceJob");
                         timeLineViewParameter.setFromDefinition(ZJTVehicleServiceJobServiceKit.class.getSimpleName());
                         break;
                     default:
@@ -147,7 +153,6 @@ public class VehicleServiceScheduleView extends StandardFormView implements HasU
                 super.setTimeLineViewParameter(timeLineViewParameter);
                 gridViewParameter.setSelectDefinition("vehicle.fleetid");
                 gridViewParameter.setGroupClass(ZJTVehicleServiceSchedule.class);
-                gridViewParameter.setGroupName("VehicelServiceSchedule");
 
             }
         } else {
@@ -172,7 +177,6 @@ public class VehicleServiceScheduleView extends StandardFormView implements HasU
         });
         MenuItem serviceJobTimeline = serviceJob.addSubItem("Timeline");
         serviceJobTimeline.addContextMenuClickListener(e -> UI.getCurrent().navigate("service-schedule/service-job/timeline/" + e.getRow().get(0).getRowKey()));
-
 
         MenuItem serviceType = contextMenu.addItem("Service Job Type");
         MenuItem serviceTypeGrid = serviceType.addSubItem("Grid");

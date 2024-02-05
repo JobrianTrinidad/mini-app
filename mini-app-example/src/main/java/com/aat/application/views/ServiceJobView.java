@@ -23,7 +23,7 @@ public class ServiceJobView extends StandardFormView implements HasUrlParameter<
     public ServiceJobView(BaseEntityRepository repository, TableInfoService tableInfoService) {
         super(repository, tableInfoService);
         gridViewParameter = new GridViewParameter(ZJTVehicleServiceJob.class, "");
-        gridViewParameter.setSelectDefinition("comments");
+        gridViewParameter.setSelectDefinition("vehicle.fleetid");
         super.setGridViewParameter(gridViewParameter);
     }
 
@@ -107,6 +107,7 @@ public class ServiceJobView extends StandardFormView implements HasUrlParameter<
                 }
                 super.setTimeLineViewParameter(timeLineViewParameter);
                 gridViewParameter.setGroupClass(ZJTVehicleServiceJob.class);
+                gridViewParameter.setFilterClass(ZJTVehicleServiceJob.class);
                 gridViewParameter.setWhereDefinition("vehicleServiceJob.zjt_vehicleservicejob_id");
             }
         } else

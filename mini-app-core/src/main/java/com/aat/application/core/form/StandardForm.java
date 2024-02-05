@@ -56,7 +56,7 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService> ex
     private final TextField lblMessage = new TextField();
     private final Button lblRowCount = new Button();
     private AATContextMenu contextMenu;
-    private String filteredValue = "";
+    private List<String> filteredValue = new ArrayList<>();
 
     public StandardForm(GridViewParameter gridViewParameter,
                         S service, TableInfoService tableInfoService) {
@@ -96,8 +96,8 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService> ex
 
     protected void onAttach(AttachEvent attachEvent) {
         super.onAttach(attachEvent);
-
-        grid.setFilter(gridViewParameter.groupName, filteredValue);
+        if (gridViewParameter.groupName != null)
+            grid.setFilter(gridViewParameter.groupName, "Select");
         grid.setRowCountOnElement("rowcount");
     }
 
@@ -435,19 +435,28 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService> ex
                 throw new Exception("Parameters are required, but not set");
             }
 
-            StringBuilder query = new StringBuilder("SELECT p.").append(gridViewParameter.getSelectDefinition());
+//            StringBuilder query = new StringBuilder("SELECT p.").append(gridViewParameter.getSelectDefinition());
+//
+//            query.append(" FROM ").append(gridViewParameter.getGroupClass().getSimpleName()).append(" as p");
+//
 
-            query.append(" FROM ").append(gridViewParameter.getGroupClass().getSimpleName()).append(" as p");
+            List<String> annotatedFields = GlobalData.getFieldNamesWithAnnotation(ContentDisplayedInSelect.class, gridViewParameter.getFilterClass(), true);
+            String pkField = GlobalData.getPrimaryKeyField(gridViewParameter.getFilterClass()).getName();
+            StringBuilder query = new StringBuilder("SELECT p.").append(pkField);
+            for (String annotatedField : annotatedFields)
+                query.append(", p.").append(annotatedField);
+
+            query.append(" FROM ").append(gridViewParameter.getFilterClass().getSimpleName()).append(" as p");
 
             if (gridViewParameter.getWhereDefinition() != null && (int) gridViewParameter.getParameters()[0] != -1) {
                 String[] whereDefinition = gridViewParameter.getWhereDefinition().split("\\.");
                 switch (gridViewParameter.getWhereDefinition().split("\\.").length) {
-                    case 1:
+                    case 2:
                         query.append(" WHERE ").append("p.").append(whereDefinition[1]);
                         break;
-                    case 2:
-                        query.append(" WHERE ").append("p.").append(gridViewParameter.getWhereDefinition());
-                        break;
+//                    case 2:
+//                        query.append(" WHERE ").append("p.").append(gridViewParameter.getWhereDefinition());
+//                        break;
                     case 3:
                         query.append(" WHERE ").append("p.").append(whereDefinition[1]).append(".").append(whereDefinition[2]);
                         break;
@@ -456,7 +465,19 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService> ex
                 query.append(" = ").append(gridViewParameter.getParameters()[0]);
             }
 
-            filteredValue = String.valueOf(service.findEntityByQuery(query.toString()).get(0));
+            for (Object[] data :
+                    service.findEntityByQuery(query.toString())) {
+                StringBuilder content = new StringBuilder();
+                for (int i = 1; i <= annotatedFields.size(); i++) {
+                    if (data[i] instanceof LocalDateTime) {
+                        DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy h:mm a", Locale.ENGLISH);
+                        content.append(" - ").append(((LocalDateTime) data[i]).format(inputFormatter));
+                    } else
+                        content.append(data[i]);
+
+                }
+                filteredValue.add(content.toString());
+            }
         }
 
         Span sp = new Span(">> " + filteredValue);
@@ -468,6 +489,7 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService> ex
             this.gridViewParameter.setParameters(new Integer[]{-1});
             String previousView = (String) VaadinSession.getCurrent().getAttribute("previousView");
             if (previousView != null) {
+                gridViewParameter.groupName = null;
                 UI.getCurrent().navigate(previousView);
             }
         });
