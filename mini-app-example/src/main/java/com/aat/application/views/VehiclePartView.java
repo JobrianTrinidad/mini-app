@@ -1,14 +1,11 @@
 package com.aat.application.views;
 
 import com.aat.application.core.data.entity.ZJTEntity;
-import com.aat.application.core.form.CommonForm;
 import com.aat.application.core.form.GridViewParameter;
-import com.aat.application.core.form.TimeLineViewParameter;
 import com.aat.application.data.entity.*;
 import com.aat.application.data.repository.BaseEntityRepository;
 import com.aat.application.data.service.TableInfoService;
 import com.vaadin.componentfactory.tuigrid.model.GuiItem;
-import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.router.*;
 
 import java.util.Optional;
