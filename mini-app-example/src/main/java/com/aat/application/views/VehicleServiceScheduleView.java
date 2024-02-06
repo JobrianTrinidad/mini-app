@@ -73,38 +73,13 @@ public class VehicleServiceScheduleView extends StandardFormView implements HasU
                 (ZJTVehicleServiceSchedule) repository
                         .findEntityById(ZJTVehicleServiceSchedule.class, this.nSelectedEntityId);
         if (serviceSchedule != null) {
-            ZJTVehicleServiceJob entityServiceJob = new ZJTVehicleServiceJob();
-            entityServiceJob.setPerformedDate(LocalDateTime.now());
-            entityServiceJob.setComplete(false);
-            entityServiceJob.setVehicle(serviceSchedule.getVehicle());
-            entityServiceJob = (ZJTVehicleServiceJob)repository.addNewEntity(entityServiceJob);
-
-            ZJTVehicleServiceJobServiceType entityServiceType = new ZJTVehicleServiceJobServiceType();
-            entityServiceType
-                    .setVehicleServiceJob
-                            (entityServiceJob);
-            entityServiceType.setServiceType(serviceSchedule.getServiceType());
-            form.onNewItem(entityServiceType, -1);
-
-            List<ZJTEntity> serviceTypeTaskList = repository.findAll(ZJTServiceTypeTask.class);
-            for (ZJTEntity serviceTypeTask : serviceTypeTaskList) {
-                ZJTVehicleServiceJobTask entityServiceJobTask = new ZJTVehicleServiceJobTask();
-                entityServiceJobTask.setVehicleServiceJob(entityServiceJob);
-                entityServiceJobTask.setServiceTask((ZJTServiceTypeTask) serviceTypeTask);
-                entityServiceJobTask.setSeqNo(((ZJTServiceTypeTask) serviceTypeTask).getSeqNo());
-                entityServiceJobTask.setComplete(false);
-                form.onNewItem(entityServiceJobTask, -1);
+            String msg = serviceSchedule.createWorkshopJob(repository);
+            if (msg != null) {
+                this.setMessageStatus("Workshop job created.");
+            } else {
+                this.setMessageStatus(msg);
             }
 
-            List<ZJTEntity> serviceJobServiceKitList = repository.findAll(ZJTServiceKit.class);
-            for (ZJTEntity serviceJobServiceKit : serviceJobServiceKitList) {
-                ZJTVehicleServiceJobServiceKit vehicleServiceJobServiceKit = new ZJTVehicleServiceJobServiceKit();
-                vehicleServiceJobServiceKit.setVehicleServiceJob(entityServiceJob);
-                vehicleServiceJobServiceKit.setServiceKit((ZJTServiceKit) serviceJobServiceKit);
-                form.onNewItem(vehicleServiceJobServiceKit, -1);
-            }
-
-            this.setMessageStatus("Workshop job created.");
         } else
             this.setMessageStatus("Please select row.");
     }

@@ -2,10 +2,12 @@ package com.aat.application.data.entity;
 
 import com.aat.application.annotations.DisplayName;
 import com.aat.application.core.data.entity.ZJTEntity;
+import com.aat.application.data.repository.BaseEntityRepository;
 import com.vaadin.flow.router.PageTitle;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 
 /**
@@ -94,5 +96,47 @@ public class ZJTVehicleServiceSchedule implements ZJTEntity {
 
     public void setDueDate(LocalDateTime dueDate) {
         this.dueDate = dueDate;
+    }
+
+
+    public String createWorkshopJob(BaseEntityRepository repository)
+    {
+
+        //TODO - check if an open workshop job exists
+        //return "Existing workshop job exists. Please complete it before creating new one."
+
+        ZJTVehicleServiceJob entityServiceJob = new ZJTVehicleServiceJob();
+        entityServiceJob.setPerformedDate(LocalDateTime.now());
+        entityServiceJob.setComplete(false);
+        entityServiceJob.setVehicle(this.getVehicle());
+        entityServiceJob = (ZJTVehicleServiceJob)repository.addNewEntity(entityServiceJob);
+
+
+        ZJTVehicleServiceJobServiceType entityServiceType = new ZJTVehicleServiceJobServiceType();
+        entityServiceType
+                .setVehicleServiceJob
+                        (entityServiceJob);
+        entityServiceType.setServiceType(this.getServiceType());
+        repository.addNewEntity(entityServiceType);
+
+        List<ZJTEntity> serviceTypeTaskList = repository.findAll(ZJTServiceTypeTask.class);
+        for (ZJTEntity serviceTypeTask : serviceTypeTaskList) {
+            ZJTVehicleServiceJobTask entityServiceJobTask = new ZJTVehicleServiceJobTask();
+            entityServiceJobTask.setVehicleServiceJob(entityServiceJob);
+            entityServiceJobTask.setServiceTask((ZJTServiceTypeTask) serviceTypeTask);
+            entityServiceJobTask.setSeqNo(((ZJTServiceTypeTask) serviceTypeTask).getSeqNo());
+            entityServiceJobTask.setComplete(false);
+            repository.addNewEntity(entityServiceJobTask);
+        }
+
+        List<ZJTEntity> serviceJobServiceKitList = repository.findAll(ZJTServiceKit.class);
+        for (ZJTEntity serviceJobServiceKit : serviceJobServiceKitList) {
+            ZJTVehicleServiceJobServiceKit vehicleServiceJobServiceKit = new ZJTVehicleServiceJobServiceKit();
+            vehicleServiceJobServiceKit.setVehicleServiceJob(entityServiceJob);
+            vehicleServiceJobServiceKit.setServiceKit((ZJTServiceKit) serviceJobServiceKit);
+            repository.addNewEntity(vehicleServiceJobServiceKit);
+        }
+        return null;
+
     }
 }
