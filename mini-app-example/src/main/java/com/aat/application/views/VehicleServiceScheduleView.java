@@ -87,7 +87,7 @@ public class VehicleServiceScheduleView extends StandardFormView implements HasU
             String query = "SELECT p FROM " + ZJTVehicleServiceJob.class.getSimpleName()
                     + " AS p  WHERE not p.isComplete AND exists ("
                     + " SELECT q FROM " + ZJTVehicleServiceType.class.getSimpleName() + " AS q "
-                    + "WHERE zjt_vehicleservicetype_id = : param0)";
+                    + "WHERE q.zjt_vehicleservicetype_id = : param0)";
             Object[] params = new Object[]{serviceType.getId()};
 
             List<Object[]> vehicleServiceJobs =
