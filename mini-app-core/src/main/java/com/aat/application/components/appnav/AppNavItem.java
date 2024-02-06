@@ -150,9 +150,9 @@ public class AppNavItem extends Component {
      */
     public AppNavItem setLabel(String label) {
         getLabelElement().setText(label);
-        tooltip = Tooltip.forComponent(this)
-                .withText(label)
-                .withPosition(Tooltip.TooltipPosition.TOP_START);
+//        tooltip = Tooltip.forComponent(this)
+//                .withText(label)
+//                .withPosition(Tooltip.TooltipPosition.TOP_START);
         return this;
     }
 

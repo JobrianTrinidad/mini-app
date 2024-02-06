@@ -9,7 +9,6 @@ import com.vaadin.flow.component.dependency.NpmPackage;
 import com.vaadin.flow.component.shared.Tooltip;
 import com.vaadin.flow.dom.Element;
 
-import java.util.Objects;
 import java.util.Optional;
 
 /**
