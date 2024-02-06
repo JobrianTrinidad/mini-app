@@ -76,18 +76,6 @@ public class BaseEntityRepository {
         return customQuery.getResultList();
     }
 
-    public List<ZJTEntity> findEntityById(String entityName, String fieldName, int id) {
-        String query = "SELECT p FROM " +
-                entityName +
-                " AS p " +
-                "WHERE p." +
-                fieldName +
-                " = :param1";
-        Query customQuery = entityManager.createQuery(query);
-        customQuery.setParameter("param1", id);
-        return customQuery.getResultList();
-    }
-
     @Transactional
     public int updateEntityByQuery(String query, Object[] params) {
         Query customQuery = entityManager.createQuery(query);
