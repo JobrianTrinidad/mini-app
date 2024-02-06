@@ -77,7 +77,7 @@ public class VehicleServiceScheduleView extends StandardFormView implements HasU
             entityServiceJob.setPerformedDate(LocalDateTime.now());
             entityServiceJob.setComplete(false);
             entityServiceJob.setVehicle(serviceSchedule.getVehicle());
-            entityServiceJob = (ZJTVehicleServiceJob) form.onNewItem(entityServiceJob, -1);
+            entityServiceJob = (ZJTVehicleServiceJob)repository.addNewEntity(entityServiceJob);
 
             ZJTVehicleServiceJobServiceType entityServiceType = new ZJTVehicleServiceJobServiceType();
             entityServiceType

@@ -21,10 +21,10 @@ public class ZJTPricingType implements ZJTEntity {
     @Column(name = "zjt_pricingtype_id")
     private int zjt_pricingtype_id;
 
-    @Column
+    @Column(name = "name")
     @ContentDisplayedInSelect
     @DisplayName(value = "Name")
-    private String name = "";
+    private String names = "";
 
     @Column
     @DisplayName(value = "Description")
@@ -44,11 +44,11 @@ public class ZJTPricingType implements ZJTEntity {
     }
 
     public String getName() {
-        return name;
+        return names;
     }
 
     public void setName(String name) {
-        this.name = name;
+        this.names = name;
     }
 
     public String getDescription() {

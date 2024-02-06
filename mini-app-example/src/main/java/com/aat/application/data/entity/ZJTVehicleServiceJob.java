@@ -38,6 +38,12 @@ public class ZJTVehicleServiceJob implements ZJTEntity {
     @ContentDisplayedInSelect(sequence = 20)
     @DisplayName(value = "Performed Date")
     private LocalDateTime performedDate;
+    @Column(name = "plandate")
+    @DisplayName(value = "Plane Date")
+    private LocalDateTime planDate;
+    @Column(name = "duedate")
+    @DisplayName(value = "Due Date")
+    private LocalDateTime dueDate;
     @Column
     @DisplayName(value = "IsComplete")
     private boolean isComplete;
@@ -100,6 +106,22 @@ public class ZJTVehicleServiceJob implements ZJTEntity {
 
     public void setKmReading(int kmReading) {
         this.kmReading = kmReading;
+    }
+
+    public LocalDateTime getPlanDate() {
+        return planDate;
+    }
+
+    public void setPlanDate(LocalDateTime planDate) {
+        this.planDate = planDate;
+    }
+
+    public LocalDateTime getDueDate() {
+        return dueDate;
+    }
+
+    public void setDueDate(LocalDateTime dueDate) {
+        this.dueDate = dueDate;
     }
 
     public LocalDateTime getPerformedDate() {

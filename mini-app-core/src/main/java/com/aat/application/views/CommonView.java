@@ -37,7 +37,7 @@ public abstract class CommonView extends VerticalLayout implements RouterLayout,
             UI.getCurrent().add(outlet);
             UI.getCurrent().add(selection);
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
-                 NoSuchMethodException e) {
+                 NoSuchMethodException | IllegalArgumentException e) {
             throw new RuntimeException(e);
         }
     }
