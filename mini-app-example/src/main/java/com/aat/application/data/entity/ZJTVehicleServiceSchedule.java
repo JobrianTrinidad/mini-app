@@ -37,10 +37,10 @@ public class ZJTVehicleServiceSchedule implements ZJTEntity {
     @DisplayName(value = "Last Service (KM)")
     private Integer lastServiceKM;
 
-    @Column
+    @Column (name = "plandate")
     @DisplayName(value = "Plan Date")
     private LocalDateTime planDate;
-    @Column
+    @Column (name = "duedate")
     @DisplayName(value = "Due Date")
     private LocalDateTime dueDate;
 
