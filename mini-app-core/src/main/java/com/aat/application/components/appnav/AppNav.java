@@ -98,9 +98,6 @@ public class AppNav extends Component implements HasSize, HasStyle {
      * @return this instance for chaining
      */
     public AppNav setLabel(String label) {
-//        Tooltip tooltip = Tooltip.forComponent(this)
-//                .withText("This is a tooltip")
-//                .withPosition(Tooltip.TooltipPosition.TOP_START);
         getLabelElement().setText(label);
         return this;
     }
