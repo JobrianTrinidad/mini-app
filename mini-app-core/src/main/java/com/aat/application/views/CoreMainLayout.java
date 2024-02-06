@@ -5,17 +5,20 @@ import com.aat.application.components.appnav.AppNav;
 import com.aat.application.core.event.EventBus;
 import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.UI;
-import com.vaadin.flow.component.accordion.AccordionPanel;
+import com.vaadin.flow.component.Unit;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
+import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.html.*;
+import com.vaadin.flow.component.orderedlayout.FlexComponent;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.Scroller;
-import com.vaadin.flow.dom.Element;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.RouterLayout;
+import com.vaadin.flow.server.VaadinSession;
 import com.vaadin.flow.theme.lumo.LumoUtility;
 
 /**
@@ -29,6 +32,8 @@ public class CoreMainLayout extends AppLayout implements RouterLayout, BeforeEnt
     private H2 viewTitle;
     protected AppNav nav;
     private Div content;
+    Span filterText = new Span("");
+    Button btnGoOriginView = new Button("");
 
     public CoreMainLayout() {
         setPrimarySection(Section.DRAWER);
@@ -41,29 +46,39 @@ public class CoreMainLayout extends AppLayout implements RouterLayout, BeforeEnt
 
     private void addHeaderContent() {
         DrawerToggle toggle = new DrawerToggle();
-        toggle.addClickListener(event -> {
+        toggle.getElement().setAttribute("aria-label", "Menu toggle");
+
+        btnGoOriginView.addClickListener(e -> {
+            if (!btnGoOriginView.getText().isEmpty()) {
+                String previousView = (String) VaadinSession.getCurrent().getAttribute("previousView");
+                if (previousView != null) {
+                    UI.getCurrent().navigate(previousView);
+                }
+            }
+        });
+        btnGoOriginView.getElement().setAttribute("theme", "tertiary-inline");
+        btnGoOriginView.addClassName("link-button");
+
+        HorizontalLayout layout = new HorizontalLayout(toggle, btnGoOriginView, filterText);
+        layout.setAlignItems(FlexComponent.Alignment.CENTER);
+        layout.addClickListener(event -> {
             EventBus.getInstance().post("DrawerToggleClicked");
         });
-        toggle.getElement().setAttribute("aria-label", "Menu toggle");
 
         viewTitle = new H2();
         viewTitle.addClassNames(LumoUtility.FontSize.LARGE, LumoUtility.Margin.NONE);
-
-        content = new Div();
-        content.setId("content");
-        addToNavbar(true, toggle, viewTitle);
-
-        setContent(content);
+        addToNavbar(false, layout, viewTitle);
     }
 
     private void addDrawerContent(String strAppName) {
         H1 appName = new H1(strAppName);
         appName.addClassNames(LumoUtility.FontSize.LARGE, LumoUtility.Margin.NONE);
         Header header = new Header(appName);
-
-        Scroller scroller = new Scroller(createNavigation());
-
-        addToDrawer(header, scroller, createFooter());
+        addToDrawer(header, createNavigation(), createFooter());
+        content = new Div();
+        content.setId("content");
+        content.setWidth("100%");
+        setContent(content);
     }
 
     protected AppNav createNavigation() {
@@ -79,6 +94,14 @@ public class CoreMainLayout extends AppLayout implements RouterLayout, BeforeEnt
         return new Footer();
     }
 
+    protected void setHamburgerTitle(String title) {
+        filterText.setText(title);
+    }
+
+    protected void setGoOriginText(String originText) {
+        btnGoOriginView.setText(originText);
+    }
+
     @Override
     protected void afterNavigation() {
         super.afterNavigation();
@@ -86,8 +109,11 @@ public class CoreMainLayout extends AppLayout implements RouterLayout, BeforeEnt
     }
 
     private String getCurrentPageTitle() {
-        PageTitle title = getContent().getClass().getAnnotation(PageTitle.class);
-        return title == null ? "" : title.value();
+        if (getContent() != null) {
+            PageTitle title = getContent().getClass().getAnnotation(PageTitle.class);
+            return title == null ? "" : title.value();
+        } else
+            return "";
     }
 
     @Override

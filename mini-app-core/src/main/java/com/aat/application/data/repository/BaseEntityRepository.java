@@ -78,7 +78,7 @@ public class BaseEntityRepository {
                 customQuery.setParameter("param1", Boolean.parseBoolean(params[2].toString()));
                 break;
             case "LocalDateTime":
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy h:mm a", Locale.ENGLISH);
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd h:mm a", Locale.ENGLISH);
                 customQuery.setParameter("param1", LocalDateTime.parse(params[2].toString(), formatter));
                 break;
             default:

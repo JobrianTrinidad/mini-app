@@ -1,8 +1,10 @@
 package com.aat.application.components.appnav;
 
 import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.DetachEvent;
 import com.vaadin.flow.component.Tag;
 import com.vaadin.flow.component.dependency.JsModule;
+import com.vaadin.flow.component.shared.Tooltip;
 import com.vaadin.flow.dom.Element;
 import com.vaadin.flow.internal.StateTree;
 import com.vaadin.flow.router.*;
@@ -22,6 +24,7 @@ public class AppNavItem extends Component {
 
     private Map<String, String> parameters;
     private String routePath;
+    private Tooltip tooltip;
 
     /**
      * Creates a menu item which does not link to any view but only shows the given
@@ -69,6 +72,7 @@ public class AppNavItem extends Component {
         setLabel(label);
         routePath = path;
         setIcon(icon);
+
     }
 
     /**
@@ -146,6 +150,9 @@ public class AppNavItem extends Component {
      */
     public AppNavItem setLabel(String label) {
         getLabelElement().setText(label);
+        tooltip = Tooltip.forComponent(this)
+                .withText(label)
+                .withPosition(Tooltip.TooltipPosition.TOP_START);
         return this;
     }
 
@@ -267,5 +274,9 @@ public class AppNavItem extends Component {
         parameters.put(parameterName, parameterValue);
         setPath(routePath);
         return this;
+    }
+
+    @Override
+    protected void onDetach(DetachEvent detachEvent) {
     }
 }

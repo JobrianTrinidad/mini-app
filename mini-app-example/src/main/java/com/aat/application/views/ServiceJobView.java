@@ -86,7 +86,7 @@ public class ServiceJobView extends StandardFormView implements HasUrlParameter<
             if (event.getRouteParameters().get("subcategory").isPresent()) {
                 TimeLineViewParameter timeLineViewParameter = new TimeLineViewParameter("vehicleServiceJob.comments", "vehicleServiceJob", "planDate");
                 timeLineViewParameter.setGroupClass(ZJTVehicleServiceJob.class);
-                timeLineViewParameter.setSelectDefinition("comments");
+                timeLineViewParameter.setSelectDefinition("vehicle.fleetid");
                 timeLineViewParameter.setWhereDefinition("vehicleServiceJob.zjt_vehicleservicejob_id");
 
                 switch (event.getRouteParameters().get("subcategory").get()) {
@@ -105,10 +105,10 @@ public class ServiceJobView extends StandardFormView implements HasUrlParameter<
                     default:
                         break;
                 }
-                super.setTimeLineViewParameter(timeLineViewParameter);
                 gridViewParameter.setGroupClass(ZJTVehicleServiceJob.class);
                 gridViewParameter.setFilterClass(ZJTVehicleServiceJob.class);
                 gridViewParameter.setWhereDefinition("vehicleServiceJob.zjt_vehicleservicejob_id");
+                super.setTimeLineViewParameter(timeLineViewParameter);
             }
         } else
             addMenu(event.getRouteParameters().get("category"));

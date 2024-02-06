@@ -96,7 +96,8 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService> ex
 
     protected void onAttach(AttachEvent attachEvent) {
         super.onAttach(attachEvent);
-        if (gridViewParameter.groupName != null)
+        if (gridViewParameter.getParameters() != null &&
+                (int) gridViewParameter.getParameters()[0] != -1)
             grid.setFilter(gridViewParameter.groupName, "Select");
         grid.setRowCountOnElement("rowcount");
     }
@@ -427,7 +428,8 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService> ex
         btnSave.addClickListener(e -> saveAll());
 //        toolbar.add(btnReload, btnSave);
 
-        if (this.gridViewParameter.getParameters() != null) {
+        if (this.gridViewParameter.getParameters() != null &&
+                (int) this.gridViewParameter.getParameters()[0] != -1) {
             if (!gridViewParameter.isValid()) {
                 throw new Exception("TuiGrid Definition is not valid.");
             }
@@ -480,31 +482,6 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService> ex
             }
         }
 
-        Span sp = new Span(">> " + filteredValue);
-        Button btnGoOriginView = new Button(GlobalData.convertToStandard(this.gridViewParameter.groupName));
-        HorizontalLayout routeLayout = new HorizontalLayout(btnGoOriginView, sp);
-        routeLayout.setAlignItems(FlexComponent.Alignment.CENTER);
-
-        btnGoOriginView.addClickListener(e -> {
-            this.gridViewParameter.setParameters(new Integer[]{-1});
-            String previousView = (String) VaadinSession.getCurrent().getAttribute("previousView");
-            if (previousView != null) {
-                gridViewParameter.groupName = null;
-                UI.getCurrent().navigate(previousView);
-            }
-        });
-        btnGoOriginView.getElement().setAttribute("theme", "tertiary-inline");
-        btnGoOriginView.addClassName("link-button");
-
-        // Set visibility based on isVehicle
-        boolean bFilter = false;
-        if (this.gridViewParameter.getParameters() != null &&
-                (int) this.gridViewParameter.getParameters()[0] != -1
-        )
-            bFilter = (int) this.gridViewParameter.getParameters()[0] != -1;
-        filterText.setVisible(!bFilter);
-        routeLayout.setVisible(bFilter);
-
         columns = new Button("Columns");
         columns.addClickListener(e -> {
             selectedItems = twinColSelect.getSelectedItems();
@@ -515,8 +492,23 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService> ex
         autoWidthSave.addValueChangeListener(e -> bSavedWidth = e.getValue());
         HorizontalLayout columnToolbar = new HorizontalLayout(autoWidthSave, columns);
         columnToolbar.setAlignItems(FlexComponent.Alignment.CENTER);
-        toolbar.add(filterText, routeLayout, btnReload, btnSave, columnToolbar);
+        toolbar.add(filterText, btnReload, btnSave, columnToolbar);
         toolbar.addClassName("aat-toolbar");
+    }
+
+    @Override
+    public String getHamburgerText() {
+        if (filteredValue.isEmpty()) {
+            return "";
+        }
+        return ">> " + gridViewParameter.getPageName() + filteredValue;
+    }
+
+    @Override
+    public String getOriginViewText() {
+        if (filteredValue.isEmpty())
+            return "";
+        return GlobalData.convertToStandard(this.gridViewParameter.groupName);
     }
 
     public void setMessageStatus(String msg) {

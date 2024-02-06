@@ -52,7 +52,7 @@ public class PricingTypeView extends StandardFormView implements HasUrlParameter
                             break;
                     }
                 } else
-                    entity = new ZJTVehicleServiceJob();
+                    entity = new ZJTPricingType();
 
                 form.onNewItem(entity, ((GuiItem) ev.getItem()).getId());
                 this.setMessageStatus("This is new added value " + ((GuiItem) ev.getItem()).getRecordData().get(1));
