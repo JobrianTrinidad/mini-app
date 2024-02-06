@@ -2,6 +2,7 @@ package com.aat.application.views;
 
 import com.aat.application.core.form.CommonForm;
 import com.aat.application.data.repository.BaseEntityRepository;
+import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -33,11 +34,13 @@ public abstract class CommonView extends VerticalLayout implements RouterLayout,
             outlet.add(layout);
             Div selection = new Div();
             selection.setId("selection");
+            UI.getCurrent().getChildren().forEach(Component::removeFromParent);
             UI.getCurrent().removeAll();
             UI.getCurrent().add(outlet);
             UI.getCurrent().add(selection);
-        } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
-                 NoSuchMethodException | IllegalArgumentException e) {
+        } catch (InstantiationException | IllegalAccessException |
+                 InvocationTargetException | NoSuchMethodException |
+                 IllegalArgumentException e) {
             throw new RuntimeException(e);
         }
     }
