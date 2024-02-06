@@ -69,15 +69,40 @@ public class VehicleServiceScheduleView extends StandardFormView implements HasU
     }
 
     private void createWorkshopJob() {
+
+        //TODO - check if an open workshop job exists
+        //return "Existing workshop job exists. Please complete it before creating new one."
+
         ZJTVehicleServiceSchedule serviceSchedule =
                 (ZJTVehicleServiceSchedule) repository
                         .findEntityById(ZJTVehicleServiceSchedule.class, this.nSelectedEntityId);
         if (serviceSchedule != null) {
+
+
+            ZJTVehicleServiceType serviceType = serviceSchedule.getServiceType();
+
+//            String query = "SELECT p FROM " + ZJTVehicleServiceJob.class.getSimpleName()
+//                    + " AS p " + "WHERE p.vehicle.zjt_vehicle_id"
+//                    + " = :param0 AND p.isComplete = : param1";
+            String query = "SELECT p FROM " + ZJTVehicleServiceJob.class.getSimpleName()
+                    + " AS p  WHERE not p.isComplete AND exists ("
+                    + " SELECT q FROM " + ZJTVehicleServiceType.class.getSimpleName() + " AS q "
+                    + "WHERE zjt_vehicleservicetype_id = : param0)";
+            Object[] params = new Object[]{serviceType.getId()};
+
+            List<Object[]> vehicleServiceJobs =
+                    repository.findEntityByQuery(query, params);
+
+            if (!vehicleServiceJobs.isEmpty()) {
+                this.setMessageStatus(" Existing workshop job exists. Please complete it before creating new one.");
+                return;
+            }
+
             ZJTVehicleServiceJob entityServiceJob = new ZJTVehicleServiceJob();
             entityServiceJob.setPerformedDate(LocalDateTime.now());
             entityServiceJob.setComplete(false);
             entityServiceJob.setVehicle(serviceSchedule.getVehicle());
-            entityServiceJob = (ZJTVehicleServiceJob)repository.addNewEntity(entityServiceJob);
+            entityServiceJob = (ZJTVehicleServiceJob) repository.addNewEntity(entityServiceJob);
 
             ZJTVehicleServiceJobServiceType entityServiceType = new ZJTVehicleServiceJobServiceType();
             entityServiceType
