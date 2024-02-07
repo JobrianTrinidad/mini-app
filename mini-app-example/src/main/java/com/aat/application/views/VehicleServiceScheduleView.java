@@ -74,7 +74,7 @@ public class VehicleServiceScheduleView extends StandardFormView implements HasU
                         .findEntityById(ZJTVehicleServiceSchedule.class, this.nSelectedEntityId);
         if (serviceSchedule != null) {
             String msg = serviceSchedule.createWorkshopJob(repository);
-            if (msg != null) {
+            if (msg == null) {
                 this.setMessageStatus("Workshop job created.");
             } else {
                 this.setMessageStatus(msg);
