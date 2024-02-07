@@ -30,6 +30,7 @@ public class VehicleServiceScheduleView extends StandardFormView implements HasU
     public VehicleServiceScheduleView(BaseEntityRepository repository, TableInfoService tableInfoService) {
         super(repository, tableInfoService);
         gridViewParameter = new GridViewParameter(ZJTVehicleServiceSchedule.class, "");
+        gridViewParameter.setDateFilterOn("planDate");
         super.setGridViewParameter(gridViewParameter);
     }
 
@@ -102,6 +103,7 @@ public class VehicleServiceScheduleView extends StandardFormView implements HasU
             entityServiceJob.setPerformedDate(LocalDateTime.now());
             entityServiceJob.setComplete(false);
             entityServiceJob.setVehicle(serviceSchedule.getVehicle());
+            entityServiceJob.setServiceType(serviceSchedule.getServiceType());
             entityServiceJob = (ZJTVehicleServiceJob) repository.addNewEntity(entityServiceJob);
 
             ZJTVehicleServiceJobServiceType entityServiceType = new ZJTVehicleServiceJobServiceType();
