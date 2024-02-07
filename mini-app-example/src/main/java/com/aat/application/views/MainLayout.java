@@ -32,8 +32,6 @@ public class MainLayout extends CoreMainLayout {
                 .withParameter("layout", this.getClass().getName()));
         parent.addItem(new AppNavItem("Service Kit", "service-kit", LineAwesomeIcon.PRODUCT_HUNT.create())
                 .withParameter("layout", this.getClass().getName()));
-        parent.addItem(new AppNavItem("Pricing Type", "pricing-type", LineAwesomeIcon.PRODUCT_HUNT.create())
-                .withParameter("layout", this.getClass().getName()));
         parent.addItem(new AppNavItem("Service Type", "service-type", LineAwesomeIcon.PRODUCT_HUNT.create())
                 .withParameter("layout", this.getClass().getName()));
         parent.addItem(new AppNavItem("Service Type kit", "service-type-kit", LineAwesomeIcon.PRODUCT_HUNT.create())
@@ -56,8 +54,6 @@ public class MainLayout extends CoreMainLayout {
         parent.addItem(new AppNavItem("Vehicle", "vehicle", LineAwesomeIcon.PRODUCT_HUNT.create())
                 .withParameter("layout", this.getClass().getName()));
 
-        parent.addItem(new AppNavItem("Vehicle Part", "vehicle-parts", LineAwesomeIcon.PRODUCT_HUNT.create())
-                .withParameter("layout", this.getClass().getName()));
 
         parent = new AppNavItem("Transaction");
         parent.setIcon(LineAwesomeIcon.FOLDER.create());
