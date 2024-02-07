@@ -10,12 +10,10 @@ import com.aat.application.util.GlobalData;
 import com.vaadin.componentfactory.tuigrid.TuiGrid;
 import com.vaadin.componentfactory.tuigrid.model.*;
 import com.vaadin.flow.component.AttachEvent;
-import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
 import com.vaadin.flow.component.dialog.Dialog;
-import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
@@ -23,7 +21,6 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.value.ValueChangeMode;
-import com.vaadin.flow.server.VaadinSession;
 
 import java.io.Serial;
 import java.time.LocalDateTime;
@@ -43,7 +40,7 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService> ex
     protected TextField filterText = new TextField();
     private final Button btnReload = new Button("Reload");
     private final Button btnSave = new Button("Save");
-    protected Button columns;
+    protected Button btnColumnSettings;
     private Dialog twinColSelDialog;
     AATTwinColSelect twinColSelect;
     Set<String> selectedItems;
@@ -82,7 +79,14 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService> ex
         left.add(lblMessage);
         lblMessage.setWidthFull();
 
-        statusBar.add(btnInfo, left, lblRowCount);
+        btnColumnSettings = new Button();
+        btnColumnSettings.setIcon(new Icon(VaadinIcon.TWIN_COL_SELECT));
+        btnColumnSettings.addClickListener(e -> {
+            selectedItems = twinColSelect.getSelectedItems();
+            twinColSelDialog.open();
+        });
+
+        statusBar.add(btnInfo, left, lblRowCount, btnColumnSettings);
         statusBar.setHeight("40px");
         statusBar.setWidthFull();
 
@@ -482,15 +486,11 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService> ex
             }
         }
 
-        columns = new Button("Columns");
-        columns.addClickListener(e -> {
-            selectedItems = twinColSelect.getSelectedItems();
-            twinColSelDialog.open();
-        });
+
         Checkbox autoWidthSave = new Checkbox("Save Column Width");
         autoWidthSave.setValue(bSavedWidth);
         autoWidthSave.addValueChangeListener(e -> bSavedWidth = e.getValue());
-        HorizontalLayout columnToolbar = new HorizontalLayout(autoWidthSave, columns);
+        HorizontalLayout columnToolbar = new HorizontalLayout(autoWidthSave);
         columnToolbar.setAlignItems(FlexComponent.Alignment.CENTER);
         toolbar.add(filterText, btnReload, btnSave, columnToolbar);
         toolbar.addClassName("aat-toolbar");
