@@ -43,7 +43,7 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService> ex
     protected TextField filterText = new TextField();
     private final Button btnReload = new Button("Reload");
     private final Button btnSave = new Button("Save");
-    protected Button columns;
+    protected Button btnColumnSettings;
     private Dialog twinColSelDialog;
     AATTwinColSelect twinColSelect;
     Set<String> selectedItems;
@@ -85,6 +85,14 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService> ex
         lblMessage.setWidthFull();
 
         statusBar.add(btnInfo, left, lblRowCount);
+        btnColumnSettings = new Button();
+        btnColumnSettings.setIcon(new Icon(VaadinIcon.TWIN_COL_SELECT));
+        btnColumnSettings.addClickListener(e -> {
+            selectedItems = twinColSelect.getSelectedItems();
+            twinColSelDialog.open();
+        });
+
+        statusBar.add(btnInfo, left, lblRowCount, btnColumnSettings);
         statusBar.setHeight("40px");
         statusBar.setWidthFull();
 
@@ -269,6 +277,7 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService> ex
         grid.setAutoSave(true);
         grid.setHeaderHeight(50);
         grid.setSizeFull();
+        grid.onDisable();
 //        grid.setTableWidth(500);
 //        grid.setTableHeight(750);
     }
@@ -311,54 +320,12 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService> ex
             //TODO -set parameter
             query.append(" = ").append(parameters[0]);
             if (gridViewParameter.getDateFilterOn() != null) {
-                if (startDatePicker.getValue() != null
-                        && endDatePicker.getValue() != null) {
-                    if (!startDatePicker.getValue().equals(endDatePicker.getValue())) {
-                        query.append(" AND DATE(p.").append(gridViewParameter.getDateFilterOn())
-                                .append(") >= '").append(startDatePicker.getValue()).append("'");
-                        query.append(" AND DATE(p.").append(gridViewParameter.getDateFilterOn())
-                                .append(") <= '").append(endDatePicker.getValue()).append("'");
-                    } else {
-                        query.append(" AND DATE(p.").append(gridViewParameter.getDateFilterOn())
-                                .append(") >= '").append(startDatePicker.getValue()).append("'");
-                        query.append(" AND DATE(p.").append(gridViewParameter.getDateFilterOn())
-                                .append(") <= '").append(endDatePicker.getValue().plusDays(1)).append("'");
-                    }
-
-                } else {
-                    if (startDatePicker.getValue() != null)
-                        query.append(" AND DATE(p.").append(gridViewParameter.getDateFilterOn())
-                                .append(") >= '").append(startDatePicker.getValue()).append("'");
-                    if (endDatePicker.getValue() != null)
-                        query.append(" AND DATE(p.").append(gridViewParameter.getDateFilterOn())
-                                .append(") <= '").append(endDatePicker.getValue()).append("'");
-                }
+                addConditionWhenFilteringDate(query);
             }
         } else {
             if (gridViewParameter.getDateFilterOn() != null) {
                 query.append(" WHERE 1=1");
-                if (startDatePicker.getValue() != null
-                        && endDatePicker.getValue() != null) {
-                    if (!startDatePicker.getValue().equals(endDatePicker.getValue())) {
-                        query.append(" AND DATE(p.").append(gridViewParameter.getDateFilterOn())
-                                .append(") >= '").append(startDatePicker.getValue()).append("'");
-                        query.append(" AND DATE(p.").append(gridViewParameter.getDateFilterOn())
-                                .append(") <= '").append(endDatePicker.getValue()).append("'");
-                    } else {
-                        query.append(" AND DATE(p.").append(gridViewParameter.getDateFilterOn())
-                                .append(") >= '").append(startDatePicker.getValue()).append("'");
-                        query.append(" AND DATE(p.").append(gridViewParameter.getDateFilterOn())
-                                .append(") <= '").append(endDatePicker.getValue().plusDays(1)).append("'");
-                    }
-
-                } else {
-                    if (startDatePicker.getValue() != null)
-                        query.append(" AND DATE(p.").append(gridViewParameter.getDateFilterOn())
-                                .append(") >= '").append(startDatePicker.getValue()).append("'");
-                    if (endDatePicker.getValue() != null)
-                        query.append(" AND DATE(p.").append(gridViewParameter.getDateFilterOn())
-                                .append(") <= '").append(endDatePicker.getValue()).append("'");
-                }
+                addConditionWhenFilteringDate(query);
             }
         }
 
@@ -381,6 +348,31 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService> ex
         }
 
         return TableData;
+    }
+
+    private void addConditionWhenFilteringDate(StringBuilder query) {
+        if (startDatePicker.getValue() != null
+                && endDatePicker.getValue() != null) {
+            if (!startDatePicker.getValue().equals(endDatePicker.getValue())) {
+                query.append(" AND DATE(p.").append(gridViewParameter.getDateFilterOn())
+                        .append(") >= '").append(startDatePicker.getValue()).append("'");
+                query.append(" AND DATE(p.").append(gridViewParameter.getDateFilterOn())
+                        .append(") <= '").append(endDatePicker.getValue()).append("'");
+            } else {
+                query.append(" AND DATE(p.").append(gridViewParameter.getDateFilterOn())
+                        .append(") >= '").append(startDatePicker.getValue()).append("'");
+                query.append(" AND DATE(p.").append(gridViewParameter.getDateFilterOn())
+                        .append(") <= '").append(endDatePicker.getValue().plusDays(1)).append("'");
+            }
+
+        } else {
+            if (startDatePicker.getValue() != null)
+                query.append(" AND DATE(p.").append(gridViewParameter.getDateFilterOn())
+                        .append(") >= '").append(startDatePicker.getValue()).append("'");
+            if (endDatePicker.getValue() != null)
+                query.append(" AND DATE(p.").append(gridViewParameter.getDateFilterOn())
+                        .append(") <= '").append(endDatePicker.getValue()).append("'");
+        }
     }
 
     private List<com.vaadin.componentfactory.tuigrid.model.Column> getColumns() {
@@ -528,15 +520,11 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService> ex
             }
         }
 
-        columns = new Button("Columns");
-        columns.addClickListener(e -> {
-            selectedItems = twinColSelect.getSelectedItems();
-            twinColSelDialog.open();
-        });
         Checkbox autoWidthSave = new Checkbox("Save Column Width");
         autoWidthSave.setValue(bSavedWidth);
         autoWidthSave.addValueChangeListener(e -> bSavedWidth = e.getValue());
-        HorizontalLayout columnToolbar = new HorizontalLayout(autoWidthSave, columns);
+//        HorizontalLayout columnToolbar = new HorizontalLayout(autoWidthSave, columns);
+        HorizontalLayout columnToolbar = new HorizontalLayout(autoWidthSave);
         columnToolbar.setAlignItems(FlexComponent.Alignment.CENTER);
 
         if (gridViewParameter.getDateFilterOn() != null)
