@@ -178,8 +178,11 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService> ex
 
         Button btnOk = new Button("OK");
         Button btnCancel = new Button("Cancel");
-        HorizontalLayout btnPanel = new HorizontalLayout(btnCancel, btnOk);
-        btnPanel.setAlignItems(FlexComponent.Alignment.END);
+        Checkbox autoWidthSave = new Checkbox("Save Column Width");
+        autoWidthSave.setValue(bSavedWidth);
+        autoWidthSave.addValueChangeListener(e -> bSavedWidth = e.getValue());
+        HorizontalLayout btnPanel = new HorizontalLayout(btnCancel, btnOk, autoWidthSave);
+        btnPanel.setAlignItems(Alignment.CENTER);
 
         ZJTTableInfo finalTableInfo = tableInfo;
         btnOk.addClickListener(e -> {
@@ -520,17 +523,13 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService> ex
             }
         }
 
-        Checkbox autoWidthSave = new Checkbox("Save Column Width");
-        autoWidthSave.setValue(bSavedWidth);
-        autoWidthSave.addValueChangeListener(e -> bSavedWidth = e.getValue());
+
 //        HorizontalLayout columnToolbar = new HorizontalLayout(autoWidthSave, columns);
-        HorizontalLayout columnToolbar = new HorizontalLayout(autoWidthSave);
-        columnToolbar.setAlignItems(FlexComponent.Alignment.CENTER);
 
         if (gridViewParameter.getDateFilterOn() != null)
-            toolbar.add(filterText, btnReload, btnSave, columnToolbar, dateFilter);
+            toolbar.add(filterText, btnReload, btnSave, dateFilter);
         else
-            toolbar.add(filterText, btnReload, btnSave, columnToolbar);
+            toolbar.add(filterText, btnReload, btnSave);
         toolbar.setAlignItems(FlexComponent.Alignment.CENTER);
         toolbar.addClassName("aat-toolbar");
     }
