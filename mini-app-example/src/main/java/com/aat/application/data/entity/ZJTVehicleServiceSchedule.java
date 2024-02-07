@@ -47,6 +47,9 @@ public class ZJTVehicleServiceSchedule implements ZJTEntity {
     private LocalDateTime dueDate;
 
 
+    @Column
+    @DisplayName(value = "In Progress")
+    private boolean inProgress;
     @Transient
     private ZJTItem item;
 
@@ -98,6 +101,14 @@ public class ZJTVehicleServiceSchedule implements ZJTEntity {
         this.dueDate = dueDate;
     }
 
+
+    public boolean isInProgress() {
+        return inProgress;
+    }
+
+    public void setInProgress(boolean inProgress) {
+        this.inProgress = inProgress;
+    }
 
     public String createWorkshopJob(BaseEntityRepository repository)
     {

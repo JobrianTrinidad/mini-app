@@ -54,11 +54,6 @@ public class ZJTVehicleServiceJob implements ZJTEntity {
     @DisplayName(value = "Vehicle")
     private ZJTVehicle vehicle;
 
-    @ManyToOne
-    @JoinColumn(name = "zjt_vehicleservicetype_id")
-    @DisplayName(value = "Service Type")
-    private ZJTVehicleServiceType serviceType;
-
     @OneToMany(mappedBy = "vehicleServiceJob", cascade = CascadeType.ALL)
     @BaseItems
     private List<ZJTVehicleServiceJobServiceType> vehicleServiceJobServiceTypes;
@@ -148,11 +143,4 @@ public class ZJTVehicleServiceJob implements ZJTEntity {
         this.vehicle = vehicle;
     }
 
-    public ZJTVehicleServiceType getServiceType() {
-        return serviceType;
-    }
-
-    public void setServiceType(ZJTVehicleServiceType serviceType) {
-        this.serviceType = serviceType;
-    }
 }
