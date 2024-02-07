@@ -9,11 +9,7 @@ import com.aat.application.data.service.BaseEntityService;
 import com.aat.application.data.service.TableInfoService;
 import com.aat.application.form.GridCommonForm;
 import com.aat.application.form.TimeLineCommonForm;
-import com.vaadin.componentfactory.timeline.event.ItemSelectEvent;
-import com.vaadin.componentfactory.tuigrid.event.ItemAddEvent;
-import com.vaadin.componentfactory.tuigrid.event.ItemChangeEvent;
-import com.vaadin.componentfactory.tuigrid.event.ItemDeleteEvent;
-import com.vaadin.componentfactory.tuigrid.event.SelectionEvent;
+import com.vaadin.componentfactory.tuigrid.event.*;
 import com.vaadin.componentfactory.tuigrid.model.AATContextMenu;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.router.BeforeEnterEvent;
@@ -97,9 +93,9 @@ public class StandardFormView extends CommonView {
             form.addCustomButton(button);
         }
     }
-    protected void onSelectEvent(Consumer<SelectionEvent> eventHandler) {
+    protected void onItemMultiSelectEvent(Consumer<ItemMultiSelectEvent> eventHandler) {
         if (bGrid) {
-            form.grid.addItemSelectListener(eventHandler::accept);
+            form.grid.addItemMultiSelectListener(eventHandler::accept);
         }
     }
     protected void onAddEvent(Consumer<ItemAddEvent> eventHandler) {

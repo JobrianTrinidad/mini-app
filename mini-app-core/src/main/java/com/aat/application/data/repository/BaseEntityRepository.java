@@ -13,6 +13,7 @@ import java.lang.reflect.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
@@ -132,5 +133,15 @@ public class BaseEntityRepository {
 
     public ZJTEntity findEntityById(Class<?> entityClass, int nEntityID) {
         return (ZJTEntity) entityManager.find(entityClass, nEntityID);
+    }
+
+    public List<?> findEntitiesByIds(Class<?> entityClass, int[] nEntityIDs) {
+        Integer[] entityIDs = Arrays.stream(nEntityIDs).boxed().toArray(Integer[]::new);
+
+        String query = "SELECT e FROM " + entityClass.getSimpleName() + " e WHERE e.id IN :ids";
+        TypedQuery<ZJTEntity> typedQuery = entityManager.createQuery(query, ZJTEntity.class);
+        typedQuery.setParameter("ids", Arrays.asList(entityIDs));
+
+        return typedQuery.getResultList();
     }
 }
