@@ -93,11 +93,13 @@ public class StandardFormView extends CommonView {
             form.addCustomButton(button);
         }
     }
+
     protected void onItemMultiSelectEvent(Consumer<ItemMultiSelectEvent> eventHandler) {
         if (bGrid) {
             form.grid.addItemMultiSelectListener(eventHandler::accept);
         }
     }
+
     protected void onAddEvent(Consumer<ItemAddEvent> eventHandler) {
         if (bGrid) {
             form.grid.addItemAddListener(eventHandler::accept);

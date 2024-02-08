@@ -40,6 +40,7 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService> ex
     protected TableInfoService tableInfoService;
     String fieldDisplayedInSelect;
     private ZJTTableInfo tableInfo;
+    List<Integer> colWidthsResized;
     protected TextField filterText = new TextField();
     private final Button btnReload = new Button("Reload");
     private final Button btnSave = new Button("Save");
@@ -49,7 +50,7 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService> ex
     Set<String> selectedItems;
     protected S service;
     List<Item> items = new ArrayList<>();
-    private boolean bSavedWidth = false;
+    private boolean bSavedWidth = true;
     private final HorizontalLayout toolbar = new HorizontalLayout();
     private final HorizontalLayout statusBar = new HorizontalLayout();
     private final Button btnInfo = new Button();
@@ -178,8 +179,7 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService> ex
 
         Button btnOk = new Button("OK");
         Button btnCancel = new Button("Cancel");
-        Checkbox autoWidthSave = new Checkbox("Save Column Width");
-        autoWidthSave.setValue(bSavedWidth);
+        Checkbox autoWidthSave = new Checkbox("Save Column Width", true);
         autoWidthSave.addValueChangeListener(e -> bSavedWidth = e.getValue());
         HorizontalLayout btnPanel = new HorizontalLayout(btnCancel, btnOk, autoWidthSave);
         btnPanel.setAlignItems(Alignment.CENTER);
@@ -187,7 +187,7 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService> ex
         ZJTTableInfo finalTableInfo = tableInfo;
         btnOk.addClickListener(e -> {
             List<String> originHeaders = this.gridViewParameter.getHeaders();
-            List<Integer> columnWidths = getColumnWidths();
+//            List<Integer> columnWidths = getColumnWidths();
             List<Integer> allowedWidths = new ArrayList<>();
             List<String> tempTwinItems = new ArrayList<>(twinColSelect.getSelectedItems());
             List<String> tempHeaders = new ArrayList<>();
@@ -210,11 +210,12 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService> ex
 
             for (String allowedHeader : this.gridViewParameter.getHeaders()) {
                 if (originHeaders.contains(allowedHeader)) {
-                    allowedWidths.add(columnWidths.get(originHeaders.indexOf(allowedHeader)));
+                    allowedWidths.add(colWidthsResized.get(originHeaders.indexOf(allowedHeader)));
                 } else allowedWidths.add(0);
             }
 
-            finalTableInfo.setWidths(allowedWidths.toString());
+            if (bSavedWidth)
+                finalTableInfo.setWidths(allowedWidths.toString());
             finalTableInfo.setHeaders(this.gridViewParameter.getHeaders().toString());
             tableInfoService.save(finalTableInfo);
             tableInfo = finalTableInfo;
@@ -265,15 +266,12 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService> ex
         grid.addColumnResizeListener(event -> {
             int colWidth = event.getColWidth();
             String colName = event.getColName();
-            List<Integer> colWidths = getColumnWidths();
+            if (colWidthsResized == null)
+                colWidthsResized = getColumnWidths();
 
             for (String header : this.gridViewParameter.getHeaders()) {
                 if (header.equals(colName))
-                    colWidths.set(this.gridViewParameter.getHeaders().indexOf(header), colWidth);
-            }
-            tableInfo.setWidths(colWidths.toString());
-            if (bSavedWidth) {
-                tableInfoService.save(tableInfo);
+                    colWidthsResized.set(this.gridViewParameter.getHeaders().indexOf(header), colWidth);
             }
         });
 
@@ -584,6 +582,7 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService> ex
 
     public void onNewItem(GuiItem item) {
         try {
+            grid.onEnable();
             grid.setRowCountOnElement("rowcount");
             T entityData = service.addNewEntity(this.gridViewParameter.getEntityClass());
             grid.setIDToGridRow(item.getId(), entityData.getId());
