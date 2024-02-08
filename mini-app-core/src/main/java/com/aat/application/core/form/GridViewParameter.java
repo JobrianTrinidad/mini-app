@@ -30,6 +30,16 @@ public class GridViewParameter {
     String pageName;
     Object[] parameters;
 
+    private boolean isReadOnly = false;
+
+    public boolean isReadOnly() {
+        return isReadOnly;
+    }
+
+    public void setReadOnly(boolean readOnly) {
+        isReadOnly = readOnly;
+    }
+
     private String dateFilterOn;
 
     /**
@@ -93,6 +103,8 @@ public class GridViewParameter {
         this.setEntityClass(entityClass);
         this.headers = configureHeader(entityClass);
         this.fromDefinition = entityClass.getSimpleName();
+
+        isReadOnly = false;  //editable by default
     }
 
     private List<String> configureHeader(Class<?> entityClass) {
