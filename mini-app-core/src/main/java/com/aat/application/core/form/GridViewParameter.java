@@ -30,6 +30,8 @@ public class GridViewParameter {
     String pageName;
     Object[] parameters;
 
+    private String dateFilterOn;
+
     /**
      * Name of the column for the class
      * Classname is the CSS name to control the appearance of the item
@@ -192,6 +194,14 @@ public class GridViewParameter {
 
     public void setFieldDisplayedInSelect(String fieldDisplayedInSelect) {
         this.fieldDisplayedInSelect = fieldDisplayedInSelect;
+    }
+
+    public String getDateFilterOn() {
+        return dateFilterOn;
+    }
+
+    public void setDateFilterOn(String dateFilterOn) {
+        this.dateFilterOn = dateFilterOn;
     }
 
     public String getClassNameFieldName() {

@@ -223,7 +223,6 @@ public class AATTwinColSelect extends Div {
                 orderedItems.add((String) itemField.get(child));
             } catch (IllegalAccessException | NoSuchFieldException e) {
                 // Log the exception
-                continue;
             }
         }
     }

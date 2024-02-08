@@ -14,10 +14,8 @@ import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
-import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.router.*;
 
-import javax.swing.text.html.parser.Entity;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -25,18 +23,19 @@ import java.util.Optional;
 @Route(value = "service-schedule/:subcategory?/:filter?", layout = MainLayout.class)
 public class VehicleServiceScheduleView extends StandardFormView implements HasUrlParameter<String> {
     GridViewParameter gridViewParameter;
-    int nSelectedEntityId = -1;
+    int[] nSelectedEntityIds;
 
     public VehicleServiceScheduleView(BaseEntityRepository repository, TableInfoService tableInfoService) {
         super(repository, tableInfoService);
         gridViewParameter = new GridViewParameter(ZJTVehicleServiceSchedule.class, "");
+        gridViewParameter.setDateFilterOn("planDate");
         super.setGridViewParameter(gridViewParameter);
     }
 
     private void processEvent(Optional<String> subcategory, Optional<Integer> urlParameter) {
         if (this.isbGrid()) {
-            onSelectEvent(ev -> {
-                nSelectedEntityId = ev.getRow();
+            onItemMultiSelectEvent(ev -> {
+                nSelectedEntityIds = ev.getRows();
             });
 
             onAddEvent(ev -> {
@@ -69,17 +68,69 @@ public class VehicleServiceScheduleView extends StandardFormView implements HasU
     }
 
     private void createWorkshopJob() {
-        ZJTVehicleServiceSchedule serviceSchedule =
-                (ZJTVehicleServiceSchedule) repository
-                        .findEntityById(ZJTVehicleServiceSchedule.class, this.nSelectedEntityId);
-        if (serviceSchedule != null) {
-            String msg = serviceSchedule.createWorkshopJob(repository);
-            if (msg == null) {
-                this.setMessageStatus("Workshop job created.");
-            } else {
-                this.setMessageStatus(msg);
-            }
 
+        //TODO - check if an open workshop job exists
+        //return "Existing workshop job exists. Please complete it before creating new one."
+
+        List<ZJTVehicleServiceSchedule> serviceSchedules =
+                (List<ZJTVehicleServiceSchedule>) repository
+                        .findEntitiesByIds(ZJTVehicleServiceSchedule.class, this.nSelectedEntityIds);
+        if (serviceSchedules != null) {
+            for (ZJTVehicleServiceSchedule serviceSchedule : serviceSchedules) {
+
+                ZJTVehicleServiceType serviceType = serviceSchedule.getServiceType();
+
+//            String query = "SELECT p FROM " + ZJTVehicleServiceJob.class.getSimpleName()
+//                    + " AS p " + "WHERE p.vehicle.zjt_vehicle_id"
+//                    + " = :param0 AND p.isComplete = : param1";
+                String query = "SELECT p FROM " + ZJTVehicleServiceJob.class.getSimpleName()
+                        + " AS p  WHERE not p.isComplete AND exists ("
+                        + " SELECT q FROM " + ZJTVehicleServiceType.class.getSimpleName() + " AS q "
+                        + "WHERE q.zjt_vehicleservicetype_id = : param0)";
+                Object[] params = new Object[]{serviceType.getId()};
+
+                List<Object[]> vehicleServiceJobs =
+                        repository.findEntityByQuery(query, params);
+
+                if (!vehicleServiceJobs.isEmpty()) {
+                    this.setMessageStatus(" Existing workshop job exists. Please complete it before creating new one.");
+                    return;
+                }
+
+                ZJTVehicleServiceJob entityServiceJob = new ZJTVehicleServiceJob();
+                entityServiceJob.setPerformedDate(LocalDateTime.now());
+                entityServiceJob.setComplete(false);
+                entityServiceJob.setVehicle(serviceSchedule.getVehicle());
+                entityServiceJob.setServiceType(serviceSchedule.getServiceType());
+                entityServiceJob = (ZJTVehicleServiceJob) repository.addNewEntity(entityServiceJob);
+
+                ZJTVehicleServiceJobServiceType entityServiceType = new ZJTVehicleServiceJobServiceType();
+                entityServiceType
+                        .setVehicleServiceJob
+                                (entityServiceJob);
+                entityServiceType.setServiceType(serviceSchedule.getServiceType());
+                form.onNewItem(entityServiceType, -1);
+
+                List<ZJTEntity> serviceTypeTaskList = repository.findAll(ZJTServiceTypeTask.class);
+                for (ZJTEntity serviceTypeTask : serviceTypeTaskList) {
+                    ZJTVehicleServiceJobTask entityServiceJobTask = new ZJTVehicleServiceJobTask();
+                    entityServiceJobTask.setVehicleServiceJob(entityServiceJob);
+                    entityServiceJobTask.setServiceTask((ZJTServiceTypeTask) serviceTypeTask);
+                    entityServiceJobTask.setSeqNo(((ZJTServiceTypeTask) serviceTypeTask).getSeqNo());
+                    entityServiceJobTask.setComplete(false);
+                    form.onNewItem(entityServiceJobTask, -1);
+                }
+
+                List<ZJTEntity> serviceJobServiceKitList = repository.findAll(ZJTServiceKit.class);
+                for (ZJTEntity serviceJobServiceKit : serviceJobServiceKitList) {
+                    ZJTVehicleServiceJobServiceKit vehicleServiceJobServiceKit = new ZJTVehicleServiceJobServiceKit();
+                    vehicleServiceJobServiceKit.setVehicleServiceJob(entityServiceJob);
+                    vehicleServiceJobServiceKit.setServiceKit((ZJTServiceKit) serviceJobServiceKit);
+                    form.onNewItem(vehicleServiceJobServiceKit, -1);
+                }
+
+                this.setMessageStatus("Workshop job created.");
+            }
         } else
             this.setMessageStatus("Please select row.");
     }
