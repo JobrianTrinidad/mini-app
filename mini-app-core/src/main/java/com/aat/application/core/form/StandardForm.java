@@ -13,6 +13,7 @@ import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.checkbox.Checkbox;
+import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.dialog.Dialog;
@@ -28,8 +29,12 @@ import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.server.VaadinSession;
 
 import java.io.Serial;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.WeekFields;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -62,6 +67,7 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService> ex
     private final DatePicker startDatePicker = new DatePicker("");
     private final DatePicker endDatePicker = new DatePicker("");
 
+    private final ComboBox<EnumDateFilter> dateFilterComboBox = new ComboBox<>("");
     public StandardForm(GridViewParameter gridViewParameter,
                         S service, TableInfoService tableInfoService) {
         addClassName("demo-app-form");
@@ -486,7 +492,10 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService> ex
             }
         });
 
-        HorizontalLayout dateFilter = new HorizontalLayout(startDatePicker, new Span("To"), endDatePicker);
+        dateFilterComboBox.setItems(EnumDateFilter.values());
+        dateFilterComboBox.addValueChangeListener(e -> updateDateFilter());
+        dateFilterComboBox.setValue(EnumDateFilter.TM);
+        HorizontalLayout dateFilter = new HorizontalLayout(dateFilterComboBox, startDatePicker, new Span("To"), endDatePicker);
         dateFilter.setAlignItems(FlexComponent.Alignment.CENTER);
 
         if (this.gridViewParameter.getParameters() != null &&
@@ -530,9 +539,10 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService> ex
 //        HorizontalLayout columnToolbar = new HorizontalLayout(autoWidthSave, columns);
 
         if (gridViewParameter.getDateFilterOn() != null)
-            toolbar.add(filterText, btnReload, btnSave, dateFilter);
-        else
-            toolbar.add(filterText, btnReload, btnSave);
+//            toolbar.add(filterText, btnReload, btnSave, dateFilter);
+            toolbar.add(dateFilter);
+//        else
+//            toolbar.add(filterText, btnReload, btnSave);
         toolbar.setAlignItems(FlexComponent.Alignment.CENTER);
         toolbar.addClassName("aat-toolbar");
     }
@@ -701,5 +711,46 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService> ex
     @SuppressWarnings("unchecked")
     private static <T extends Enum<T>> Enum<T>[] getEnumConstants(Class<?> enumTypes) {
         return ((Class<T>) enumTypes).getEnumConstants();
+    }
+
+    private void updateDateFilter()
+    {
+        LocalDate dateFrom = null;
+        LocalDate dateTo = null;
+
+        switch (dateFilterComboBox.getValue()) {
+            case TD :
+                dateFrom = LocalDate.from(LocalDateTime.now().truncatedTo(ChronoUnit.DAYS));
+                dateTo = LocalDate.from(LocalDateTime.now().truncatedTo(ChronoUnit.DAYS));
+                break;
+
+            case TW:
+                dateFrom = LocalDate.now();
+                dateFrom = dateFrom.with(WeekFields.of(Locale.UK).getFirstDayOfWeek());
+                dateTo = dateFrom.plusWeeks(1).minusDays(1);
+                break;
+            case NW:
+                dateFrom = LocalDate.now().plusWeeks(1);
+                dateFrom = dateFrom.with(WeekFields.of(Locale.UK).getFirstDayOfWeek());
+                dateTo = dateFrom.plusWeeks(1).minusDays(1);
+                break;
+            case TM:
+                dateFrom = LocalDate.of(LocalDate.now().getYear(), LocalDate.now().getMonth(), 1);
+                dateTo = YearMonth.of(LocalDate.now().getYear(), LocalDate.now().getMonth()).atEndOfMonth();
+                break;
+            case NM:
+                dateFrom = LocalDate.now().plusMonths(1);
+                dateFrom = LocalDate.of(dateFrom.getYear(), dateFrom.getMonth(), 1);
+                dateTo = YearMonth.of(dateFrom.getYear(), dateFrom.getMonth()).atEndOfMonth();
+
+                break;
+
+
+        }
+
+        if (dateFrom != null)
+            startDatePicker.setValue(dateFrom);
+        if (dateTo != null)
+            endDatePicker.setValue(dateTo);
     }
 }
