@@ -281,7 +281,9 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService> ex
         grid.setAutoSave(true);
         grid.setHeaderHeight(50);
         grid.setSizeFull();
-        grid.onDisable();
+        if (this.gridViewParameter.isReadOnly()) {
+            grid.onDisable();
+        }
 //        grid.setTableWidth(500);
 //        grid.setTableHeight(750);
     }
