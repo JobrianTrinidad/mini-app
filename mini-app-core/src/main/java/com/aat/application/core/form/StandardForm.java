@@ -369,23 +369,23 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService> ex
                 && endDatePicker.getValue() != null) {
             if (!startDatePicker.getValue().equals(endDatePicker.getValue())) {
                 query.append(" AND DATE(p.").append(gridViewParameter.getDateFilterOn())
-                        .append(") > '").append(startDatePicker.getValue()).append("'");
+                        .append(") >= '").append(startDatePicker.getValue().atStartOfDay()).append("'");
                 query.append(" AND DATE(p.").append(gridViewParameter.getDateFilterOn())
-                        .append(") < '").append(endDatePicker.getValue()).append("'");
+                        .append(") < '").append(endDatePicker.getValue().plusDays(1).atStartOfDay()).append("'");
             } else {
                 query.append(" AND DATE(p.").append(gridViewParameter.getDateFilterOn())
-                        .append(") >= '").append(startDatePicker.getValue()).append("'");
+                        .append(") >= '").append(startDatePicker.getValue().atStartOfDay()).append("'");
                 query.append(" AND DATE(p.").append(gridViewParameter.getDateFilterOn())
-                        .append(") < '").append(endDatePicker.getValue().plusDays(1)).append("'");
+                        .append(") < '").append(endDatePicker.getValue().plusDays(1).atStartOfDay()).append("'");
             }
 
         } else {
             if (startDatePicker.getValue() != null)
                 query.append(" AND DATE(p.").append(gridViewParameter.getDateFilterOn())
-                        .append(") > '").append(startDatePicker.getValue()).append("'");
+                        .append(") >= '").append(startDatePicker.getValue().atStartOfDay()).append("'");
             if (endDatePicker.getValue() != null)
                 query.append(" AND DATE(p.").append(gridViewParameter.getDateFilterOn())
-                        .append(") < '").append(endDatePicker.getValue()).append("'");
+                        .append(") < '").append(endDatePicker.getValue().plusDays(1).atStartOfDay()).append("'");
         }
     }
 
