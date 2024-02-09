@@ -7,7 +7,9 @@ import com.vaadin.flow.router.PageTitle;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -110,44 +112,71 @@ public class ZJTVehicleServiceSchedule implements ZJTEntity {
         this.inProgress = inProgress;
     }
 
-    public String createWorkshopJob(BaseEntityRepository repository)
+
+    public static int createWorkshopJob(BaseEntityRepository repository,  List<ZJTVehicleServiceSchedule> serviceSchedules)
     {
+        Map<Integer, ZJTVehicleServiceJob> vehicleJobs = new HashMap<Integer, ZJTVehicleServiceJob>();
+        int n = 0;
 
-        //TODO - check if an open workshop job exists
-        //return "Existing workshop job exists. Please complete it before creating new one."
+        for (ZJTVehicleServiceSchedule serviceSchedule : serviceSchedules) {
+            ZJTVehicleServiceType serviceType = serviceSchedule.getServiceType();
+            ZJTVehicle vehicle = serviceSchedule.getVehicle();
 
-        ZJTVehicleServiceJob entityServiceJob = new ZJTVehicleServiceJob();
-        entityServiceJob.setPerformedDate(LocalDateTime.now());
-        entityServiceJob.setComplete(false);
-        entityServiceJob.setVehicle(this.getVehicle());
-        entityServiceJob = (ZJTVehicleServiceJob)repository.addNewEntity(entityServiceJob);
+            String query = "SELECT p FROM " + ZJTVehicleServiceJob.class.getSimpleName()
+                    + " AS p  WHERE not p.isComplete AND p.zjt_vehicle_id = :param1 AND exists ("
+                    + " SELECT q FROM " + ZJTVehicleServiceType.class.getSimpleName() + " AS q "
+                    + "WHERE q.zjt_vehicleservicetype_id = :param2)";
+            Object[] params = new Object[]{vehicle.getId(), serviceType.getId()};
+
+            List<Object[]> vehicleServiceJobs =
+                    repository.findEntityByQuery(query, params);
+
+            //check if there is an open service job for the vehicle of this service type
+            if (!vehicleServiceJobs.isEmpty()) {
+                serviceSchedule.setInProgress(true);
+
+                ZJTVehicleServiceJob entityServiceJob = vehicleJobs.get(vehicle.getId());
+
+                if (entityServiceJob == null) {
+                    entityServiceJob = new ZJTVehicleServiceJob();
+                    entityServiceJob.setPerformedDate(LocalDateTime.now());
+                    entityServiceJob.setComplete(false);
+                    entityServiceJob.setVehicle(vehicle);
+                    entityServiceJob = (ZJTVehicleServiceJob)repository.addNewEntity(entityServiceJob);
+
+                    vehicleJobs.put(vehicle.getId(), entityServiceJob);
+                }
 
 
-        ZJTVehicleServiceJobServiceType entityServiceType = new ZJTVehicleServiceJobServiceType();
-        entityServiceType
-                .setVehicleServiceJob
-                        (entityServiceJob);
-        entityServiceType.setServiceType(this.getServiceType());
-        repository.addNewEntity(entityServiceType);
+                ZJTVehicleServiceJobServiceType entityServiceType = new ZJTVehicleServiceJobServiceType();
+                entityServiceType.setVehicleServiceJob(entityServiceJob);
+                entityServiceType.setServiceType(serviceSchedule.getServiceType());
+                repository.addNewEntity(entityServiceType);
 
-        List<ZJTEntity> serviceTypeTaskList = repository.findAll(ZJTServiceTypeTask.class);
-        for (ZJTEntity serviceTypeTask : serviceTypeTaskList) {
-            ZJTVehicleServiceJobTask entityServiceJobTask = new ZJTVehicleServiceJobTask();
-            entityServiceJobTask.setVehicleServiceJob(entityServiceJob);
-            entityServiceJobTask.setServiceTask((ZJTServiceTypeTask) serviceTypeTask);
-            entityServiceJobTask.setSeqNo(((ZJTServiceTypeTask) serviceTypeTask).getSeqNo());
-            entityServiceJobTask.setComplete(false);
-            repository.addNewEntity(entityServiceJobTask);
+                List<ZJTEntity> serviceTypeTaskList = repository.findAll(ZJTServiceTypeTask.class);
+                for (ZJTEntity serviceTypeTask : serviceTypeTaskList) {
+                    ZJTVehicleServiceJobTask entityServiceJobTask = new ZJTVehicleServiceJobTask();
+                    entityServiceJobTask.setVehicleServiceJob(entityServiceJob);
+                    entityServiceJobTask.setServiceTask((ZJTServiceTypeTask) serviceTypeTask);
+                    //TODO - should sum seqno of other service type
+                    entityServiceJobTask.setSeqNo(((ZJTServiceTypeTask) serviceTypeTask).getSeqNo());
+                    entityServiceJobTask.setComplete(false);
+                    repository.addNewEntity(entityServiceJobTask);
+                }
+
+                List<ZJTEntity> serviceJobServiceKitList = repository.findAll(ZJTServiceKit.class);
+                for (ZJTEntity serviceJobServiceKit : serviceJobServiceKitList) {
+                    ZJTVehicleServiceJobServiceKit vehicleServiceJobServiceKit = new ZJTVehicleServiceJobServiceKit();
+                    vehicleServiceJobServiceKit.setVehicleServiceJob(entityServiceJob);
+                    vehicleServiceJobServiceKit.setServiceKit((ZJTServiceKit) serviceJobServiceKit);
+                    repository.addNewEntity(vehicleServiceJobServiceKit);
+                }
+
+
+                repository.updateEntity(serviceSchedule);
+                n++;
+            }
         }
-
-        List<ZJTEntity> serviceJobServiceKitList = repository.findAll(ZJTServiceKit.class);
-        for (ZJTEntity serviceJobServiceKit : serviceJobServiceKitList) {
-            ZJTVehicleServiceJobServiceKit vehicleServiceJobServiceKit = new ZJTVehicleServiceJobServiceKit();
-            vehicleServiceJobServiceKit.setVehicleServiceJob(entityServiceJob);
-            vehicleServiceJobServiceKit.setServiceKit((ZJTServiceKit) serviceJobServiceKit);
-            repository.addNewEntity(vehicleServiceJobServiceKit);
-        }
-        return null;
-
+        return n;
     }
 }
