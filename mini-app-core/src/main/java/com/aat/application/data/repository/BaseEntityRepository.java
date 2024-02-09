@@ -77,6 +77,15 @@ public class BaseEntityRepository {
         return customQuery.getResultList();
     }
 
+    public List<ZJTEntity> findEntitiesFilteredBy(ZJTEntity filterEntity, String fieldName, Class<?> entityClass) {
+        String sql = "SELECT p FROM " + entityClass.getSimpleName() + " AS p"
+                + " WHERE p." + fieldName + " = :param0";
+        Query customQuery = entityManager.createQuery(sql);
+        customQuery.setParameter("param0", filterEntity);
+
+        return customQuery.getResultList();
+    }
+
     @Transactional
     public int updateEntityByQuery(String query, Object[] params) {
         Query customQuery = entityManager.createQuery(query);
@@ -128,6 +137,18 @@ public class BaseEntityRepository {
     @Transactional
     public ZJTEntity addNewEntity(ZJTEntity entity) {
         entityManager.persist(entity);
+        return entity;
+    }
+
+    @Transactional
+    public ZJTEntity updateEntity(ZJTEntity entity) {
+        entityManager.merge(entity);
+        return entity;
+    }
+
+    @Transactional
+    public ZJTEntity deleteEntity(ZJTEntity entity) {
+        entityManager.remove(entity);
         return entity;
     }
 
