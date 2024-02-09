@@ -288,10 +288,10 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService> ex
         grid.setAutoSave(true);
         grid.setHeaderHeight(50);
         grid.setSizeFull();
-        if (this.gridViewParameter.isReadOnly())
-            grid.onDisable();
-        else
-            grid.onEnable();
+//        if (this.gridViewParameter.isReadOnly())
+        grid.onDisable();
+//        else
+//            grid.onEnable();
 //        grid.setTableWidth(500);
 //        grid.setTableHeight(750);
     }
@@ -318,6 +318,7 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService> ex
             String colType = this.gridViewParameter.getHeaderOptions().get(header);
             if (!header.equals("id")) {
                 if (!(colType.equals("input") || colType.equals("date")
+                        || colType.equals("input_multi") || colType.equals("date_multi")
                         || colType.equals("check") || colType.equals("select_enum")))
                     query.append(", COALESCE(p.").append(header).append(", -1)");
                 else
@@ -409,19 +410,25 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService> ex
             com.vaadin.componentfactory.tuigrid.model.Column column = new com.vaadin.componentfactory.tuigrid.model.Column(baseOption);
             column.setEditable(true);
             column.setSortable(true);
-            column.setMultiline(true);
+
             column.setSortingType("asc");
             int index = 1;
             if (header.equals("id"))
                 continue;
+
+            if (this.gridViewParameter.getHeaderOptions().get(header).split("_").length == 2)
+                column.setMultiline(true);
+
             switch (this.gridViewParameter.getHeaderOptions().get(header)) {
                 case "input":
+                case "input_multi":
                     column.setType("input");
                     break;
                 case "check":
                     column.setType("check");
                     break;
                 case "date":
+                case "date_multi":
                     column.setType("datePicker");
                     column.setDateOption(new DateOption("yyyy-MM-dd HH:mm A", true));
                     break;

@@ -3,6 +3,7 @@ package com.aat.application.data.entity;
 import com.aat.application.annotations.BaseItems;
 import com.aat.application.annotations.ContentDisplayedInSelect;
 import com.aat.application.annotations.DisplayName;
+import com.aat.application.annotations.MultiLineField;
 import com.aat.application.core.data.entity.ZJTEntity;
 import com.vaadin.flow.router.PageTitle;
 import jakarta.persistence.*;
@@ -24,6 +25,7 @@ public class ZJTVehicleServiceJob implements ZJTEntity {
     protected int zjt_vehicleservicejob_id;
 
     @Column
+    @MultiLineField
     @DisplayName(value = "Comments")
     private String comments;
 
