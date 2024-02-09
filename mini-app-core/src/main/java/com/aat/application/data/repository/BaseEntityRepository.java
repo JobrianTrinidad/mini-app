@@ -131,6 +131,18 @@ public class BaseEntityRepository {
         return entity;
     }
 
+    @Transactional
+    public ZJTEntity updateEntity(ZJTEntity entity) {
+        entityManager.merge(entity);
+        return entity;
+    }
+
+    @Transactional
+    public ZJTEntity deleteEntity(ZJTEntity entity) {
+        entityManager.remove(entity);
+        return entity;
+    }
+
     public ZJTEntity findEntityById(Class<?> entityClass, int nEntityID) {
         return (ZJTEntity) entityManager.find(entityClass, nEntityID);
     }
