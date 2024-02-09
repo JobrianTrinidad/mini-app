@@ -137,8 +137,6 @@ public class GridViewParameter {
                     case "boolean":
                         headerOptions.put(field.getName(), "check");
                         break;
-                    case "String":
-                    case "int":
                     default:
                         headerOptions.put(field.getName(), "input" + strAdd);
                         break;
