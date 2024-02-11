@@ -2,6 +2,7 @@ package com.aat.application.views;
 
 import com.aat.application.core.form.TimeLineViewParameter;
 import com.aat.application.data.entity.ZJTVehicle;
+import com.aat.application.data.entity.ZJTVehicleServiceSchedule;
 import com.aat.application.data.repository.BaseEntityRepository;
 import com.aat.application.data.service.TableInfoService;
 import com.vaadin.flow.router.*;
@@ -13,7 +14,9 @@ public class ServiceScheduleOverview extends StandardFormView implements HasUrlP
 
     public ServiceScheduleOverview(BaseEntityRepository repository, TableInfoService tableInfoService) {
         super(repository, tableInfoService);
-        timeLineViewParameter = new TimeLineViewParameter(new String[]{"vehicle.fleetid", "serviceType.name"}, "vehicle", "planDate", null, null, "ZJTVehicleServiceSchedule");
+        timeLineViewParameter = new TimeLineViewParameter(new String[]{"vehicle.fleetid", "serviceType.name"}
+                , "vehicle", new String[]{"planDate", "dueDate"});
+        timeLineViewParameter.setFromDefinition("ZJTVehicleServiceSchedule");
         timeLineViewParameter.setGroupClass(ZJTVehicle.class);
         timeLineViewParameter.setDateFilterOn("planDate");
         timeLineViewParameter.setSelectDefinition("fleetid");

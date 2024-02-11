@@ -2,15 +2,19 @@ package com.aat.application.core.form;
 
 import com.aat.application.core.data.service.ZJTService;
 import com.aat.application.data.entity.ZJTItem;
+import com.aat.application.util.GlobalData;
 import com.vaadin.componentfactory.timeline.Timeline;
 import com.vaadin.componentfactory.timeline.model.Item;
 import com.vaadin.componentfactory.timeline.model.ItemGroup;
+import com.vaadin.flow.component.Unit;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.datepicker.DatePicker;
+import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 
 import java.io.Serial;
 import java.time.LocalDate;
@@ -51,24 +55,33 @@ public abstract class TimeLineForm<S extends ZJTService> extends CommonForm {
     }
 
     private void getToolbar() throws Exception {
-//        VerticalLayout itemKindLayout = new VerticalLayout();
-//        for (String fieldName : GlobalData.getFieldNamesWithAnnotation(StartDate.class, this.groupClass)) {
-//            HorizontalLayout everyItemLayout = new HorizontalLayout();
-//            everyItemLayout.setWidth(200, Unit.PIXELS);
-//            everyItemLayout.setJustifyContentMode(FlexComponent.JustifyContentMode.BETWEEN);
-//            String itemClassName = null;
-//            for (Field field : this.groupClass.getDeclaredFields()) {
-//                if (field.getName().equals(fieldName)) {
-//                    itemClassName = field.getAnnotation(StartDate.class).className();
-//                }
-//            }
-//            Span label = new Span(GlobalData.convertToStandard(fieldName));
-//            Div graph = new Div();
-//            graph.setWidth(50, Unit.PIXELS);
-//            graph.setClassName(itemClassName);
-//            everyItemLayout.add(label, graph);
-//            itemKindLayout.add(everyItemLayout);
-//        }
+        VerticalLayout itemKindLayout = new VerticalLayout();
+
+        int nStartDateId = 0;
+        for (String fieldName : timeLineViewParameter.getStartDateFieldNames()) {
+            HorizontalLayout everyItemLayout = new HorizontalLayout();
+            everyItemLayout.setWidth(200, Unit.PIXELS);
+            everyItemLayout.setJustifyContentMode(FlexComponent.JustifyContentMode.BETWEEN);
+
+            Span label = new Span(GlobalData.convertToStandard(fieldName));
+            Div graph = new Div();
+            graph.setWidth(50, Unit.PIXELS);
+            switch (nStartDateId) {
+                case 0:
+                    graph.setClassName("bg-success");
+                    break;
+                case 1:
+                    graph.setClassName("bg-warning");
+                    break;
+                default:
+                    graph.setClassName("bg-error");
+                    break;
+            }
+            everyItemLayout.add(label, graph);
+            itemKindLayout.add(everyItemLayout);
+            nStartDateId++;
+        }
+        toolbar.add(itemKindLayout);
 
         startDatePicker.addValueChangeListener(e -> {
             try {
@@ -212,7 +225,19 @@ public abstract class TimeLineForm<S extends ZJTService> extends CommonForm {
             Item item = new Item();
 //            item.setId(data.getId().toString());
             item.setContent(data.getTitle());
-            item.setClassName(data.getClassName());
+
+            switch (data.getStartDateId()) {
+                case 0:
+                    item.setClassName("bg-success");
+                    break;
+                case 1:
+                    item.setClassName("bg-warning");
+                    break;
+                default:
+                    item.setClassName("bg-error");
+                    break;
+            }
+
             item.setStart(data.getStartTime());
             item.setEnd(data.getEndTime());
             item.setGroup(data.getGroupId());
@@ -232,9 +257,13 @@ public abstract class TimeLineForm<S extends ZJTService> extends CommonForm {
             index++;
         }
         query.append(") AS title");
-        query.append(", p.").append(timeLineViewParameter.getGroupIDFieldName())
-                .append(", p.").append(timeLineViewParameter.getStartDateFieldName())
-                .append(timeLineViewParameter.getEndDateFieldName() != null ? ", p." + timeLineViewParameter.getEndDateFieldName() : "")
+        int count = 0;
+        query.append(", p.").append(timeLineViewParameter.getGroupIDFieldName()).append(" AS groupId");
+        for (String startDateFieldName : timeLineViewParameter.getStartDateFieldNames()) {
+            query.append(", p.").append(startDateFieldName).append(" AS startDate").append(count);
+            count++;
+        }
+        query.append(timeLineViewParameter.getEndDateFieldName() != null ? ", p." + timeLineViewParameter.getEndDateFieldName() : "")
                 .append(timeLineViewParameter.getClassNameFieldName() != null ? ", p." + timeLineViewParameter.getClassNameFieldName() : "");
 
         query.append(" FROM ").append(timeLineViewParameter.getFromDefinition()).append(" as p");

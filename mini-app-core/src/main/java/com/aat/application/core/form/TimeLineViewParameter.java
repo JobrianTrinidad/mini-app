@@ -38,7 +38,7 @@ public class TimeLineViewParameter {
      * Name of the column for the startdate
      * e.g pd.birthdate
      */
-    private String startDateFieldName = null;
+    private String[] startDateFieldNames = null;
 
     /**
      * Name of the column for the enddate
@@ -106,19 +106,19 @@ public class TimeLineViewParameter {
     }
 
 
-    public TimeLineViewParameter(String[] titleFieldName, String groupIDFieldName, String startDateFieldName, String endDateFieldName, String classNameFieldName, String fromDefinition) {
+    public TimeLineViewParameter(String[] titleFieldName, String groupIDFieldName, String[] startDateFieldNames, String endDateFieldName, String classNameFieldName, String fromDefinition) {
         this.titleFieldName = titleFieldName;
         this.groupIDFieldName = groupIDFieldName;
-        this.startDateFieldName = startDateFieldName;
+        this.startDateFieldNames = startDateFieldNames;
         this.endDateFieldName = endDateFieldName;
         this.classNameFieldName = classNameFieldName;
         this.fromDefinition = fromDefinition;
     }
 
-    public TimeLineViewParameter(String[] titleFieldName, String groupIDFieldName, String startDateFieldName) {
+    public TimeLineViewParameter(String[] titleFieldName, String groupIDFieldName, String[] startDateFieldNames) {
         this.titleFieldName = titleFieldName;
         this.groupIDFieldName = groupIDFieldName;
-        this.startDateFieldName = startDateFieldName;
+        this.startDateFieldNames = startDateFieldNames;
     }
 
     public String[] getTitleFieldName() {
@@ -137,12 +137,12 @@ public class TimeLineViewParameter {
         this.groupIDFieldName = groupIDFieldName;
     }
 
-    public String getStartDateFieldName() {
-        return startDateFieldName;
+    public String[] getStartDateFieldNames() {
+        return startDateFieldNames;
     }
 
-    public void setStartDateFieldName(String startDateFieldName) {
-        this.startDateFieldName = startDateFieldName;
+    public void setStartDateFieldNames(String[] startDateFieldNames) {
+        this.startDateFieldNames = startDateFieldNames;
     }
 
     public String getEndDateFieldName() {

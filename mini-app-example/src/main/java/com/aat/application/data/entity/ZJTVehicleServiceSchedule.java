@@ -1,6 +1,7 @@
 package com.aat.application.data.entity;
 
 import com.aat.application.annotations.DisplayName;
+import com.aat.application.annotations.timeline.StartDate;
 import com.aat.application.core.data.entity.ZJTEntity;
 import com.aat.application.data.repository.BaseEntityRepository;
 import com.vaadin.flow.router.PageTitle;
@@ -41,11 +42,14 @@ public class ZJTVehicleServiceSchedule implements ZJTEntity {
     @DisplayName(value = "Last Service (KM)")
     private Integer lastServiceKM;
 
-    @Column
+    @Column(name = "plandate")
+    @StartDate(className = "red")
     @DisplayName(value = "Plan Date")
     private LocalDateTime planDate;
-    @Column
-    private LocalDateTime actualDate;
+    @Column(name = "duedate")
+    @StartDate(className = "blue")
+    @DisplayName(value = "Due Date")
+    private LocalDateTime dueDate;
 
     @Column
     @DisplayName(value = "In Progress")
@@ -168,11 +172,11 @@ public class ZJTVehicleServiceSchedule implements ZJTEntity {
         this.planDate = planDate;
     }
 
-    public LocalDateTime getActualDate() {
-        return actualDate;
+    public LocalDateTime getDueDate() {
+        return dueDate;
     }
 
-    public void setActualDate(LocalDateTime actualDate) {
-        this.actualDate = actualDate;
+    public void setDueDate(LocalDateTime dueDate) {
+        this.dueDate = dueDate;
     }
 }
