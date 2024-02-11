@@ -73,34 +73,6 @@ public class VehicleServiceScheduleView extends StandardFormView implements HasU
         List<ZJTVehicleServiceSchedule> serviceSchedules =
                 (List<ZJTVehicleServiceSchedule>) repository
                         .findEntitiesByIds(ZJTVehicleServiceSchedule.class, this.nSelectedEntityIds);
-//        if (serviceSchedules != null) {
-//            for (ZJTVehicleServiceSchedule serviceSchedule : serviceSchedules) {
-//
-//                ZJTVehicleServiceType serviceType = serviceSchedule.getServiceType();
-//
-////            String query = "SELECT p FROM " + ZJTVehicleServiceJob.class.getSimpleName()
-////                    + " AS p " + "WHERE p.vehicle.zjt_vehicle_id"
-////                    + " = :param0 AND p.isComplete = : param1";
-//                String query = "SELECT p FROM " + ZJTVehicleServiceJob.class.getSimpleName()
-//                        + " AS p  WHERE not p.isComplete AND exists ("
-//                        + " SELECT q FROM " + ZJTVehicleServiceType.class.getSimpleName() + " AS q "
-//                        + "WHERE q.zjt_vehicleservicetype_id = : param0)";
-//                Object[] params = new Object[]{serviceType.getId()};
-//
-//                List<Object[]> vehicleServiceJobs =
-//                        repository.findEntityByQuery(query, params);
-//
-//                if (!vehicleServiceJobs.isEmpty()) {
-//                    this.setMessageStatus(" Existing workshop job exists. Please complete it before creating new one.");
-//                    return;
-//                }
-//
-//                ZJTVehicleServiceJob entityServiceJob = new ZJTVehicleServiceJob();
-//                entityServiceJob.setPerformedDate(LocalDateTime.now());
-//                entityServiceJob.setComplete(false);
-//                entityServiceJob.setVehicle(serviceSchedule.getVehicle());
-//                entityServiceJob.setServiceType(serviceSchedule.getServiceType());
-//                entityServiceJob = (ZJTVehicleServiceJob) repository.addNewEntity(entityServiceJob);
         int n = 0;
         if (serviceSchedules != null) {
             this.form.grid.setUnCheckAll();

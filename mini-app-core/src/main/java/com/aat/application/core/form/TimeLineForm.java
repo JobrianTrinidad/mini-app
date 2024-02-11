@@ -36,10 +36,6 @@ public abstract class TimeLineForm<S extends ZJTService> extends CommonForm {
     private final HorizontalLayout toolbar = new HorizontalLayout();
     private String filteredValue = "";
 
-    private final DatePicker startDatePicker = new DatePicker("");
-    private final DatePicker endDatePicker = new DatePicker("");
-    private final ComboBox<EnumDateFilter> dateFilterComboBox = new ComboBox<>("");
-
     public TimeLineForm(TimeLineViewParameter timeLineViewParameter,
                         S service) {
         this.timeLineViewParameter = timeLineViewParameter;
@@ -82,27 +78,6 @@ public abstract class TimeLineForm<S extends ZJTService> extends CommonForm {
             nStartDateId++;
         }
         toolbar.add(itemKindLayout);
-
-        startDatePicker.addValueChangeListener(e -> {
-            try {
-                this.filterByDate(e.getValue().atStartOfDay(), null);
-            } catch (Exception ex) {
-                throw new RuntimeException(ex);
-            }
-        });
-        endDatePicker.addValueChangeListener(e -> {
-            try {
-                this.filterByDate(e.getValue().atStartOfDay(), null);
-            } catch (Exception ex) {
-                throw new RuntimeException(ex);
-            }
-        });
-
-        dateFilterComboBox.setItems(EnumDateFilter.values());
-        dateFilterComboBox.addValueChangeListener(e -> updateDateFilter());
-        dateFilterComboBox.setValue(EnumDateFilter.TM);
-        HorizontalLayout dateFilter = new HorizontalLayout(dateFilterComboBox, startDatePicker, new Span("To"), endDatePicker);
-        dateFilter.setAlignItems(FlexComponent.Alignment.CENTER);
 
         if (this.timeLineViewParameter.getParameters() != null &&
                 (int) this.timeLineViewParameter.getParameters()[0] != -1) {
@@ -342,53 +317,10 @@ public abstract class TimeLineForm<S extends ZJTService> extends CommonForm {
         return "";
     }
 
-    private void filterByDate(LocalDateTime start, LocalDateTime end) throws Exception {
-        if (start != null && end != null) {
-            if (!start.isBefore(end)) {
-                Notification.show("End date should be after start date", 5000, Notification.Position.MIDDLE);
-                return;
-            }
-        }
+    @Override
+    public void onUpdateForm() throws Exception {
+        if (this.timeLineViewParameter == null)
+            return;
         timeline.setItems(this.getItems(true), true);
-    }
-
-    private void updateDateFilter() {
-        LocalDate dateFrom = null;
-        LocalDate dateTo = null;
-
-        switch (dateFilterComboBox.getValue()) {
-            case TD:
-                dateFrom = LocalDate.from(LocalDateTime.now().truncatedTo(ChronoUnit.DAYS));
-                dateTo = LocalDate.from(LocalDateTime.now().truncatedTo(ChronoUnit.DAYS));
-                break;
-
-            case TW:
-                dateFrom = LocalDate.now();
-                dateFrom = dateFrom.with(WeekFields.of(Locale.UK).getFirstDayOfWeek());
-                dateTo = dateFrom.plusWeeks(1).minusDays(1);
-                break;
-            case NW:
-                dateFrom = LocalDate.now().plusWeeks(1);
-                dateFrom = dateFrom.with(WeekFields.of(Locale.UK).getFirstDayOfWeek());
-                dateTo = dateFrom.plusWeeks(1).minusDays(1);
-                break;
-            case TM:
-                dateFrom = LocalDate.of(LocalDate.now().getYear(), LocalDate.now().getMonth(), 1);
-                dateTo = YearMonth.of(LocalDate.now().getYear(), LocalDate.now().getMonth()).atEndOfMonth();
-                break;
-            case NM:
-                dateFrom = LocalDate.now().plusMonths(1);
-                dateFrom = LocalDate.of(dateFrom.getYear(), dateFrom.getMonth(), 1);
-                dateTo = YearMonth.of(dateFrom.getYear(), dateFrom.getMonth()).atEndOfMonth();
-
-                break;
-
-
-        }
-
-        if (dateFrom != null)
-            startDatePicker.setValue(dateFrom);
-        if (dateTo != null)
-            endDatePicker.setValue(dateTo);
     }
 }
