@@ -2,20 +2,15 @@ package com.aat.application.core.form;
 
 import com.aat.application.core.data.service.ZJTService;
 import com.aat.application.data.entity.ZJTItem;
-import com.aat.application.util.GlobalData;
 import com.vaadin.componentfactory.timeline.Timeline;
 import com.vaadin.componentfactory.timeline.model.Item;
 import com.vaadin.componentfactory.timeline.model.ItemGroup;
-import com.vaadin.flow.component.UI;
-import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.server.VaadinSession;
 
 import java.io.Serial;
 import java.time.LocalDate;
@@ -35,6 +30,8 @@ public abstract class TimeLineForm<S extends ZJTService> extends CommonForm {
     private final TimeLineViewParameter timeLineViewParameter;
     protected S service;
     private final HorizontalLayout toolbar = new HorizontalLayout();
+    private String filteredValue = "";
+
     private final DatePicker startDatePicker = new DatePicker("");
     private final DatePicker endDatePicker = new DatePicker("");
     private final ComboBox<EnumDateFilter> dateFilterComboBox = new ComboBox<>("");
@@ -54,8 +51,6 @@ public abstract class TimeLineForm<S extends ZJTService> extends CommonForm {
     }
 
     private void getToolbar() throws Exception {
-        Button btnGoOriginView = new Button(GlobalData.convertToStandard(this.timeLineViewParameter.groupName));
-
 //        VerticalLayout itemKindLayout = new VerticalLayout();
 //        for (String fieldName : GlobalData.getFieldNamesWithAnnotation(StartDate.class, this.groupClass)) {
 //            HorizontalLayout everyItemLayout = new HorizontalLayout();
@@ -96,8 +91,8 @@ public abstract class TimeLineForm<S extends ZJTService> extends CommonForm {
         HorizontalLayout dateFilter = new HorizontalLayout(dateFilterComboBox, startDatePicker, new Span("To"), endDatePicker);
         dateFilter.setAlignItems(FlexComponent.Alignment.CENTER);
 
-        String filteredValue = "";
-        if (this.timeLineViewParameter.getParameters() != null) {
+        if (this.timeLineViewParameter.getParameters() != null &&
+                (int) this.timeLineViewParameter.getParameters()[0] != -1) {
             if (!timeLineViewParameter.isValid()) {
                 throw new Exception("TuiGrid Definition is not valid.");
             }
@@ -118,20 +113,6 @@ public abstract class TimeLineForm<S extends ZJTService> extends CommonForm {
 
             filteredValue = String.valueOf(service.findEntityByQuery(query.toString()).get(0));
         }
-        Span sp = new Span(">> " + filteredValue);
-        HorizontalLayout routeLayout = new HorizontalLayout(btnGoOriginView, sp);
-        routeLayout.setAlignItems(FlexComponent.Alignment.CENTER);
-
-        btnGoOriginView.addClickListener(e -> {
-            String previousView = (String) VaadinSession.getCurrent().getAttribute("previousView");
-            if (previousView != null) {
-                UI.getCurrent().navigate(previousView);
-            }
-        });
-        btnGoOriginView.getElement().setAttribute("theme", "tertiary-inline");
-        btnGoOriginView.addClassName("link-button");
-
-        toolbar.add(routeLayout);
         if (timeLineViewParameter.getDateFilterOn() != null)
             //            toolbar.add(filterText, btnReload, btnSave, dateFilter);
             toolbar.add(dateFilter);
@@ -242,13 +223,19 @@ public abstract class TimeLineForm<S extends ZJTService> extends CommonForm {
     }
 
     private String getStandardQuery(Object[] parameters) {
-        StringBuilder query = new StringBuilder("SELECT "
-                + "p." + timeLineViewParameter.getTitleFieldName()
-                + ", p." + timeLineViewParameter.getGroupIDFieldName()
-                + ", p." + timeLineViewParameter.getStartDateFieldName()
-                + (timeLineViewParameter.getEndDateFieldName() != null ? ", p." + timeLineViewParameter.getEndDateFieldName() : "")
-                + (timeLineViewParameter.getClassNameFieldName() != null ? ", p." + timeLineViewParameter.getClassNameFieldName() : ""));
-
+        StringBuilder query = new StringBuilder("SELECT ");
+        query.append("CONCAT(p.").append(timeLineViewParameter.getTitleFieldName()[0]);
+        int index = 0;
+        for (String titleField : timeLineViewParameter.getTitleFieldName()) {
+            if (index != 0)
+                query.append(", ' '").append(", p.").append(titleField);
+            index++;
+        }
+        query.append(") AS title");
+        query.append(", p.").append(timeLineViewParameter.getGroupIDFieldName())
+                .append(", p.").append(timeLineViewParameter.getStartDateFieldName())
+                .append(timeLineViewParameter.getEndDateFieldName() != null ? ", p." + timeLineViewParameter.getEndDateFieldName() : "")
+                .append(timeLineViewParameter.getClassNameFieldName() != null ? ", p." + timeLineViewParameter.getClassNameFieldName() : "");
 
         query.append(" FROM ").append(timeLineViewParameter.getFromDefinition()).append(" as p");
 
@@ -314,7 +301,10 @@ public abstract class TimeLineForm<S extends ZJTService> extends CommonForm {
 
     @Override
     public String getHamburgerText() {
-        return ">> ";
+        if (filteredValue.isEmpty()) {
+            return "";
+        }
+        return ">> " + timeLineViewParameter.getPageName() + filteredValue;
     }
 
     @Override

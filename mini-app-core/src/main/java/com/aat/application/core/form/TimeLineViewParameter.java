@@ -1,6 +1,7 @@
 package com.aat.application.core.form;
 
 import com.aat.application.util.GlobalData;
+import com.vaadin.flow.router.PageTitle;
 
 /**
  * Class definition to create the mapping for the timeline
@@ -11,7 +12,7 @@ public class TimeLineViewParameter {
      * Name of the column to display in the content
      * e.g  e.employeename
      */
-    private String titleFieldName = null;
+    private String[] titleFieldName = null;
 
     public String getToolTipFieldName() {
         return toolTipFieldName;
@@ -71,6 +72,7 @@ public class TimeLineViewParameter {
     private Class<?> groupClass;
     private String groupClassPKField;
     String groupName;
+    private String pageName;
     private Object[] parameters;
     private String dateFilterOn;
 
@@ -104,7 +106,7 @@ public class TimeLineViewParameter {
     }
 
 
-    public TimeLineViewParameter(String titleFieldName, String groupIDFieldName, String startDateFieldName, String endDateFieldName, String classNameFieldName, String fromDefinition) {
+    public TimeLineViewParameter(String[] titleFieldName, String groupIDFieldName, String startDateFieldName, String endDateFieldName, String classNameFieldName, String fromDefinition) {
         this.titleFieldName = titleFieldName;
         this.groupIDFieldName = groupIDFieldName;
         this.startDateFieldName = startDateFieldName;
@@ -113,17 +115,17 @@ public class TimeLineViewParameter {
         this.fromDefinition = fromDefinition;
     }
 
-    public TimeLineViewParameter(String titleFieldName, String groupIDFieldName, String startDateFieldName) {
+    public TimeLineViewParameter(String[] titleFieldName, String groupIDFieldName, String startDateFieldName) {
         this.titleFieldName = titleFieldName;
         this.groupIDFieldName = groupIDFieldName;
         this.startDateFieldName = startDateFieldName;
     }
 
-    public String getTitleFieldName() {
+    public String[] getTitleFieldName() {
         return titleFieldName;
     }
 
-    public void setTitleFieldName(String titleFieldName) {
+    public void setTitleFieldName(String[] titleFieldName) {
         this.titleFieldName = titleFieldName;
     }
 
@@ -189,6 +191,7 @@ public class TimeLineViewParameter {
 
     public void setGroupClass(Class<?> groupClass) {
         this.groupClass = groupClass;
+        pageName = groupClass.getAnnotation(PageTitle.class).value();
         groupClassPKField = GlobalData.getPrimaryKeyField(groupClass).getName();
     }
 
@@ -222,5 +225,13 @@ public class TimeLineViewParameter {
 
     public void setDateFilterOn(String dateFilterOn) {
         this.dateFilterOn = dateFilterOn;
+    }
+
+    public String getPageName() {
+        return pageName;
+    }
+
+    public void setPageName(String pageName) {
+        this.pageName = pageName;
     }
 }

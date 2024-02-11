@@ -64,7 +64,7 @@ public class ServiceKitView extends StandardFormView implements HasUrlParameter<
     public void setParameter(BeforeEvent event, @OptionalParameter String parameter) {
         if (parameter != null) {
             if (event.getRouteParameters().get("subcategory").isPresent()) {
-                TimeLineViewParameter timeLineViewParameter = new TimeLineViewParameter("serviceKit.name", "serviceKit", "planDate", null, null, "ZJTServiceKit");
+                TimeLineViewParameter timeLineViewParameter = new TimeLineViewParameter(new String[]{"serviceKit.name"}, "serviceKit", "planDate", null, null, "ZJTServiceKit");
                 timeLineViewParameter.setGroupClass(ZJTServiceKit.class);
                 timeLineViewParameter.setSelectDefinition("name");
                 timeLineViewParameter.setWhereDefinition("serviceKit.zjt_servicekit_id");

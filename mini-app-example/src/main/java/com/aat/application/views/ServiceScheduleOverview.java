@@ -13,11 +13,10 @@ public class ServiceScheduleOverview extends StandardFormView implements HasUrlP
 
     public ServiceScheduleOverview(BaseEntityRepository repository, TableInfoService tableInfoService) {
         super(repository, tableInfoService);
-        timeLineViewParameter = new TimeLineViewParameter("vehicle.fleetid", "vehicle", "planDate", null, null, "ZJTVehicleServiceSchedule");
+        timeLineViewParameter = new TimeLineViewParameter(new String[]{"vehicle.fleetid", "serviceType.name"}, "vehicle", "planDate", null, null, "ZJTVehicleServiceSchedule");
         timeLineViewParameter.setGroupClass(ZJTVehicle.class);
         timeLineViewParameter.setDateFilterOn("planDate");
         timeLineViewParameter.setSelectDefinition("fleetid");
-//        timeLineViewParameter.setWhereDefinition("vehicle.zjt_vehicle_id");
         super.setTimeLineViewParameter(timeLineViewParameter);
     }
 
