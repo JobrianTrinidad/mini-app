@@ -71,6 +71,7 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService> ex
         this.service = service;
         this.tableInfoService = tableInfoService;
         this.setHeight("calc(100vh - 60px)");
+        dateFilterOn = gridViewParameter.getDateFilterOn();
 
         initColSelDialog();
 
@@ -331,11 +332,11 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService> ex
             query.append(" WHERE ").append("p.").append(gridViewParameter.getWhereDefinition());
             //TODO -set parameter
             query.append(" = ").append(parameters[0]);
-            if (gridViewParameter.getDateFilterOn() != null) {
+            if (dateFilterOn != null) {
                 addConditionWhenFilteringDate(query);
             }
         } else {
-            if (gridViewParameter.getDateFilterOn() != null) {
+            if (dateFilterOn != null) {
                 query.append(" WHERE 1=1");
                 addConditionWhenFilteringDate(query);
             }
@@ -360,31 +361,6 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService> ex
         }
 
         return TableData;
-    }
-
-    private void addConditionWhenFilteringDate(StringBuilder query) {
-        if (startDatePicker.getValue() != null
-                && endDatePicker.getValue() != null) {
-            if (!startDatePicker.getValue().equals(endDatePicker.getValue())) {
-                query.append(" AND DATE(p.").append(gridViewParameter.getDateFilterOn())
-                        .append(") >= '").append(startDatePicker.getValue().atStartOfDay()).append("'");
-                query.append(" AND DATE(p.").append(gridViewParameter.getDateFilterOn())
-                        .append(") < '").append(endDatePicker.getValue().plusDays(1).atStartOfDay()).append("'");
-            } else {
-                query.append(" AND DATE(p.").append(gridViewParameter.getDateFilterOn())
-                        .append(") >= '").append(startDatePicker.getValue().atStartOfDay()).append("'");
-                query.append(" AND DATE(p.").append(gridViewParameter.getDateFilterOn())
-                        .append(") < '").append(endDatePicker.getValue().plusDays(1).atStartOfDay()).append("'");
-            }
-
-        } else {
-            if (startDatePicker.getValue() != null)
-                query.append(" AND DATE(p.").append(gridViewParameter.getDateFilterOn())
-                        .append(") >= '").append(startDatePicker.getValue().atStartOfDay()).append("'");
-            if (endDatePicker.getValue() != null)
-                query.append(" AND DATE(p.").append(gridViewParameter.getDateFilterOn())
-                        .append(") < '").append(endDatePicker.getValue().plusDays(1).atStartOfDay()).append("'");
-        }
     }
 
     private List<com.vaadin.componentfactory.tuigrid.model.Column> getColumns() {
@@ -523,8 +499,7 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService> ex
 
 //        HorizontalLayout columnToolbar = new HorizontalLayout(autoWidthSave, columns);
 
-        if (gridViewParameter.getDateFilterOn() != null)
-            //            toolbar.add(filterText, btnReload, btnSave, dateFilter);
+        if (dateFilterOn != null)
             toolbar.add(dateFilter);
 //        else
 //            toolbar.add(filterText, btnReload, btnSave);
@@ -539,7 +514,6 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService> ex
             return;
 
         this.updateList();
-        grid.reloadData();
     }
 
     private String makeContent(List<String> annotatedFields, Object[] data) {
@@ -688,7 +662,7 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService> ex
         } catch (Exception e) {
             e.fillInStackTrace();
         }
-        add(grid);
+        grid.reloadData();
     }
 
     @SuppressWarnings("unchecked")

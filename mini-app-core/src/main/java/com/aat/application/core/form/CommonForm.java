@@ -23,6 +23,7 @@ import java.util.Locale;
 public abstract class CommonForm extends VerticalLayout {
 
     public TuiGrid grid;
+    protected String dateFilterOn;
     protected final DatePicker startDatePicker = new DatePicker("");
     protected final DatePicker endDatePicker = new DatePicker("");
     private final ComboBox<EnumDateFilter> dateFilterComboBox = new ComboBox<>("");
@@ -122,5 +123,30 @@ public abstract class CommonForm extends VerticalLayout {
             }
         }
         onUpdateForm();
+    }
+
+    protected void addConditionWhenFilteringDate(StringBuilder query) {
+        if (startDatePicker.getValue() != null
+                && endDatePicker.getValue() != null) {
+            if (!startDatePicker.getValue().equals(endDatePicker.getValue())) {
+                query.append(" AND DATE(p.").append(dateFilterOn)
+                        .append(") >= '").append(startDatePicker.getValue().atStartOfDay()).append("'");
+                query.append(" AND DATE(p.").append(dateFilterOn)
+                        .append(") < '").append(endDatePicker.getValue().plusDays(1).atStartOfDay()).append("'");
+            } else {
+                query.append(" AND DATE(p.").append(dateFilterOn)
+                        .append(") >= '").append(startDatePicker.getValue().atStartOfDay()).append("'");
+                query.append(" AND DATE(p.").append(dateFilterOn)
+                        .append(") < '").append(endDatePicker.getValue().plusDays(1).atStartOfDay()).append("'");
+            }
+
+        } else {
+            if (startDatePicker.getValue() != null)
+                query.append(" AND DATE(p.").append(dateFilterOn)
+                        .append(") >= '").append(startDatePicker.getValue().atStartOfDay()).append("'");
+            if (endDatePicker.getValue() != null)
+                query.append(" AND DATE(p.").append(dateFilterOn)
+                        .append(") < '").append(endDatePicker.getValue().plusDays(1).atStartOfDay()).append("'");
+        }
     }
 }

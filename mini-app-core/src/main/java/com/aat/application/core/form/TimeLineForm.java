@@ -40,6 +40,7 @@ public abstract class TimeLineForm<S extends ZJTService> extends CommonForm {
                         S service) {
         this.timeLineViewParameter = timeLineViewParameter;
         this.service = service;
+        dateFilterOn = timeLineViewParameter.getDateFilterOn();
         addClassName("demo-app-form");
         configureTimeLine();
         try {
@@ -101,8 +102,7 @@ public abstract class TimeLineForm<S extends ZJTService> extends CommonForm {
 
             filteredValue = String.valueOf(service.findEntityByQuery(query.toString()).get(0));
         }
-        if (timeLineViewParameter.getDateFilterOn() != null)
-            //            toolbar.add(filterText, btnReload, btnSave, dateFilter);
+        if (dateFilterOn != null)
             toolbar.add(dateFilter);
     }
 
@@ -247,41 +247,16 @@ public abstract class TimeLineForm<S extends ZJTService> extends CommonForm {
             query.append(" WHERE p.").append(timeLineViewParameter.getWhereDefinition());
             //TODO -set parameter
             query.append(" = ").append(parameters[0]);
-            if (timeLineViewParameter.getDateFilterOn() != null) {
+            if (dateFilterOn != null) {
                 addConditionWhenFilteringDate(query);
             }
         } else {
-            if (timeLineViewParameter.getDateFilterOn() != null) {
+            if (dateFilterOn != null) {
                 query.append(" WHERE 1=1");
                 addConditionWhenFilteringDate(query);
             }
         }
         return query.toString();
-    }
-
-    private void addConditionWhenFilteringDate(StringBuilder query) {
-        if (startDatePicker.getValue() != null
-                && endDatePicker.getValue() != null) {
-            if (!startDatePicker.getValue().equals(endDatePicker.getValue())) {
-                query.append(" AND DATE(p.").append(timeLineViewParameter.getDateFilterOn())
-                        .append(") >= '").append(startDatePicker.getValue().atStartOfDay()).append("'");
-                query.append(" AND DATE(p.").append(timeLineViewParameter.getDateFilterOn())
-                        .append(") < '").append(endDatePicker.getValue().plusDays(1).atStartOfDay()).append("'");
-            } else {
-                query.append(" AND DATE(p.").append(timeLineViewParameter.getDateFilterOn())
-                        .append(") >= '").append(startDatePicker.getValue().atStartOfDay()).append("'");
-                query.append(" AND DATE(p.").append(timeLineViewParameter.getDateFilterOn())
-                        .append(") < '").append(endDatePicker.getValue().plusDays(1).atStartOfDay()).append("'");
-            }
-
-        } else {
-            if (startDatePicker.getValue() != null)
-                query.append(" AND DATE(p.").append(timeLineViewParameter.getDateFilterOn())
-                        .append(") >= '").append(startDatePicker.getValue().atStartOfDay()).append("'");
-            if (endDatePicker.getValue() != null)
-                query.append(" AND DATE(p.").append(timeLineViewParameter.getDateFilterOn())
-                        .append(") < '").append(endDatePicker.getValue().plusDays(1).atStartOfDay()).append("'");
-        }
     }
 
     private List<ItemGroup> getGroupItems(List<Object[]> groupResults) {
