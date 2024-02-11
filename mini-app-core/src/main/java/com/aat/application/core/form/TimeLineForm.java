@@ -8,16 +8,24 @@ import com.vaadin.componentfactory.timeline.model.Item;
 import com.vaadin.componentfactory.timeline.model.ItemGroup;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.combobox.ComboBox;
+import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.server.VaadinSession;
 
 import java.io.Serial;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.YearMonth;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.WeekFields;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public abstract class TimeLineForm<S extends ZJTService> extends CommonForm {
 
@@ -26,17 +34,26 @@ public abstract class TimeLineForm<S extends ZJTService> extends CommonForm {
     Timeline timeline;
     private final TimeLineViewParameter timeLineViewParameter;
     protected S service;
+    private final HorizontalLayout toolbar = new HorizontalLayout();
+    private final DatePicker startDatePicker = new DatePicker("");
+    private final DatePicker endDatePicker = new DatePicker("");
+    private final ComboBox<EnumDateFilter> dateFilterComboBox = new ComboBox<>("");
 
     public TimeLineForm(TimeLineViewParameter timeLineViewParameter,
                         S service) {
         this.timeLineViewParameter = timeLineViewParameter;
         this.service = service;
         addClassName("demo-app-form");
-
         configureTimeLine();
+        try {
+            getToolbar();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        addComponentAtIndex(0, toolbar);
     }
 
-    private VerticalLayout getToolbar() throws Exception {
+    private void getToolbar() throws Exception {
         Button btnGoOriginView = new Button(GlobalData.convertToStandard(this.timeLineViewParameter.groupName));
 
 //        VerticalLayout itemKindLayout = new VerticalLayout();
@@ -57,6 +74,27 @@ public abstract class TimeLineForm<S extends ZJTService> extends CommonForm {
 //            everyItemLayout.add(label, graph);
 //            itemKindLayout.add(everyItemLayout);
 //        }
+
+        startDatePicker.addValueChangeListener(e -> {
+            try {
+                this.filterByDate(e.getValue().atStartOfDay(), null);
+            } catch (Exception ex) {
+                throw new RuntimeException(ex);
+            }
+        });
+        endDatePicker.addValueChangeListener(e -> {
+            try {
+                this.filterByDate(e.getValue().atStartOfDay(), null);
+            } catch (Exception ex) {
+                throw new RuntimeException(ex);
+            }
+        });
+
+        dateFilterComboBox.setItems(EnumDateFilter.values());
+        dateFilterComboBox.addValueChangeListener(e -> updateDateFilter());
+        dateFilterComboBox.setValue(EnumDateFilter.TM);
+        HorizontalLayout dateFilter = new HorizontalLayout(dateFilterComboBox, startDatePicker, new Span("To"), endDatePicker);
+        dateFilter.setAlignItems(FlexComponent.Alignment.CENTER);
 
         String filteredValue = "";
         if (this.timeLineViewParameter.getParameters() != null) {
@@ -92,7 +130,11 @@ public abstract class TimeLineForm<S extends ZJTService> extends CommonForm {
         });
         btnGoOriginView.getElement().setAttribute("theme", "tertiary-inline");
         btnGoOriginView.addClassName("link-button");
-        return new VerticalLayout(routeLayout);
+
+        toolbar.add(routeLayout);
+        if (timeLineViewParameter.getDateFilterOn() != null)
+            //            toolbar.add(filterText, btnReload, btnSave, dateFilter);
+            toolbar.add(dateFilter);
     }
 
     private List<Object[]> configureGroup() throws Exception {
@@ -103,17 +145,16 @@ public abstract class TimeLineForm<S extends ZJTService> extends CommonForm {
             throw new Exception("Parameters are required, but not set");
         }
 
-        String[] whereDefinition = timeLineViewParameter.getWhereDefinition().split("\\.");
 
         StringBuilder query = new StringBuilder("SELECT p.")
-                .append(whereDefinition[1])
+                .append(timeLineViewParameter.getGroupClassPKField())
                 .append(", p.").append(timeLineViewParameter.getSelectDefinition());
 
 
         query.append(" FROM ").append(timeLineViewParameter.getGroupClass().getSimpleName()).append(" as p");
 
         if ((int) timeLineViewParameter.getParameters()[0] != -1) {
-            query.append(" WHERE ").append("p.").append(whereDefinition[1]);
+            query.append(" WHERE ").append("p.").append(timeLineViewParameter.getGroupClassPKField());
             //TODO -set parameter
             query.append(" = ").append(timeLineViewParameter.getParameters()[0]);
         }
@@ -162,7 +203,7 @@ public abstract class TimeLineForm<S extends ZJTService> extends CommonForm {
         });
 
         try {
-            add(getToolbar(), timeline);
+            add(toolbar, timeline);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -201,24 +242,55 @@ public abstract class TimeLineForm<S extends ZJTService> extends CommonForm {
     }
 
     private String getStandardQuery(Object[] parameters) {
-        String query = "SELECT "
+        StringBuilder query = new StringBuilder("SELECT "
                 + "p." + timeLineViewParameter.getTitleFieldName()
                 + ", p." + timeLineViewParameter.getGroupIDFieldName()
                 + ", p." + timeLineViewParameter.getStartDateFieldName()
                 + (timeLineViewParameter.getEndDateFieldName() != null ? ", p." + timeLineViewParameter.getEndDateFieldName() : "")
-                + (timeLineViewParameter.getClassNameFieldName() != null ? ", p." + timeLineViewParameter.getClassNameFieldName() : "");
+                + (timeLineViewParameter.getClassNameFieldName() != null ? ", p." + timeLineViewParameter.getClassNameFieldName() : ""));
 
 
-        query = query +
-                " FROM " + timeLineViewParameter.getFromDefinition() + " as p";
+        query.append(" FROM ").append(timeLineViewParameter.getFromDefinition()).append(" as p");
 
         if (timeLineViewParameter.getWhereDefinition() != null) {
-            query = query +
-                    " WHERE " + "p." + timeLineViewParameter.getWhereDefinition();
+            query.append(" WHERE p.").append(timeLineViewParameter.getWhereDefinition());
             //TODO -set parameter
-            query = query + " = " + parameters[0];
+            query.append(" = ").append(parameters[0]);
+            if (timeLineViewParameter.getDateFilterOn() != null) {
+                addConditionWhenFilteringDate(query);
+            }
+        } else {
+            if (timeLineViewParameter.getDateFilterOn() != null) {
+                query.append(" WHERE 1=1");
+                addConditionWhenFilteringDate(query);
+            }
         }
-        return query;
+        return query.toString();
+    }
+
+    private void addConditionWhenFilteringDate(StringBuilder query) {
+        if (startDatePicker.getValue() != null
+                && endDatePicker.getValue() != null) {
+            if (!startDatePicker.getValue().equals(endDatePicker.getValue())) {
+                query.append(" AND DATE(p.").append(timeLineViewParameter.getDateFilterOn())
+                        .append(") >= '").append(startDatePicker.getValue().atStartOfDay()).append("'");
+                query.append(" AND DATE(p.").append(timeLineViewParameter.getDateFilterOn())
+                        .append(") < '").append(endDatePicker.getValue().plusDays(1).atStartOfDay()).append("'");
+            } else {
+                query.append(" AND DATE(p.").append(timeLineViewParameter.getDateFilterOn())
+                        .append(") >= '").append(startDatePicker.getValue().atStartOfDay()).append("'");
+                query.append(" AND DATE(p.").append(timeLineViewParameter.getDateFilterOn())
+                        .append(") < '").append(endDatePicker.getValue().plusDays(1).atStartOfDay()).append("'");
+            }
+
+        } else {
+            if (startDatePicker.getValue() != null)
+                query.append(" AND DATE(p.").append(timeLineViewParameter.getDateFilterOn())
+                        .append(") >= '").append(startDatePicker.getValue().atStartOfDay()).append("'");
+            if (endDatePicker.getValue() != null)
+                query.append(" AND DATE(p.").append(timeLineViewParameter.getDateFilterOn())
+                        .append(") < '").append(endDatePicker.getValue().plusDays(1).atStartOfDay()).append("'");
+        }
     }
 
     private List<ItemGroup> getGroupItems(List<Object[]> groupResults) {
@@ -247,7 +319,57 @@ public abstract class TimeLineForm<S extends ZJTService> extends CommonForm {
 
     @Override
     public String getOriginViewText() {
-//        return GlobalData.convertToStandard(this.gridViewParameter.groupName);
+//        return GlobalData.convertToStandard(this.timeLineViewParameter.groupName);
         return "";
+    }
+
+    private void filterByDate(LocalDateTime start, LocalDateTime end) throws Exception {
+        if (start != null && end != null) {
+            if (!start.isBefore(end)) {
+                Notification.show("End date should be after start date", 5000, Notification.Position.MIDDLE);
+                return;
+            }
+        }
+        timeline.setItems(this.getItems(true), true);
+    }
+
+    private void updateDateFilter() {
+        LocalDate dateFrom = null;
+        LocalDate dateTo = null;
+
+        switch (dateFilterComboBox.getValue()) {
+            case TD:
+                dateFrom = LocalDate.from(LocalDateTime.now().truncatedTo(ChronoUnit.DAYS));
+                dateTo = LocalDate.from(LocalDateTime.now().truncatedTo(ChronoUnit.DAYS));
+                break;
+
+            case TW:
+                dateFrom = LocalDate.now();
+                dateFrom = dateFrom.with(WeekFields.of(Locale.UK).getFirstDayOfWeek());
+                dateTo = dateFrom.plusWeeks(1).minusDays(1);
+                break;
+            case NW:
+                dateFrom = LocalDate.now().plusWeeks(1);
+                dateFrom = dateFrom.with(WeekFields.of(Locale.UK).getFirstDayOfWeek());
+                dateTo = dateFrom.plusWeeks(1).minusDays(1);
+                break;
+            case TM:
+                dateFrom = LocalDate.of(LocalDate.now().getYear(), LocalDate.now().getMonth(), 1);
+                dateTo = YearMonth.of(LocalDate.now().getYear(), LocalDate.now().getMonth()).atEndOfMonth();
+                break;
+            case NM:
+                dateFrom = LocalDate.now().plusMonths(1);
+                dateFrom = LocalDate.of(dateFrom.getYear(), dateFrom.getMonth(), 1);
+                dateTo = YearMonth.of(dateFrom.getYear(), dateFrom.getMonth()).atEndOfMonth();
+
+                break;
+
+
+        }
+
+        if (dateFrom != null)
+            startDatePicker.setValue(dateFrom);
+        if (dateTo != null)
+            endDatePicker.setValue(dateTo);
     }
 }

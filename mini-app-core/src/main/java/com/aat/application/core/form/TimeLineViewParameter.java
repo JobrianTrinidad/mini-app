@@ -1,5 +1,7 @@
 package com.aat.application.core.form;
 
+import com.aat.application.util.GlobalData;
+
 /**
  * Class definition to create the mapping for the timeline
  */
@@ -67,8 +69,10 @@ public class TimeLineViewParameter {
     private String selectDefinition = null;
 
     private Class<?> groupClass;
+    private String groupClassPKField;
     String groupName;
     private Object[] parameters;
+    private String dateFilterOn;
 
     /**
      * This is to test if the definition is valid or not
@@ -108,6 +112,7 @@ public class TimeLineViewParameter {
         this.classNameFieldName = classNameFieldName;
         this.fromDefinition = fromDefinition;
     }
+
     public TimeLineViewParameter(String titleFieldName, String groupIDFieldName, String startDateFieldName) {
         this.titleFieldName = titleFieldName;
         this.groupIDFieldName = groupIDFieldName;
@@ -184,6 +189,15 @@ public class TimeLineViewParameter {
 
     public void setGroupClass(Class<?> groupClass) {
         this.groupClass = groupClass;
+        groupClassPKField = GlobalData.getPrimaryKeyField(groupClass).getName();
+    }
+
+    public String getGroupClassPKField() {
+        return groupClassPKField;
+    }
+
+    public void setGroupClassPKField(String groupClassPKField) {
+        this.groupClassPKField = groupClassPKField;
     }
 
     public String getGroupName() {
@@ -200,5 +214,13 @@ public class TimeLineViewParameter {
 
     public void setParameters(Object[] parameters) {
         this.parameters = parameters;
+    }
+
+    public String getDateFilterOn() {
+        return dateFilterOn;
+    }
+
+    public void setDateFilterOn(String dateFilterOn) {
+        this.dateFilterOn = dateFilterOn;
     }
 }

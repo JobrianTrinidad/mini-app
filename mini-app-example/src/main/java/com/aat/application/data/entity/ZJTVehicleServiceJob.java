@@ -48,7 +48,7 @@ public class ZJTVehicleServiceJob implements ZJTEntity {
     private LocalDateTime dueDate;
     @Column
     @DisplayName(value = "IsComplete")
-    private boolean isComplete;
+    private Boolean isComplete;
 
     @ManyToOne
     @ContentDisplayedInSelect(sequence = 10)
@@ -134,11 +134,11 @@ public class ZJTVehicleServiceJob implements ZJTEntity {
         this.performedDate = performedDate;
     }
 
-    public boolean isComplete() {
+    public Boolean isComplete() {
         return isComplete;
     }
 
-    public void setComplete(boolean complete) {
+    public void setComplete(Boolean complete) {
         isComplete = complete;
     }
 

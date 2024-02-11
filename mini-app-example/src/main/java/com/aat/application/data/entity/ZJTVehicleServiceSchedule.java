@@ -79,7 +79,7 @@ public class ZJTVehicleServiceSchedule implements ZJTEntity {
                     repository.findEntityByQuery(query, params);
 
             //check if there is an open service job for the vehicle of this service type
-            if (!vehicleServiceJobs.isEmpty()) {
+            if (vehicleServiceJobs.isEmpty()) {
 
                 ZJTVehicleServiceJob entityServiceJob = vehicleJobs.get(vehicle.getId());
 

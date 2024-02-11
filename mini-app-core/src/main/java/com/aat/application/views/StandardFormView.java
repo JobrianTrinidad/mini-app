@@ -56,16 +56,21 @@ public class StandardFormView extends CommonView {
                 form = new GridCommonForm<>(gridViewParameter, new BaseEntityService<>(repository), tableInfoService);
                 break;
             default:
-                bGrid = true;
-                gridViewParameter.setParameters(new Integer[]{filterObjectId});
-                if (gridViewParameter.getGroupClass() != null) {
-                    gridViewParameter.setEntityClass(gridViewParameter.getGroupClass());
-                } else
-                    gridViewParameter.setGroupClass(gridViewParameter.getEntityClass());
-                gridViewParameter.setWhereDefinition(null);
-                form = new GridCommonForm<>(gridViewParameter, new BaseEntityService<>(repository), tableInfoService);
-                if (this.contextMenu != null) {
-                    form.setContextMenu(this.contextMenu);
+                if (gridViewParameter != null) {
+                    bGrid = true;
+                    gridViewParameter.setParameters(new Integer[]{filterObjectId});
+                    if (gridViewParameter.getGroupClass() != null) {
+                        gridViewParameter.setEntityClass(gridViewParameter.getGroupClass());
+                    } else
+                        gridViewParameter.setGroupClass(gridViewParameter.getEntityClass());
+                    gridViewParameter.setWhereDefinition(null);
+                    form = new GridCommonForm<>(gridViewParameter, new BaseEntityService<>(repository), tableInfoService);
+                    if (this.contextMenu != null) {
+                        form.setContextMenu(this.contextMenu);
+                    }
+                } else {
+                    bGrid = false;
+                    form = new TimeLineCommonForm(this.timeLineViewParameter, new BaseEntityService<>(repository));
                 }
                 break;
         }
