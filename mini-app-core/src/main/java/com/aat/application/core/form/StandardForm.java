@@ -587,7 +587,6 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService> ex
             parameters[1] = parameters[1] + "." + pkField;
         }
 
-
         StringBuilder query = new StringBuilder("UPDATE ")
                 .append(gridViewParameter.getFromDefinition());
         query.append(" p SET p.")
