@@ -92,7 +92,6 @@ public class ZJTVehicleServiceSchedule implements ZJTEntity {
                     entityServiceJob.setPerformedDate(LocalDateTime.now());
                     entityServiceJob.setComplete(false);
                     entityServiceJob.setVehicle(vehicle);
-                    entityServiceJob.setServiceType(serviceType);
                     entityServiceJob = (ZJTVehicleServiceJob) repository.addNewEntity(entityServiceJob);
 
                     vehicleJobs.put(vehicle.getId(), entityServiceJob);
@@ -116,11 +115,12 @@ public class ZJTVehicleServiceSchedule implements ZJTEntity {
                     repository.addNewEntity(entityServiceJobTask);
                 }
 
-                List<ZJTEntity> serviceJobServiceKitList = repository.findAll(ZJTServiceKit.class);
+                List<ZJTEntity> serviceJobServiceKitList = repository.findEntitiesFilteredBy(serviceSchedule.getServiceType()
+                        , "serviceType", ZJTServiceTypeKit.class);
                 for (ZJTEntity serviceJobServiceKit : serviceJobServiceKitList) {
                     ZJTVehicleServiceJobServiceKit vehicleServiceJobServiceKit = new ZJTVehicleServiceJobServiceKit();
                     vehicleServiceJobServiceKit.setVehicleServiceJob(entityServiceJob);
-                    vehicleServiceJobServiceKit.setServiceKit((ZJTServiceKit) serviceJobServiceKit);
+                    vehicleServiceJobServiceKit.setServiceKit(((ZJTServiceTypeKit) serviceJobServiceKit).getServiceKit());
                     repository.addNewEntity(vehicleServiceJobServiceKit);
                 }
 
