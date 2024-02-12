@@ -1,5 +1,8 @@
 package com.aat.application.core.form;
 
+import com.aat.application.util.GlobalData;
+import com.vaadin.flow.router.PageTitle;
+
 /**
  * Class definition to create the mapping for the timeline
  */
@@ -9,7 +12,7 @@ public class TimeLineViewParameter {
      * Name of the column to display in the content
      * e.g  e.employeename
      */
-    private String titleFieldName = null;
+    private String[] titleFieldName = null;
 
     public String getToolTipFieldName() {
         return toolTipFieldName;
@@ -35,7 +38,7 @@ public class TimeLineViewParameter {
      * Name of the column for the startdate
      * e.g pd.birthdate
      */
-    private String startDateFieldName = null;
+    private String[] startDateFieldNames = null;
 
     /**
      * Name of the column for the enddate
@@ -67,8 +70,11 @@ public class TimeLineViewParameter {
     private String selectDefinition = null;
 
     private Class<?> groupClass;
+    private String groupClassPKField;
     String groupName;
+    private String pageName;
     private Object[] parameters;
+    private String dateFilterOn;
 
     /**
      * This is to test if the definition is valid or not
@@ -100,25 +106,26 @@ public class TimeLineViewParameter {
     }
 
 
-    public TimeLineViewParameter(String titleFieldName, String groupIDFieldName, String startDateFieldName, String endDateFieldName, String classNameFieldName, String fromDefinition) {
+    public TimeLineViewParameter(String[] titleFieldName, String groupIDFieldName, String[] startDateFieldNames, String endDateFieldName, String classNameFieldName, String fromDefinition) {
         this.titleFieldName = titleFieldName;
         this.groupIDFieldName = groupIDFieldName;
-        this.startDateFieldName = startDateFieldName;
+        this.startDateFieldNames = startDateFieldNames;
         this.endDateFieldName = endDateFieldName;
         this.classNameFieldName = classNameFieldName;
         this.fromDefinition = fromDefinition;
     }
-    public TimeLineViewParameter(String titleFieldName, String groupIDFieldName, String startDateFieldName) {
+
+    public TimeLineViewParameter(String[] titleFieldName, String groupIDFieldName, String[] startDateFieldNames) {
         this.titleFieldName = titleFieldName;
         this.groupIDFieldName = groupIDFieldName;
-        this.startDateFieldName = startDateFieldName;
+        this.startDateFieldNames = startDateFieldNames;
     }
 
-    public String getTitleFieldName() {
+    public String[] getTitleFieldName() {
         return titleFieldName;
     }
 
-    public void setTitleFieldName(String titleFieldName) {
+    public void setTitleFieldName(String[] titleFieldName) {
         this.titleFieldName = titleFieldName;
     }
 
@@ -130,12 +137,12 @@ public class TimeLineViewParameter {
         this.groupIDFieldName = groupIDFieldName;
     }
 
-    public String getStartDateFieldName() {
-        return startDateFieldName;
+    public String[] getStartDateFieldNames() {
+        return startDateFieldNames;
     }
 
-    public void setStartDateFieldName(String startDateFieldName) {
-        this.startDateFieldName = startDateFieldName;
+    public void setStartDateFieldNames(String[] startDateFieldNames) {
+        this.startDateFieldNames = startDateFieldNames;
     }
 
     public String getEndDateFieldName() {
@@ -184,6 +191,16 @@ public class TimeLineViewParameter {
 
     public void setGroupClass(Class<?> groupClass) {
         this.groupClass = groupClass;
+        pageName = groupClass.getAnnotation(PageTitle.class).value();
+        groupClassPKField = GlobalData.getPrimaryKeyField(groupClass).getName();
+    }
+
+    public String getGroupClassPKField() {
+        return groupClassPKField;
+    }
+
+    public void setGroupClassPKField(String groupClassPKField) {
+        this.groupClassPKField = groupClassPKField;
     }
 
     public String getGroupName() {
@@ -200,5 +217,21 @@ public class TimeLineViewParameter {
 
     public void setParameters(Object[] parameters) {
         this.parameters = parameters;
+    }
+
+    public String getDateFilterOn() {
+        return dateFilterOn;
+    }
+
+    public void setDateFilterOn(String dateFilterOn) {
+        this.dateFilterOn = dateFilterOn;
+    }
+
+    public String getPageName() {
+        return pageName;
+    }
+
+    public void setPageName(String pageName) {
+        this.pageName = pageName;
     }
 }

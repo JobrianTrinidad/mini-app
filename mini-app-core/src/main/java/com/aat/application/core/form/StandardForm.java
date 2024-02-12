@@ -10,31 +10,21 @@ import com.aat.application.util.GlobalData;
 import com.vaadin.componentfactory.tuigrid.TuiGrid;
 import com.vaadin.componentfactory.tuigrid.model.*;
 import com.vaadin.flow.component.AttachEvent;
-import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.checkbox.Checkbox;
-import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
-import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.dialog.Dialog;
-import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
-import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.value.ValueChangeMode;
-import com.vaadin.flow.server.VaadinSession;
 
 import java.io.Serial;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.WeekFields;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -47,6 +37,7 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService> ex
     protected TableInfoService tableInfoService;
     String fieldDisplayedInSelect;
     private ZJTTableInfo tableInfo;
+    List<Integer> colWidthsResized;
     protected TextField filterText = new TextField();
     private final Button btnReload = new Button("Reload");
     private final Button btnSave = new Button("Save");
@@ -64,10 +55,7 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService> ex
     private final Button lblRowCount = new Button();
     private AATContextMenu contextMenu;
     private final List<String> filteredValue = new ArrayList<>();
-    private final DatePicker startDatePicker = new DatePicker("");
-    private final DatePicker endDatePicker = new DatePicker("");
 
-    private final ComboBox<EnumDateFilter> dateFilterComboBox = new ComboBox<>("");
     public StandardForm(GridViewParameter gridViewParameter,
                         S service, TableInfoService tableInfoService) {
         addClassName("demo-app-form");
@@ -75,6 +63,7 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService> ex
         this.service = service;
         this.tableInfoService = tableInfoService;
         this.setHeight("calc(100vh - 60px)");
+        dateFilterOn = gridViewParameter.getDateFilterOn();
 
         initColSelDialog();
 
@@ -92,6 +81,7 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService> ex
         left.add(lblMessage);
         lblMessage.setWidthFull();
 
+        statusBar.add(btnInfo, left, lblRowCount);
         btnColumnSettings = new Button();
         btnColumnSettings.setIcon(new Icon(VaadinIcon.TWIN_COL_SELECT));
         btnColumnSettings.addClickListener(e -> {
@@ -185,8 +175,7 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService> ex
 
         Button btnOk = new Button("OK");
         Button btnCancel = new Button("Cancel");
-        Checkbox autoWidthSave = new Checkbox("Save Column Width");
-        autoWidthSave.setValue(bSavedWidth);
+        Checkbox autoWidthSave = new Checkbox("Save Column Width", true);
         autoWidthSave.addValueChangeListener(e -> bSavedWidth = e.getValue());
         HorizontalLayout btnPanel = new HorizontalLayout(btnCancel, btnOk, autoWidthSave);
         btnPanel.setAlignItems(Alignment.CENTER);
@@ -194,7 +183,7 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService> ex
         ZJTTableInfo finalTableInfo = tableInfo;
         btnOk.addClickListener(e -> {
             List<String> originHeaders = this.gridViewParameter.getHeaders();
-            List<Integer> columnWidths = getColumnWidths();
+//            List<Integer> columnWidths = getColumnWidths();
             List<Integer> allowedWidths = new ArrayList<>();
             List<String> tempTwinItems = new ArrayList<>(twinColSelect.getSelectedItems());
             List<String> tempHeaders = new ArrayList<>();
@@ -216,12 +205,17 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService> ex
             this.gridViewParameter.setHeaders(tempHeaders);
 
             for (String allowedHeader : this.gridViewParameter.getHeaders()) {
+                if (colWidthsResized == null) {
+                    allowedWidths = getColumnWidths();
+                    break;
+                }
                 if (originHeaders.contains(allowedHeader)) {
-                    allowedWidths.add(columnWidths.get(originHeaders.indexOf(allowedHeader)));
+                    allowedWidths.add(colWidthsResized.get(originHeaders.indexOf(allowedHeader)));
                 } else allowedWidths.add(0);
             }
 
-            finalTableInfo.setWidths(allowedWidths.toString());
+            if (bSavedWidth)
+                finalTableInfo.setWidths(allowedWidths.toString());
             finalTableInfo.setHeaders(this.gridViewParameter.getHeaders().toString());
             tableInfoService.save(finalTableInfo);
             tableInfo = finalTableInfo;
@@ -272,24 +266,22 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService> ex
         grid.addColumnResizeListener(event -> {
             int colWidth = event.getColWidth();
             String colName = event.getColName();
-            List<Integer> colWidths = getColumnWidths();
+            if (colWidthsResized == null)
+                colWidthsResized = getColumnWidths();
 
             for (String header : this.gridViewParameter.getHeaders()) {
                 if (header.equals(colName))
-                    colWidths.set(this.gridViewParameter.getHeaders().indexOf(header), colWidth);
-            }
-            tableInfo.setWidths(colWidths.toString());
-            if (bSavedWidth) {
-                tableInfoService.save(tableInfo);
+                    colWidthsResized.set(this.gridViewParameter.getHeaders().indexOf(header), colWidth);
             }
         });
 
         grid.setAutoSave(true);
         grid.setHeaderHeight(50);
         grid.setSizeFull();
-        if (this.gridViewParameter.isReadOnly()) {
+        if (this.gridViewParameter.isReadOnly())
             grid.onDisable();
-        }
+        else
+            grid.onEnable();
 //        grid.setTableWidth(500);
 //        grid.setTableHeight(750);
     }
@@ -316,6 +308,7 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService> ex
             String colType = this.gridViewParameter.getHeaderOptions().get(header);
             if (!header.equals("id")) {
                 if (!(colType.equals("input") || colType.equals("date")
+                        || colType.equals("input_multi") || colType.equals("date_multi")
                         || colType.equals("check") || colType.equals("select_enum")))
                     query.append(", COALESCE(p.").append(header).append(", -1)");
                 else
@@ -331,11 +324,11 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService> ex
             query.append(" WHERE ").append("p.").append(gridViewParameter.getWhereDefinition());
             //TODO -set parameter
             query.append(" = ").append(parameters[0]);
-            if (gridViewParameter.getDateFilterOn() != null) {
+            if (dateFilterOn != null) {
                 addConditionWhenFilteringDate(query);
             }
         } else {
-            if (gridViewParameter.getDateFilterOn() != null) {
+            if (dateFilterOn != null) {
                 query.append(" WHERE 1=1");
                 addConditionWhenFilteringDate(query);
             }
@@ -362,31 +355,6 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService> ex
         return TableData;
     }
 
-    private void addConditionWhenFilteringDate(StringBuilder query) {
-        if (startDatePicker.getValue() != null
-                && endDatePicker.getValue() != null) {
-            if (!startDatePicker.getValue().equals(endDatePicker.getValue())) {
-                query.append(" AND DATE(p.").append(gridViewParameter.getDateFilterOn())
-                        .append(") >= '").append(startDatePicker.getValue()).append("'");
-                query.append(" AND DATE(p.").append(gridViewParameter.getDateFilterOn())
-                        .append(") <= '").append(endDatePicker.getValue()).append("'");
-            } else {
-                query.append(" AND DATE(p.").append(gridViewParameter.getDateFilterOn())
-                        .append(") >= '").append(startDatePicker.getValue()).append("'");
-                query.append(" AND DATE(p.").append(gridViewParameter.getDateFilterOn())
-                        .append(") <= '").append(endDatePicker.getValue().plusDays(1)).append("'");
-            }
-
-        } else {
-            if (startDatePicker.getValue() != null)
-                query.append(" AND DATE(p.").append(gridViewParameter.getDateFilterOn())
-                        .append(") >= '").append(startDatePicker.getValue()).append("'");
-            if (endDatePicker.getValue() != null)
-                query.append(" AND DATE(p.").append(gridViewParameter.getDateFilterOn())
-                        .append(") <= '").append(endDatePicker.getValue()).append("'");
-        }
-    }
-
     private List<com.vaadin.componentfactory.tuigrid.model.Column> getColumns() {
         List<com.vaadin.componentfactory.tuigrid.model.Column> columns = new ArrayList<>();
         int nId = 0;
@@ -407,19 +375,25 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService> ex
             com.vaadin.componentfactory.tuigrid.model.Column column = new com.vaadin.componentfactory.tuigrid.model.Column(baseOption);
             column.setEditable(true);
             column.setSortable(true);
-            column.setMultiline(true);
+
             column.setSortingType("asc");
             int index = 1;
             if (header.equals("id"))
                 continue;
+
+            if (this.gridViewParameter.getHeaderOptions().get(header).split("_").length == 2)
+                column.setMultiline(true);
+
             switch (this.gridViewParameter.getHeaderOptions().get(header)) {
                 case "input":
+                case "input_multi":
                     column.setType("input");
                     break;
                 case "check":
                     column.setType("check");
                     break;
                 case "date":
+                case "date_multi":
                     column.setType("datePicker");
                     column.setDateOption(new DateOption("yyyy-MM-dd HH:mm A", true));
                     break;
@@ -477,27 +451,6 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService> ex
         btnReload.addClickListener(e -> reloadGrid());
         btnSave.addClickListener(e -> saveAll());
 
-        startDatePicker.addValueChangeListener(e -> {
-            try {
-                this.filterByDate(e.getValue().atStartOfDay(), null);
-            } catch (Exception ex) {
-                throw new RuntimeException(ex);
-            }
-        });
-        endDatePicker.addValueChangeListener(e -> {
-            try {
-                this.filterByDate(null, e.getValue().atStartOfDay());
-            } catch (Exception ex) {
-                throw new RuntimeException(ex);
-            }
-        });
-
-        dateFilterComboBox.setItems(EnumDateFilter.values());
-        dateFilterComboBox.addValueChangeListener(e -> updateDateFilter());
-        dateFilterComboBox.setValue(EnumDateFilter.TM);
-        HorizontalLayout dateFilter = new HorizontalLayout(dateFilterComboBox, startDatePicker, new Span("To"), endDatePicker);
-        dateFilter.setAlignItems(FlexComponent.Alignment.CENTER);
-
         if (this.gridViewParameter.getParameters() != null &&
                 (int) this.gridViewParameter.getParameters()[0] != -1) {
             if (!gridViewParameter.isValid()) {
@@ -538,8 +491,7 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService> ex
 
 //        HorizontalLayout columnToolbar = new HorizontalLayout(autoWidthSave, columns);
 
-        if (gridViewParameter.getDateFilterOn() != null)
-//            toolbar.add(filterText, btnReload, btnSave, dateFilter);
+        if (dateFilterOn != null)
             toolbar.add(dateFilter);
 //        else
 //            toolbar.add(filterText, btnReload, btnSave);
@@ -548,16 +500,12 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService> ex
     }
 
 
-    private void filterByDate(LocalDateTime start, LocalDateTime end) throws Exception {
-        if (start != null && end != null) {
-            if (!start.isBefore(end)) {
-                Notification.show("End date should be after start date", 5000, Notification.Position.MIDDLE);
-                return;
-            }
-        }
+    @Override
+    public void onUpdateForm() throws Exception {
+        if (this.gridViewParameter == null)
+            return;
 
-        grid.setItems(this.getTableData(this.gridViewParameter.getParameters(), false));
-        grid.reloadData();
+        this.updateList();
     }
 
     private String makeContent(List<String> annotatedFields, Object[] data) {
@@ -597,6 +545,7 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService> ex
 
     public void onNewItem(GuiItem item) {
         try {
+            grid.onEnable();
             grid.setRowCountOnElement("rowcount");
             T entityData = service.addNewEntity(this.gridViewParameter.getEntityClass());
             grid.setIDToGridRow(item.getId(), entityData.getId());
@@ -637,7 +586,6 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService> ex
             String pkField = GlobalData.getPrimaryKeyField(selectClass).getName();
             parameters[1] = parameters[1] + "." + pkField;
         }
-
 
         StringBuilder query = new StringBuilder("UPDATE ")
                 .append(gridViewParameter.getFromDefinition());
@@ -701,56 +649,15 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService> ex
 
     private void updateList() {
         try {
-            grid.setItems(this.getTableData(new Integer[]{-1}, false));
+            grid.setItems(this.getTableData(gridViewParameter.getParameters(), false));
         } catch (Exception e) {
             e.fillInStackTrace();
         }
-        add(grid);
+        grid.reloadData();
     }
 
     @SuppressWarnings("unchecked")
     private static <T extends Enum<T>> Enum<T>[] getEnumConstants(Class<?> enumTypes) {
         return ((Class<T>) enumTypes).getEnumConstants();
-    }
-
-    private void updateDateFilter()
-    {
-        LocalDate dateFrom = null;
-        LocalDate dateTo = null;
-
-        switch (dateFilterComboBox.getValue()) {
-            case TD :
-                dateFrom = LocalDate.from(LocalDateTime.now().truncatedTo(ChronoUnit.DAYS));
-                dateTo = LocalDate.from(LocalDateTime.now().truncatedTo(ChronoUnit.DAYS));
-                break;
-
-            case TW:
-                dateFrom = LocalDate.now();
-                dateFrom = dateFrom.with(WeekFields.of(Locale.UK).getFirstDayOfWeek());
-                dateTo = dateFrom.plusWeeks(1).minusDays(1);
-                break;
-            case NW:
-                dateFrom = LocalDate.now().plusWeeks(1);
-                dateFrom = dateFrom.with(WeekFields.of(Locale.UK).getFirstDayOfWeek());
-                dateTo = dateFrom.plusWeeks(1).minusDays(1);
-                break;
-            case TM:
-                dateFrom = LocalDate.of(LocalDate.now().getYear(), LocalDate.now().getMonth(), 1);
-                dateTo = YearMonth.of(LocalDate.now().getYear(), LocalDate.now().getMonth()).atEndOfMonth();
-                break;
-            case NM:
-                dateFrom = LocalDate.now().plusMonths(1);
-                dateFrom = LocalDate.of(dateFrom.getYear(), dateFrom.getMonth(), 1);
-                dateTo = YearMonth.of(dateFrom.getYear(), dateFrom.getMonth()).atEndOfMonth();
-
-                break;
-
-
-        }
-
-        if (dateFrom != null)
-            startDatePicker.setValue(dateFrom);
-        if (dateTo != null)
-            endDatePicker.setValue(dateTo);
     }
 }

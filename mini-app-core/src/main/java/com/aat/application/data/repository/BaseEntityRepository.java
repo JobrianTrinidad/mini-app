@@ -52,14 +52,26 @@ public class BaseEntityRepository {
             if (result[1] != null) {
                 groupID = String.valueOf(((ZJTEntity) result[1]).getId());
             }
-            if (result[2] != null) {
-                startDate = (LocalDateTime) result[2];
-                DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy h:mm a", Locale.ENGLISH);
-                String formattedDate = startDate.format(inputFormatter);
-                startDate = LocalDateTime.parse(formattedDate, inputFormatter);
-                ZJTItem item = new ZJTItem(title, groupID, startDate);
-                items.add(item);
+            int nStartDateId = 0;
+            for (Object resultObj : result) {
+                if (resultObj instanceof LocalDateTime) {
+                    startDate = (LocalDateTime) resultObj;
+                    DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy h:mm a", Locale.ENGLISH);
+                    String formattedDate = startDate.format(inputFormatter);
+                    startDate = LocalDateTime.parse(formattedDate, inputFormatter);
+                    ZJTItem item = new ZJTItem(title, groupID, startDate);
+                    item.setStartDateId(nStartDateId++);
+                    items.add(item);
+                }
             }
+//            if (result[2] != null && result[2] instanceof LocalDateTime) {
+//                startDate = (LocalDateTime) result[2];
+//                DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy h:mm a", Locale.ENGLISH);
+//                String formattedDate = startDate.format(inputFormatter);
+//                startDate = LocalDateTime.parse(formattedDate, inputFormatter);
+//                ZJTItem item = new ZJTItem(title, groupID, startDate);
+//                items.add(item);
+//            }
         }
         return items;
     }
@@ -74,6 +86,15 @@ public class BaseEntityRepository {
         for (int i = 0; i < params.length; i++) {
             customQuery.setParameter("param" + i, params[i]);
         }
+        return customQuery.getResultList();
+    }
+
+    public List<ZJTEntity> findEntitiesFilteredBy(ZJTEntity filterEntity, String fieldName, Class<?> entityClass) {
+        String sql = "SELECT p FROM " + entityClass.getSimpleName() + " AS p"
+                + " WHERE p." + fieldName + " = :param0";
+        Query customQuery = entityManager.createQuery(sql);
+        customQuery.setParameter("param0", filterEntity);
+
         return customQuery.getResultList();
     }
 

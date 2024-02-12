@@ -6,13 +6,12 @@ import com.aat.application.util.GlobalData;
 import com.vaadin.componentfactory.timeline.Timeline;
 import com.vaadin.componentfactory.timeline.model.Item;
 import com.vaadin.componentfactory.timeline.model.ItemGroup;
-import com.vaadin.flow.component.UI;
-import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.Unit;
+import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.server.VaadinSession;
 
 import java.io.Serial;
 import java.time.LocalDateTime;
@@ -26,40 +25,55 @@ public abstract class TimeLineForm<S extends ZJTService> extends CommonForm {
     Timeline timeline;
     private final TimeLineViewParameter timeLineViewParameter;
     protected S service;
+    private final HorizontalLayout toolbar = new HorizontalLayout();
+    private String filteredValue = "";
 
     public TimeLineForm(TimeLineViewParameter timeLineViewParameter,
                         S service) {
         this.timeLineViewParameter = timeLineViewParameter;
         this.service = service;
+        dateFilterOn = timeLineViewParameter.getDateFilterOn();
         addClassName("demo-app-form");
-
         configureTimeLine();
+        try {
+            getToolbar();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        addComponentAtIndex(0, toolbar);
     }
 
-    private VerticalLayout getToolbar() throws Exception {
-        Button btnGoOriginView = new Button(GlobalData.convertToStandard(this.timeLineViewParameter.groupName));
+    private void getToolbar() throws Exception {
+        VerticalLayout itemKindLayout = new VerticalLayout();
 
-//        VerticalLayout itemKindLayout = new VerticalLayout();
-//        for (String fieldName : GlobalData.getFieldNamesWithAnnotation(StartDate.class, this.groupClass)) {
-//            HorizontalLayout everyItemLayout = new HorizontalLayout();
-//            everyItemLayout.setWidth(200, Unit.PIXELS);
-//            everyItemLayout.setJustifyContentMode(FlexComponent.JustifyContentMode.BETWEEN);
-//            String itemClassName = null;
-//            for (Field field : this.groupClass.getDeclaredFields()) {
-//                if (field.getName().equals(fieldName)) {
-//                    itemClassName = field.getAnnotation(StartDate.class).className();
-//                }
-//            }
-//            Span label = new Span(GlobalData.convertToStandard(fieldName));
-//            Div graph = new Div();
-//            graph.setWidth(50, Unit.PIXELS);
-//            graph.setClassName(itemClassName);
-//            everyItemLayout.add(label, graph);
-//            itemKindLayout.add(everyItemLayout);
-//        }
+        int nStartDateId = 0;
+        for (String fieldName : timeLineViewParameter.getStartDateFieldNames()) {
+            HorizontalLayout everyItemLayout = new HorizontalLayout();
+            everyItemLayout.setWidth(200, Unit.PIXELS);
+            everyItemLayout.setJustifyContentMode(FlexComponent.JustifyContentMode.BETWEEN);
 
-        String filteredValue = "";
-        if (this.timeLineViewParameter.getParameters() != null) {
+            Span label = new Span(GlobalData.convertToStandard(fieldName));
+            Div graph = new Div();
+            graph.setWidth(50, Unit.PIXELS);
+            switch (nStartDateId) {
+                case 0:
+                    graph.setClassName("bg-success");
+                    break;
+                case 1:
+                    graph.setClassName("bg-warning");
+                    break;
+                default:
+                    graph.setClassName("bg-error");
+                    break;
+            }
+            everyItemLayout.add(label, graph);
+            itemKindLayout.add(everyItemLayout);
+            nStartDateId++;
+        }
+        toolbar.add(itemKindLayout);
+
+        if (this.timeLineViewParameter.getParameters() != null &&
+                (int) this.timeLineViewParameter.getParameters()[0] != -1) {
             if (!timeLineViewParameter.isValid()) {
                 throw new Exception("TuiGrid Definition is not valid.");
             }
@@ -80,19 +94,8 @@ public abstract class TimeLineForm<S extends ZJTService> extends CommonForm {
 
             filteredValue = String.valueOf(service.findEntityByQuery(query.toString()).get(0));
         }
-        Span sp = new Span(">> " + filteredValue);
-        HorizontalLayout routeLayout = new HorizontalLayout(btnGoOriginView, sp);
-        routeLayout.setAlignItems(FlexComponent.Alignment.CENTER);
-
-        btnGoOriginView.addClickListener(e -> {
-            String previousView = (String) VaadinSession.getCurrent().getAttribute("previousView");
-            if (previousView != null) {
-                UI.getCurrent().navigate(previousView);
-            }
-        });
-        btnGoOriginView.getElement().setAttribute("theme", "tertiary-inline");
-        btnGoOriginView.addClassName("link-button");
-        return new VerticalLayout(routeLayout);
+        if (dateFilterOn != null)
+            toolbar.add(dateFilter);
     }
 
     private List<Object[]> configureGroup() throws Exception {
@@ -103,17 +106,16 @@ public abstract class TimeLineForm<S extends ZJTService> extends CommonForm {
             throw new Exception("Parameters are required, but not set");
         }
 
-        String[] whereDefinition = timeLineViewParameter.getWhereDefinition().split("\\.");
 
         StringBuilder query = new StringBuilder("SELECT p.")
-                .append(whereDefinition[1])
+                .append(timeLineViewParameter.getGroupClassPKField())
                 .append(", p.").append(timeLineViewParameter.getSelectDefinition());
 
 
         query.append(" FROM ").append(timeLineViewParameter.getGroupClass().getSimpleName()).append(" as p");
 
         if ((int) timeLineViewParameter.getParameters()[0] != -1) {
-            query.append(" WHERE ").append("p.").append(whereDefinition[1]);
+            query.append(" WHERE ").append("p.").append(timeLineViewParameter.getGroupClassPKField());
             //TODO -set parameter
             query.append(" = ").append(timeLineViewParameter.getParameters()[0]);
         }
@@ -162,7 +164,7 @@ public abstract class TimeLineForm<S extends ZJTService> extends CommonForm {
         });
 
         try {
-            add(getToolbar(), timeline);
+            add(toolbar, timeline);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -190,7 +192,19 @@ public abstract class TimeLineForm<S extends ZJTService> extends CommonForm {
             Item item = new Item();
 //            item.setId(data.getId().toString());
             item.setContent(data.getTitle());
-            item.setClassName(data.getClassName());
+
+            switch (data.getStartDateId()) {
+                case 0:
+                    item.setClassName("bg-success");
+                    break;
+                case 1:
+                    item.setClassName("bg-warning");
+                    break;
+                default:
+                    item.setClassName("bg-error");
+                    break;
+            }
+
             item.setStart(data.getStartTime());
             item.setEnd(data.getEndTime());
             item.setGroup(data.getGroupId());
@@ -201,24 +215,40 @@ public abstract class TimeLineForm<S extends ZJTService> extends CommonForm {
     }
 
     private String getStandardQuery(Object[] parameters) {
-        String query = "SELECT "
-                + "p." + timeLineViewParameter.getTitleFieldName()
-                + ", p." + timeLineViewParameter.getGroupIDFieldName()
-                + ", p." + timeLineViewParameter.getStartDateFieldName()
-                + (timeLineViewParameter.getEndDateFieldName() != null ? ", p." + timeLineViewParameter.getEndDateFieldName() : "")
-                + (timeLineViewParameter.getClassNameFieldName() != null ? ", p." + timeLineViewParameter.getClassNameFieldName() : "");
+        StringBuilder query = new StringBuilder("SELECT ");
+        query.append("CONCAT(p.").append(timeLineViewParameter.getTitleFieldName()[0]);
+        int index = 0;
+        for (String titleField : timeLineViewParameter.getTitleFieldName()) {
+            if (index != 0)
+                query.append(", ' '").append(", p.").append(titleField);
+            index++;
+        }
+        query.append(") AS title");
+        int count = 0;
+        query.append(", p.").append(timeLineViewParameter.getGroupIDFieldName()).append(" AS groupId");
+        for (String startDateFieldName : timeLineViewParameter.getStartDateFieldNames()) {
+            query.append(", p.").append(startDateFieldName).append(" AS startDate").append(count);
+            count++;
+        }
+        query.append(timeLineViewParameter.getEndDateFieldName() != null ? ", p." + timeLineViewParameter.getEndDateFieldName() : "")
+                .append(timeLineViewParameter.getClassNameFieldName() != null ? ", p." + timeLineViewParameter.getClassNameFieldName() : "");
 
-
-        query = query +
-                " FROM " + timeLineViewParameter.getFromDefinition() + " as p";
+        query.append(" FROM ").append(timeLineViewParameter.getFromDefinition()).append(" as p");
 
         if (timeLineViewParameter.getWhereDefinition() != null) {
-            query = query +
-                    " WHERE " + "p." + timeLineViewParameter.getWhereDefinition();
+            query.append(" WHERE p.").append(timeLineViewParameter.getWhereDefinition());
             //TODO -set parameter
-            query = query + " = " + parameters[0];
+            query.append(" = ").append(parameters[0]);
+            if (dateFilterOn != null) {
+                addConditionWhenFilteringDate(query);
+            }
+        } else {
+            if (dateFilterOn != null) {
+                query.append(" WHERE 1=1");
+                addConditionWhenFilteringDate(query);
+            }
         }
-        return query;
+        return query.toString();
     }
 
     private List<ItemGroup> getGroupItems(List<Object[]> groupResults) {
@@ -242,12 +272,22 @@ public abstract class TimeLineForm<S extends ZJTService> extends CommonForm {
 
     @Override
     public String getHamburgerText() {
-        return ">> ";
+        if (filteredValue.isEmpty()) {
+            return "";
+        }
+        return ">> " + timeLineViewParameter.getPageName() + filteredValue;
     }
 
     @Override
     public String getOriginViewText() {
-//        return GlobalData.convertToStandard(this.gridViewParameter.groupName);
+//        return GlobalData.convertToStandard(this.timeLineViewParameter.groupName);
         return "";
+    }
+
+    @Override
+    public void onUpdateForm() throws Exception {
+        if (this.timeLineViewParameter == null)
+            return;
+        timeline.setItems(this.getItems(true), true);
     }
 }

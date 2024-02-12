@@ -1,6 +1,7 @@
 package com.aat.application.data.entity;
 
 import com.aat.application.annotations.DisplayName;
+import com.aat.application.annotations.timeline.StartDate;
 import com.aat.application.core.data.entity.ZJTEntity;
 import com.aat.application.data.repository.BaseEntityRepository;
 import com.vaadin.flow.router.PageTitle;
@@ -41,19 +42,95 @@ public class ZJTVehicleServiceSchedule implements ZJTEntity {
     @DisplayName(value = "Last Service (KM)")
     private Integer lastServiceKM;
 
-    @Column (name = "plandate")
+    @Column(name = "plandate")
+    @StartDate(className = "red")
     @DisplayName(value = "Plan Date")
     private LocalDateTime planDate;
-    @Column (name = "duedate")
+    @Column(name = "duedate")
+    @StartDate(className = "blue")
     @DisplayName(value = "Due Date")
     private LocalDateTime dueDate;
 
-
     @Column
     @DisplayName(value = "In Progress")
-    private boolean inProgress;
+    private Boolean inProgress;
     @Transient
     private ZJTItem item;
+
+    public Boolean isInProgress() {
+        return inProgress;
+    }
+
+    public void setInProgress(boolean inProgress) {
+        this.inProgress = inProgress;
+    }
+
+    public static int createWorkshopJob(BaseEntityRepository repository, List<ZJTVehicleServiceSchedule> serviceSchedules) {
+        Map<Integer, ZJTVehicleServiceJob> vehicleJobs = new HashMap<Integer, ZJTVehicleServiceJob>();
+        int n = 0;
+
+        for (ZJTVehicleServiceSchedule serviceSchedule : serviceSchedules) {
+            ZJTVehicleServiceType serviceType = serviceSchedule.getServiceType();
+            ZJTVehicle vehicle = serviceSchedule.getVehicle();
+
+            String query = "SELECT p FROM " + ZJTVehicleServiceJob.class.getSimpleName()
+                    + " AS p WHERE not p.isComplete AND p.vehicle.zjt_vehicle_id = :param0 AND EXISTS ("
+                    + "SELECT q FROM " + ZJTVehicleServiceType.class.getSimpleName() + " AS q "
+                    + "WHERE q.zjt_vehicleservicetype_id = :param1)";
+            Object[] params = new Object[]{vehicle.getId(), serviceType.getId()};
+
+            List<Object[]> vehicleServiceJobs =
+                    repository.findEntityByQuery(query, params);
+
+            //check if there is an open service job for the vehicle of this service type
+            if (vehicleServiceJobs.isEmpty()) {
+
+                ZJTVehicleServiceJob entityServiceJob = vehicleJobs.get(vehicle.getId());
+
+                if (entityServiceJob == null) {
+                    entityServiceJob = new ZJTVehicleServiceJob();
+                    entityServiceJob.setPerformedDate(LocalDateTime.now());
+                    entityServiceJob.setComplete(false);
+                    entityServiceJob.setVehicle(vehicle);
+                    entityServiceJob.setServiceType(serviceType);
+                    entityServiceJob = (ZJTVehicleServiceJob) repository.addNewEntity(entityServiceJob);
+
+                    vehicleJobs.put(vehicle.getId(), entityServiceJob);
+                }
+
+                ZJTVehicleServiceJobServiceType entityServiceType = new ZJTVehicleServiceJobServiceType();
+                entityServiceType.setVehicleServiceJob(entityServiceJob);
+                entityServiceType.setServiceType(serviceSchedule.getServiceType());
+                repository.addNewEntity(entityServiceType);
+
+                List<ZJTEntity> serviceTypeTaskList = repository.findEntitiesFilteredBy(serviceSchedule.getServiceType()
+                        , "serviceType", ZJTServiceTypeTask.class);
+//                List<ZJTEntity> serviceTypeTaskList = repository.findAll(ZJTServiceTypeTask.class);
+                for (ZJTEntity serviceTypeTask : serviceTypeTaskList) {
+                    ZJTVehicleServiceJobTask entityServiceJobTask = new ZJTVehicleServiceJobTask();
+                    entityServiceJobTask.setVehicleServiceJob(entityServiceJob);
+                    entityServiceJobTask.setServiceTask((ZJTServiceTypeTask) serviceTypeTask);
+                    //TODO - should sum seqno of other service type
+                    entityServiceJobTask.setSeqNo(((ZJTServiceTypeTask) serviceTypeTask).getSeqNo());
+                    entityServiceJobTask.setComplete(false);
+                    repository.addNewEntity(entityServiceJobTask);
+                }
+
+                List<ZJTEntity> serviceJobServiceKitList = repository.findAll(ZJTServiceKit.class);
+                for (ZJTEntity serviceJobServiceKit : serviceJobServiceKitList) {
+                    ZJTVehicleServiceJobServiceKit vehicleServiceJobServiceKit = new ZJTVehicleServiceJobServiceKit();
+                    vehicleServiceJobServiceKit.setVehicleServiceJob(entityServiceJob);
+                    vehicleServiceJobServiceKit.setServiceKit((ZJTServiceKit) serviceJobServiceKit);
+                    repository.addNewEntity(vehicleServiceJobServiceKit);
+                }
+
+                serviceSchedule.setInProgress(true);
+                repository.updateEntity(serviceSchedule);
+                n++;
+            }
+        }
+        return n;
+    }
 
     public int getZjt_vehicleserviceschedule_id() {
         return zjt_vehicleserviceschedule_id;
@@ -101,82 +178,5 @@ public class ZJTVehicleServiceSchedule implements ZJTEntity {
 
     public void setDueDate(LocalDateTime dueDate) {
         this.dueDate = dueDate;
-    }
-
-
-    public boolean isInProgress() {
-        return inProgress;
-    }
-
-    public void setInProgress(boolean inProgress) {
-        this.inProgress = inProgress;
-    }
-
-
-    public static int createWorkshopJob(BaseEntityRepository repository,  List<ZJTVehicleServiceSchedule> serviceSchedules)
-    {
-        Map<Integer, ZJTVehicleServiceJob> vehicleJobs = new HashMap<Integer, ZJTVehicleServiceJob>();
-        int n = 0;
-
-        for (ZJTVehicleServiceSchedule serviceSchedule : serviceSchedules) {
-            ZJTVehicleServiceType serviceType = serviceSchedule.getServiceType();
-            ZJTVehicle vehicle = serviceSchedule.getVehicle();
-
-            String query = "SELECT p FROM " + ZJTVehicleServiceJob.class.getSimpleName()
-                    + " AS p  WHERE not p.isComplete AND p.zjt_vehicle_id = :param1 AND exists ("
-                    + " SELECT q FROM " + ZJTVehicleServiceType.class.getSimpleName() + " AS q "
-                    + "WHERE q.zjt_vehicleservicetype_id = :param2)";
-            Object[] params = new Object[]{vehicle.getId(), serviceType.getId()};
-
-            List<Object[]> vehicleServiceJobs =
-                    repository.findEntityByQuery(query, params);
-
-            //check if there is an open service job for the vehicle of this service type
-            if (!vehicleServiceJobs.isEmpty()) {
-                serviceSchedule.setInProgress(true);
-
-                ZJTVehicleServiceJob entityServiceJob = vehicleJobs.get(vehicle.getId());
-
-                if (entityServiceJob == null) {
-                    entityServiceJob = new ZJTVehicleServiceJob();
-                    entityServiceJob.setPerformedDate(LocalDateTime.now());
-                    entityServiceJob.setComplete(false);
-                    entityServiceJob.setVehicle(vehicle);
-                    entityServiceJob = (ZJTVehicleServiceJob)repository.addNewEntity(entityServiceJob);
-
-                    vehicleJobs.put(vehicle.getId(), entityServiceJob);
-                }
-
-
-                ZJTVehicleServiceJobServiceType entityServiceType = new ZJTVehicleServiceJobServiceType();
-                entityServiceType.setVehicleServiceJob(entityServiceJob);
-                entityServiceType.setServiceType(serviceSchedule.getServiceType());
-                repository.addNewEntity(entityServiceType);
-
-                List<ZJTEntity> serviceTypeTaskList = repository.findAll(ZJTServiceTypeTask.class);
-                for (ZJTEntity serviceTypeTask : serviceTypeTaskList) {
-                    ZJTVehicleServiceJobTask entityServiceJobTask = new ZJTVehicleServiceJobTask();
-                    entityServiceJobTask.setVehicleServiceJob(entityServiceJob);
-                    entityServiceJobTask.setServiceTask((ZJTServiceTypeTask) serviceTypeTask);
-                    //TODO - should sum seqno of other service type
-                    entityServiceJobTask.setSeqNo(((ZJTServiceTypeTask) serviceTypeTask).getSeqNo());
-                    entityServiceJobTask.setComplete(false);
-                    repository.addNewEntity(entityServiceJobTask);
-                }
-
-                List<ZJTEntity> serviceJobServiceKitList = repository.findAll(ZJTServiceKit.class);
-                for (ZJTEntity serviceJobServiceKit : serviceJobServiceKitList) {
-                    ZJTVehicleServiceJobServiceKit vehicleServiceJobServiceKit = new ZJTVehicleServiceJobServiceKit();
-                    vehicleServiceJobServiceKit.setVehicleServiceJob(entityServiceJob);
-                    vehicleServiceJobServiceKit.setServiceKit((ZJTServiceKit) serviceJobServiceKit);
-                    repository.addNewEntity(vehicleServiceJobServiceKit);
-                }
-
-
-                repository.updateEntity(serviceSchedule);
-                n++;
-            }
-        }
-        return n;
     }
 }

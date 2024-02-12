@@ -17,6 +17,8 @@ public class ZJTItem implements ZJTEntity {
     @Column
     private LocalDateTime startTime;
     @Column
+    private int startDateId;
+    @Column
     private LocalDateTime endTime;
     @Column
     private String groupId;
@@ -73,6 +75,14 @@ public class ZJTItem implements ZJTEntity {
 
     public void setStartTime(LocalDateTime startTime) {
         this.startTime = startTime;
+    }
+
+    public int getStartDateId() {
+        return startDateId;
+    }
+
+    public void setStartDateId(int startDateId) {
+        this.startDateId = startDateId;
     }
 
     public LocalDateTime getEndTime() {

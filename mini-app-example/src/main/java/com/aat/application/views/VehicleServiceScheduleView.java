@@ -29,7 +29,7 @@ public class VehicleServiceScheduleView extends StandardFormView implements HasU
         super(repository, tableInfoService);
         gridViewParameter = new GridViewParameter(ZJTVehicleServiceSchedule.class, "");
         gridViewParameter.setDateFilterOn("planDate");
-//        gridViewParameter.setReadOnly(true);
+        gridViewParameter.setReadOnly(false);
         super.setGridViewParameter(gridViewParameter);
     }
 
@@ -74,10 +74,10 @@ public class VehicleServiceScheduleView extends StandardFormView implements HasU
                 (List<ZJTVehicleServiceSchedule>) repository
                         .findEntitiesByIds(ZJTVehicleServiceSchedule.class, this.nSelectedEntityIds);
         int n = 0;
-        if (serviceSchedules != null ) {
+        if (serviceSchedules != null) {
+            this.form.grid.setUnCheckAll();
             n = ZJTVehicleServiceSchedule.createWorkshopJob(repository, serviceSchedules);
             this.setMessageStatus(n + " workshop job created.");
-
         } else
             this.setMessageStatus("Please select row.");
     }
@@ -90,7 +90,7 @@ public class VehicleServiceScheduleView extends StandardFormView implements HasU
     public void setParameter(BeforeEvent event, @OptionalParameter String parameter) {
         if (parameter != null) {
             if (event.getRouteParameters().get("subcategory").isPresent()) {
-                TimeLineViewParameter timeLineViewParameter = new TimeLineViewParameter("vehicle.fleetid", "vehicle", "planDate");
+                TimeLineViewParameter timeLineViewParameter = new TimeLineViewParameter(new String[]{"vehicle.fleetid"}, "vehicle", new String[]{"planDate"});
                 timeLineViewParameter.setGroupClass(ZJTVehicleServiceSchedule.class);
                 timeLineViewParameter.setSelectDefinition("vehicle.fleetid");
                 timeLineViewParameter.setWhereDefinition("vehicle.zjt_vehicle_id");

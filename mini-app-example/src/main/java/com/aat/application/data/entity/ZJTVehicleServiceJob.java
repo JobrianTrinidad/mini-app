@@ -3,6 +3,7 @@ package com.aat.application.data.entity;
 import com.aat.application.annotations.BaseItems;
 import com.aat.application.annotations.ContentDisplayedInSelect;
 import com.aat.application.annotations.DisplayName;
+import com.aat.application.annotations.MultiLineField;
 import com.aat.application.core.data.entity.ZJTEntity;
 import com.vaadin.flow.router.PageTitle;
 import jakarta.persistence.*;
@@ -24,6 +25,7 @@ public class ZJTVehicleServiceJob implements ZJTEntity {
     protected int zjt_vehicleservicejob_id;
 
     @Column
+    @MultiLineField
     @DisplayName(value = "Comments")
     private String comments;
 
@@ -46,7 +48,7 @@ public class ZJTVehicleServiceJob implements ZJTEntity {
     private LocalDateTime dueDate;
     @Column
     @DisplayName(value = "IsComplete")
-    private boolean isComplete;
+    private Boolean isComplete;
 
     @ManyToOne
     @ContentDisplayedInSelect(sequence = 10)
@@ -127,11 +129,11 @@ public class ZJTVehicleServiceJob implements ZJTEntity {
         this.performedDate = performedDate;
     }
 
-    public boolean isComplete() {
+    public Boolean isComplete() {
         return isComplete;
     }
 
-    public void setComplete(boolean complete) {
+    public void setComplete(Boolean complete) {
         isComplete = complete;
     }
 

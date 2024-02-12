@@ -2,6 +2,7 @@ package com.aat.application.core.form;
 
 import com.aat.application.annotations.ContentDisplayedInSelect;
 import com.aat.application.annotations.DisplayName;
+import com.aat.application.annotations.MultiLineField;
 import com.vaadin.flow.router.PageTitle;
 import jakarta.persistence.Id;
 
@@ -125,12 +126,22 @@ public class GridViewParameter {
             }
             if (field.getAnnotation(jakarta.persistence.Column.class) != null) {
                 fieldNames.add(field.getName());
-                if (field.getType().getSimpleName().equals("LocalDateTime"))
-                    headerOptions.put(field.getName(), "date");
-                else if (field.getType().getSimpleName().equals("boolean"))
-                    headerOptions.put(field.getName(), "check");
-                else
-                    headerOptions.put(field.getName(), "input");
+                String strAdd = "";
+                if (field.getAnnotation(MultiLineField.class) != null)
+                    strAdd = "_multi";
+                switch (field.getType().getSimpleName()) {
+                    case "LocalDateTime":
+                        headerOptions.put(field.getName(), "date" + strAdd);
+                        break;
+                    case "Boolean":
+                    case "boolean":
+                        headerOptions.put(field.getName(), "check");
+                        break;
+                    default:
+                        headerOptions.put(field.getName(), "input" + strAdd);
+                        break;
+                }
+
                 headerNames.put(field.getName(), field.getAnnotation(DisplayName.class).value());
             }
             if (field.getAnnotation(jakarta.persistence.Enumerated.class) != null) {

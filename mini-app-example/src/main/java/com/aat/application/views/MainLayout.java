@@ -57,9 +57,11 @@ public class MainLayout extends CoreMainLayout {
 
         parent = new AppNavItem("Transaction");
         parent.setIcon(LineAwesomeIcon.FOLDER.create());
+        parent.addItem(new AppNavItem("Vehicle KM Reading", "vehiclekmreading", LineAwesomeIcon.PRODUCT_HUNT.create())
+                .withParameter("layout", this.getClass().getName()));
         parent.addItem(new AppNavItem("Service Schedule", "service-schedule", LineAwesomeIcon.PRODUCT_HUNT.create())
                 .withParameter("layout", this.getClass().getName()));
-        parent.addItem(new AppNavItem("Vehicle KM Reading", "vehiclekmreading", LineAwesomeIcon.PRODUCT_HUNT.create())
+        parent.addItem(new AppNavItem("Service Schedule Overview", "service-schedule-overview", LineAwesomeIcon.PRODUCT_HUNT.create())
                 .withParameter("layout", this.getClass().getName()));
 
         nav.addItem(parent);

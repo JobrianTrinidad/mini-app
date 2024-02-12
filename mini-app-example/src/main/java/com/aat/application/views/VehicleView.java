@@ -76,7 +76,7 @@ public class VehicleView extends StandardFormView implements HasUrlParameter<Str
                 gridViewParameter.setGroupClass(ZJTVehicle.class);
                 gridViewParameter.setFilterClass(ZJTVehicle.class);
                 gridViewParameter.setWhereDefinition("vehicle.zjt_vehicle_id");
-                TimeLineViewParameter timeLineViewParameter = new TimeLineViewParameter("vehicle.fleetid", "vehicle", "planDate", null, null, "ZJTVehicleServiceSchedule");
+                TimeLineViewParameter timeLineViewParameter = new TimeLineViewParameter(new String[]{"vehicle.fleetid"}, "vehicle", new String[]{"planDate"}, null, null, "ZJTVehicleServiceSchedule");
                 timeLineViewParameter.setGroupClass(ZJTVehicle.class);
                 timeLineViewParameter.setSelectDefinition("fleetid");
                 timeLineViewParameter.setWhereDefinition("vehicle.zjt_vehicle_id");
