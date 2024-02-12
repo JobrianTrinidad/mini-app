@@ -29,7 +29,7 @@ public class VehicleServiceScheduleView extends StandardFormView implements HasU
         super(repository, tableInfoService);
         gridViewParameter = new GridViewParameter(ZJTVehicleServiceSchedule.class, "");
         gridViewParameter.setDateFilterOn("planDate");
-        gridViewParameter.setReadOnly(false);
+        gridViewParameter.setReadOnly(true);
         super.setGridViewParameter(gridViewParameter);
     }
 
@@ -78,6 +78,7 @@ public class VehicleServiceScheduleView extends StandardFormView implements HasU
             this.form.grid.setUnCheckAll();
             n = ZJTVehicleServiceSchedule.createWorkshopJob(repository, serviceSchedules);
             this.setMessageStatus(n + " workshop job created.");
+            this.form.grid.reloadData();
         } else
             this.setMessageStatus("Please select row.");
     }
