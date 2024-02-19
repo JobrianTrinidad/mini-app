@@ -625,8 +625,12 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService> ex
     private void saveAll() {
     }
 
-    private void reloadGrid() {
+    public void reloadGrid() {
         grid.reloadData();
+    }
+
+    public void restore() {
+        grid.refreshGrid();
     }
 
     private List<Integer> getColumnWidths() {
@@ -647,7 +651,7 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService> ex
         return colWidths;
     }
 
-    private void updateList() {
+    public void updateList() {
         try {
             grid.setItems(this.getTableData(gridViewParameter.getParameters(), false));
         } catch (Exception e) {
