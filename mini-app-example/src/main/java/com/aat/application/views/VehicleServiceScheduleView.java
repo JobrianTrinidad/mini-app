@@ -2,6 +2,7 @@ package com.aat.application.views;
 
 import com.aat.application.core.data.entity.ZJTEntity;
 import com.aat.application.core.form.GridViewParameter;
+import com.aat.application.core.form.StandardForm;
 import com.aat.application.core.form.TimeLineViewParameter;
 import com.aat.application.data.entity.*;
 import com.aat.application.data.repository.BaseEntityRepository;
@@ -29,7 +30,7 @@ public class VehicleServiceScheduleView extends StandardFormView implements HasU
         super(repository, tableInfoService);
         gridViewParameter = new GridViewParameter(ZJTVehicleServiceSchedule.class, "");
         gridViewParameter.setDateFilterOn("planDate");
-        gridViewParameter.setReadOnly(false);
+        gridViewParameter.setReadOnly(true);
         super.setGridViewParameter(gridViewParameter);
     }
 
@@ -77,6 +78,7 @@ public class VehicleServiceScheduleView extends StandardFormView implements HasU
         if (serviceSchedules != null) {
             this.form.grid.setUnCheckAll();
             n = ZJTVehicleServiceSchedule.createWorkshopJob(repository, serviceSchedules);
+            ((StandardForm<?, ?>) this.form).updateList();
             this.setMessageStatus(n + " workshop job created.");
         } else
             this.setMessageStatus("Please select row.");
