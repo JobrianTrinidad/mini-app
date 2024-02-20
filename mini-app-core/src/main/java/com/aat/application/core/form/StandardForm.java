@@ -324,9 +324,9 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService> ex
             query.append(" WHERE ").append("p.").append(gridViewParameter.getWhereDefinition());
             //TODO -set parameter
             query.append(" = ").append(parameters[0]);
-            if (dateFilterOn != null) {
-                addConditionWhenFilteringDate(query);
-            }
+//            if (dateFilterOn != null) {
+//                addConditionWhenFilteringDate(query);
+//            }
         } else {
             if (dateFilterOn != null) {
                 query.append(" WHERE 1=1");

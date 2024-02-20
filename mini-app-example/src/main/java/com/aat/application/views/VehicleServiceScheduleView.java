@@ -1,6 +1,5 @@
 package com.aat.application.views;
 
-import com.aat.application.core.data.entity.ZJTEntity;
 import com.aat.application.core.form.GridViewParameter;
 import com.aat.application.core.form.StandardForm;
 import com.aat.application.core.form.TimeLineViewParameter;
@@ -17,7 +16,6 @@ import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.router.*;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -107,7 +105,7 @@ public class VehicleServiceScheduleView extends StandardFormView implements HasU
                         gridViewParameter.setGroupName("vehicle");
                         timeLineViewParameter.setFromDefinition(ZJTVehicleServiceJob.class.getSimpleName());
                         break;
-                    case "servicetype":
+                    case "service-type":
                         gridViewParameter.setEntityClass(ZJTVehicleServiceJobServiceType.class);
                         gridViewParameter.setGroupName("vehicleServiceJob");
                         timeLineViewParameter.setFromDefinition(ZJTVehicleServiceJobServiceType.class.getSimpleName());
@@ -117,7 +115,7 @@ public class VehicleServiceScheduleView extends StandardFormView implements HasU
                         gridViewParameter.setGroupName("vehicleServiceJob");
                         timeLineViewParameter.setFromDefinition(ZJTVehicleServiceJobTask.class.getSimpleName());
                         break;
-                    case "servicekit":
+                    case "service-kit":
                         gridViewParameter.setEntityClass(ZJTVehicleServiceJobServiceKit.class);
                         gridViewParameter.setGroupName("vehicleServiceJob");
                         timeLineViewParameter.setFromDefinition(ZJTVehicleServiceJobServiceKit.class.getSimpleName());
@@ -158,13 +156,13 @@ public class VehicleServiceScheduleView extends StandardFormView implements HasU
         serviceTypeGrid.addContextMenuClickListener(e -> {
             for (Cell cell : e.getRow()) {
                 if (cell.getColName().equals("vehicle")) {
-                    UI.getCurrent().navigate("service-schedule/servicetype/grid/" + cell.getCellValue());
+                    UI.getCurrent().navigate("service-schedule/service-type/grid/" + cell.getCellValue());
                     break;
                 }
             }
         });
         MenuItem serviceTypeTimeline = serviceType.addSubItem("Timeline");
-        serviceTypeTimeline.addContextMenuClickListener(e -> UI.getCurrent().navigate("service-schedule/servicetype/timeline/" + e.getRow().get(0).getRowKey()));
+        serviceTypeTimeline.addContextMenuClickListener(e -> UI.getCurrent().navigate("service-schedule/service-type/timeline/" + e.getRow().get(0).getRowKey()));
 
         MenuItem task = contextMenu.addItem("Service Job Task");
         MenuItem taskGrid = task.addSubItem("Grid");
@@ -184,13 +182,13 @@ public class VehicleServiceScheduleView extends StandardFormView implements HasU
         serviceKitGrid.addContextMenuClickListener(e -> {
             for (Cell cell : e.getRow()) {
                 if (cell.getColName().equals("vehicle")) {
-                    UI.getCurrent().navigate("service-schedule/servicekit/grid/" + cell.getCellValue());
+                    UI.getCurrent().navigate("service-schedule/service-kit/grid/" + cell.getCellValue());
                     break;
                 }
             }
         });
         MenuItem serviceKitTimeline = serviceKit.addSubItem("Timeline");
-        serviceKitTimeline.addContextMenuClickListener(e -> UI.getCurrent().navigate("service-schedule/servicekit/timeline/" + e.getRow().get(0).getRowKey()));
+        serviceKitTimeline.addContextMenuClickListener(e -> UI.getCurrent().navigate("service-schedule/service-kit/timeline/" + e.getRow().get(0).getRowKey()));
 
         this.setContextMenu(contextMenu);
     }
