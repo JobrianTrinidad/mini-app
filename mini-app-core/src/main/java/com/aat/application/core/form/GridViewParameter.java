@@ -32,6 +32,8 @@ public class GridViewParameter {
     Object[] parameters;
 
     private boolean isReadOnly = false;
+    private boolean isAllowDelete = true;
+    private boolean isAllowInsert = true;
 
     public boolean isReadOnly() {
         return isReadOnly;
@@ -39,6 +41,22 @@ public class GridViewParameter {
 
     public void setReadOnly(boolean readOnly) {
         isReadOnly = readOnly;
+    }
+
+    public boolean isAllowDelete() {
+        return isAllowDelete;
+    }
+
+    public void setAllowDelete(boolean allowDelete) {
+        isAllowDelete = allowDelete;
+    }
+
+    public boolean isAllowInsert() {
+        return isAllowInsert;
+    }
+
+    public void setAllowInsert(boolean allowInsert) {
+        isAllowInsert = allowInsert;
     }
 
     private String dateFilterOn;

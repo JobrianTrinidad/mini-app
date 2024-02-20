@@ -544,6 +544,8 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService> ex
     }
 
     public void onNewItem(GuiItem item) {
+        if (!gridViewParameter.isAllowInsert())
+            return;
         try {
             grid.onEnable();
             grid.setRowCountOnElement("rowcount");
@@ -603,6 +605,9 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService> ex
 
     public int onDeleteItemChecked() throws Exception {
         int[] checkedItems = grid.getCheckedItems();
+
+        if(!gridViewParameter.isAllowDelete())
+            return 0;
 
         if (!gridViewParameter.isValid()) {
             throw new Exception("TuiGrid Definition is not valid.");
