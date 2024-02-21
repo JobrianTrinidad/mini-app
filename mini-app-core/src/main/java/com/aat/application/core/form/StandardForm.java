@@ -282,6 +282,8 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService> ex
             grid.onDisable();
         else
             grid.onEnable();
+        grid.setbAllowDelete(gridViewParameter.isAllowDelete());
+        grid.setbAllowInsert(gridViewParameter.isAllowInsert());
 //        grid.setTableWidth(500);
 //        grid.setTableHeight(750);
     }

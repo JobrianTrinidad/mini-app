@@ -20,6 +20,7 @@ public class ServiceScheduleOverview extends StandardFormView implements HasUrlP
         timeLineViewParameter.setGroupClass(ZJTVehicle.class);
         timeLineViewParameter.setDateFilterOn("planDate");
         timeLineViewParameter.setSelectDefinition("fleetid");
+        timeLineViewParameter.setGroupSelectDefinition("fleetid");
         super.setTimeLineViewParameter(timeLineViewParameter);
     }
 

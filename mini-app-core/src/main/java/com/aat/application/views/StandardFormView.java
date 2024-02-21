@@ -35,7 +35,6 @@ public class StandardFormView extends CommonView {
 
     public void setTimeLineViewParameter(TimeLineViewParameter timeLineViewParameter) {
         this.timeLineViewParameter = timeLineViewParameter;
-        this.timeLineViewParameter.setParameters(new Integer[]{this.filterObjectId});
     }
 
     public void setGridViewParameter(GridViewParameter gridViewParameter) {
@@ -48,6 +47,7 @@ public class StandardFormView extends CommonView {
         switch (strFilter) {
             case "timeline":
                 bGrid = false;
+                this.timeLineViewParameter.setParameters(new Integer[]{this.filterObjectId});
                 form = new TimeLineCommonForm(this.timeLineViewParameter, new BaseEntityService<>(repository));
                 break;
             case "grid":

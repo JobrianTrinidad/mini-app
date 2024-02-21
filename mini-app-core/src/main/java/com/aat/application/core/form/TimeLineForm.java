@@ -81,18 +81,25 @@ public abstract class TimeLineForm<S extends ZJTService> extends CommonForm {
                 throw new Exception("Parameters are required, but not set");
             }
 
-            StringBuilder query = new StringBuilder("SELECT p.").append(timeLineViewParameter.getSelectDefinition());
+            StringBuilder query = new StringBuilder("SELECT p.").append(timeLineViewParameter.getGroupSelectDefinition());
 
             query.append(" FROM ").append(timeLineViewParameter.getGroupClass().getSimpleName()).append(" as p");
 
             if (timeLineViewParameter.getWhereDefinition() != null && (int) timeLineViewParameter.getParameters()[0] != -1) {
                 String[] whereDefinition = timeLineViewParameter.getWhereDefinition().split("\\.");
-                query.append(" WHERE ").append("p.").append(whereDefinition[1]);
+                switch (timeLineViewParameter.getWhereDefinition().split("\\.").length) {
+                    case 2:
+                        query.append(" WHERE ").append("p.").append(timeLineViewParameter.getWhereDefinition());
+                        break;
+                    case 3:
+                        query.append(" WHERE ").append("p.").append(whereDefinition[1]).append(".").append(whereDefinition[2]);
+                        break;
+                }
                 //TODO -set parameter
                 query.append(" = ").append(timeLineViewParameter.getParameters()[0]);
             }
 
-            filteredValue = String.valueOf(service.findEntityByQuery(query.toString()).get(0));
+                filteredValue = String.valueOf(service.findEntityByQuery(query.toString()).get(0));
         }
         if (dateFilterOn != null)
             toolbar.add(dateFilter);
@@ -109,12 +116,13 @@ public abstract class TimeLineForm<S extends ZJTService> extends CommonForm {
 
         StringBuilder query = new StringBuilder("SELECT p.")
                 .append(timeLineViewParameter.getGroupClassPKField())
-                .append(", p.").append(timeLineViewParameter.getSelectDefinition());
+                .append(", p.").append(timeLineViewParameter.getGroupSelectDefinition());
 
 
         query.append(" FROM ").append(timeLineViewParameter.getGroupClass().getSimpleName()).append(" as p");
 
-        if ((int) timeLineViewParameter.getParameters()[0] != -1) {
+        if (timeLineViewParameter.getParameters() != null
+                && (int) timeLineViewParameter.getParameters()[0] != -1) {
             query.append(" WHERE ").append("p.").append(timeLineViewParameter.getGroupClassPKField());
             //TODO -set parameter
             query.append(" = ").append(timeLineViewParameter.getParameters()[0]);
@@ -239,9 +247,9 @@ public abstract class TimeLineForm<S extends ZJTService> extends CommonForm {
             query.append(" WHERE p.").append(timeLineViewParameter.getWhereDefinition());
             //TODO -set parameter
             query.append(" = ").append(parameters[0]);
-            if (dateFilterOn != null) {
-                addConditionWhenFilteringDate(query);
-            }
+//            if (dateFilterOn != null) {
+//                addConditionWhenFilteringDate(query);
+//            }
         } else {
             if (dateFilterOn != null) {
                 query.append(" WHERE 1=1");
@@ -280,8 +288,8 @@ public abstract class TimeLineForm<S extends ZJTService> extends CommonForm {
 
     @Override
     public String getOriginViewText() {
-//        return GlobalData.convertToStandard(this.timeLineViewParameter.groupName);
-        return "";
+        return GlobalData.convertToStandard(this.timeLineViewParameter.groupName);
+//        return "";
     }
 
     @Override
