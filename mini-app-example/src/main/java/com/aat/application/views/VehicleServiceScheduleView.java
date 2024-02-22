@@ -1,7 +1,7 @@
 package com.aat.application.views;
 
-import com.aat.application.core.data.entity.ZJTEntity;
 import com.aat.application.core.form.GridViewParameter;
+import com.aat.application.core.form.StandardForm;
 import com.aat.application.core.form.TimeLineViewParameter;
 import com.aat.application.data.entity.*;
 import com.aat.application.data.repository.BaseEntityRepository;
@@ -16,7 +16,6 @@ import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.router.*;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -77,6 +76,7 @@ public class VehicleServiceScheduleView extends StandardFormView implements HasU
         if (serviceSchedules != null) {
             this.form.grid.setUnCheckAll();
             n = ZJTVehicleServiceSchedule.createWorkshopJob(repository, serviceSchedules);
+            ((StandardForm<?, ?>) this.form).updateList();
             this.setMessageStatus(n + " workshop job created.");
             this.form.grid.reloadData();
         } else
@@ -91,10 +91,12 @@ public class VehicleServiceScheduleView extends StandardFormView implements HasU
     public void setParameter(BeforeEvent event, @OptionalParameter String parameter) {
         if (parameter != null) {
             if (event.getRouteParameters().get("subcategory").isPresent()) {
-                TimeLineViewParameter timeLineViewParameter = new TimeLineViewParameter(new String[]{"vehicle.fleetid"}, "vehicle", new String[]{"planDate"});
+                TimeLineViewParameter timeLineViewParameter = new TimeLineViewParameter(new String[]{"vehicleServiceJob.vehicle.fleetid"}, "vehicleServiceJob.vehicle", new String[]{"vehicleServiceJob.planDate"});
                 timeLineViewParameter.setGroupClass(ZJTVehicleServiceSchedule.class);
-                timeLineViewParameter.setSelectDefinition("vehicle.fleetid");
-                timeLineViewParameter.setWhereDefinition("vehicle.zjt_vehicle_id");
+                timeLineViewParameter.setSelectDefinition("vehicleServiceJob.vehicle.fleetid");
+                timeLineViewParameter.setWhereDefinition("vehicleServiceJob.vehicle.zjt_vehicle_id");
+                timeLineViewParameter.setGroupSelectDefinition("vehicle.fleetid");
+                timeLineViewParameter.setGroupName("vehicleServiceJob");
 
                 gridViewParameter.setFilterClass(ZJTVehicleServiceJob.class);
                 gridViewParameter.setWhereDefinition("vehicleServiceJob.vehicle.zjt_vehicle_id");
@@ -104,9 +106,15 @@ public class VehicleServiceScheduleView extends StandardFormView implements HasU
                         gridViewParameter.setFilterClass(ZJTVehicle.class);
                         gridViewParameter.setWhereDefinition("vehicle.zjt_vehicle_id");
                         gridViewParameter.setGroupName("vehicle");
+                        timeLineViewParameter.setTitleFieldName(new String[]{"vehicle.fleetid"});
+                        timeLineViewParameter.setGroupIDFieldName("vehicle");
+                        timeLineViewParameter.setStartDateFieldNames(new String[]{"planDate"});
+                        timeLineViewParameter.setSelectDefinition("vehicle.fleetid");
+                        timeLineViewParameter.setWhereDefinition("vehicle.zjt_vehicle_id");
                         timeLineViewParameter.setFromDefinition(ZJTVehicleServiceJob.class.getSimpleName());
+                        timeLineViewParameter.setGroupName("vehicle");
                         break;
-                    case "servicetype":
+                    case "service-type":
                         gridViewParameter.setEntityClass(ZJTVehicleServiceJobServiceType.class);
                         gridViewParameter.setGroupName("vehicleServiceJob");
                         timeLineViewParameter.setFromDefinition(ZJTVehicleServiceJobServiceType.class.getSimpleName());
@@ -116,7 +124,7 @@ public class VehicleServiceScheduleView extends StandardFormView implements HasU
                         gridViewParameter.setGroupName("vehicleServiceJob");
                         timeLineViewParameter.setFromDefinition(ZJTVehicleServiceJobTask.class.getSimpleName());
                         break;
-                    case "servicekit":
+                    case "service-kit":
                         gridViewParameter.setEntityClass(ZJTVehicleServiceJobServiceKit.class);
                         gridViewParameter.setGroupName("vehicleServiceJob");
                         timeLineViewParameter.setFromDefinition(ZJTVehicleServiceJobServiceKit.class.getSimpleName());
@@ -150,20 +158,36 @@ public class VehicleServiceScheduleView extends StandardFormView implements HasU
             }
         });
         MenuItem serviceJobTimeline = serviceJob.addSubItem("Timeline");
-        serviceJobTimeline.addContextMenuClickListener(e -> UI.getCurrent().navigate("service-schedule/service-job/timeline/" + e.getRow().get(0).getRowKey()));
+//        serviceJobTimeline.addContextMenuClickListener(e -> UI.getCurrent().navigate("service-schedule/service-job/timeline/" + e.getRow().get(0).getRowKey()));
+        serviceJobTimeline.addContextMenuClickListener(e -> {
+            for (Cell cell : e.getRow()) {
+                if (cell.getColName().equals("vehicle")) {
+                    UI.getCurrent().navigate("service-schedule/service-job/timeline/" + cell.getCellValue());
+                    break;
+                }
+            }
+        });
 
         MenuItem serviceType = contextMenu.addItem("Service Job Type");
         MenuItem serviceTypeGrid = serviceType.addSubItem("Grid");
         serviceTypeGrid.addContextMenuClickListener(e -> {
             for (Cell cell : e.getRow()) {
                 if (cell.getColName().equals("vehicle")) {
-                    UI.getCurrent().navigate("service-schedule/servicetype/grid/" + cell.getCellValue());
+                    UI.getCurrent().navigate("service-schedule/service-type/grid/" + cell.getCellValue());
                     break;
                 }
             }
         });
         MenuItem serviceTypeTimeline = serviceType.addSubItem("Timeline");
-        serviceTypeTimeline.addContextMenuClickListener(e -> UI.getCurrent().navigate("service-schedule/servicetype/timeline/" + e.getRow().get(0).getRowKey()));
+//        serviceTypeTimeline.addContextMenuClickListener(e -> UI.getCurrent().navigate("service-schedule/service-type/timeline/" + e.getRow().get(0).getRowKey()));
+        serviceTypeTimeline.addContextMenuClickListener(e -> {
+            for (Cell cell : e.getRow()) {
+                if (cell.getColName().equals("vehicle")) {
+                    UI.getCurrent().navigate("service-schedule/service-type/timeline/" + cell.getCellValue());
+                    break;
+                }
+            }
+        });
 
         MenuItem task = contextMenu.addItem("Service Job Task");
         MenuItem taskGrid = task.addSubItem("Grid");
@@ -176,20 +200,36 @@ public class VehicleServiceScheduleView extends StandardFormView implements HasU
             }
         });
         MenuItem taskTimeline = task.addSubItem("Timeline");
-        taskTimeline.addContextMenuClickListener(e -> UI.getCurrent().navigate("service-schedule/task/timeline/" + e.getRow().get(0).getRowKey()));
+//        taskTimeline.addContextMenuClickListener(e -> UI.getCurrent().navigate("service-schedule/task/timeline/" + e.getRow().get(0).getRowKey()));
+        taskTimeline.addContextMenuClickListener(e -> {
+            for (Cell cell : e.getRow()) {
+                if (cell.getColName().equals("vehicle")) {
+                    UI.getCurrent().navigate("service-schedule/task/timeline/" + cell.getCellValue());
+                    break;
+                }
+            }
+        });
 
         MenuItem serviceKit = contextMenu.addItem("ServiceJob & ServiceKit");
         MenuItem serviceKitGrid = serviceKit.addSubItem("Grid");
         serviceKitGrid.addContextMenuClickListener(e -> {
             for (Cell cell : e.getRow()) {
                 if (cell.getColName().equals("vehicle")) {
-                    UI.getCurrent().navigate("service-schedule/servicekit/grid/" + cell.getCellValue());
+                    UI.getCurrent().navigate("service-schedule/service-kit/grid/" + cell.getCellValue());
                     break;
                 }
             }
         });
         MenuItem serviceKitTimeline = serviceKit.addSubItem("Timeline");
-        serviceKitTimeline.addContextMenuClickListener(e -> UI.getCurrent().navigate("service-schedule/servicekit/timeline/" + e.getRow().get(0).getRowKey()));
+//        serviceKitTimeline.addContextMenuClickListener(e -> UI.getCurrent().navigate("service-schedule/service-kit/timeline/" + e.getRow().get(0).getRowKey()));
+        serviceKitTimeline.addContextMenuClickListener(e -> {
+            for (Cell cell : e.getRow()) {
+                if (cell.getColName().equals("vehicle")) {
+                    UI.getCurrent().navigate("service-schedule/service-kit/timeline/" + cell.getCellValue());
+                    break;
+                }
+            }
+        });
 
         this.setContextMenu(contextMenu);
     }

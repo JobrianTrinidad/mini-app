@@ -68,6 +68,7 @@ public class TimeLineViewParameter {
      */
     private String whereDefinition = null;
     private String selectDefinition = null;
+    private String groupSelectDefinition = null;
 
     private Class<?> groupClass;
     private String groupClassPKField;
@@ -183,6 +184,14 @@ public class TimeLineViewParameter {
 
     public void setSelectDefinition(String selectDefinition) {
         this.selectDefinition = selectDefinition;
+    }
+
+    public String getGroupSelectDefinition() {
+        return groupSelectDefinition;
+    }
+
+    public void setGroupSelectDefinition(String groupSelectDefinition) {
+        this.groupSelectDefinition = groupSelectDefinition;
     }
 
     public Class<?> getGroupClass() {

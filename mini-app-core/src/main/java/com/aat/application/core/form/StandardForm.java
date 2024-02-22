@@ -282,6 +282,8 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService> ex
             grid.onDisable();
         else
             grid.onEnable();
+        grid.setbAllowDelete(gridViewParameter.isAllowDelete());
+        grid.setbAllowInsert(gridViewParameter.isAllowInsert());
 //        grid.setTableWidth(500);
 //        grid.setTableHeight(750);
     }
@@ -324,9 +326,9 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService> ex
             query.append(" WHERE ").append("p.").append(gridViewParameter.getWhereDefinition());
             //TODO -set parameter
             query.append(" = ").append(parameters[0]);
-            if (dateFilterOn != null) {
-                addConditionWhenFilteringDate(query);
-            }
+//            if (dateFilterOn != null) {
+//                addConditionWhenFilteringDate(query);
+//            }
         } else {
             if (dateFilterOn != null) {
                 query.append(" WHERE 1=1");
@@ -544,6 +546,8 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService> ex
     }
 
     public void onNewItem(GuiItem item) {
+        if (!gridViewParameter.isAllowInsert())
+            return;
         try {
             grid.onEnable();
             grid.setRowCountOnElement("rowcount");
@@ -604,6 +608,9 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService> ex
     public int onDeleteItemChecked() throws Exception {
         int[] checkedItems = grid.getCheckedItems();
 
+        if(!gridViewParameter.isAllowDelete())
+            return 0;
+
         if (!gridViewParameter.isValid()) {
             throw new Exception("TuiGrid Definition is not valid.");
         }
@@ -625,8 +632,12 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService> ex
     private void saveAll() {
     }
 
-    private void reloadGrid() {
+    public void reloadGrid() {
         grid.reloadData();
+    }
+
+    public void restore() {
+        grid.refreshGrid();
     }
 
     private List<Integer> getColumnWidths() {
@@ -647,7 +658,7 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService> ex
         return colWidths;
     }
 
-    private void updateList() {
+    public void updateList() {
         try {
             grid.setItems(this.getTableData(gridViewParameter.getParameters(), false));
         } catch (Exception e) {
