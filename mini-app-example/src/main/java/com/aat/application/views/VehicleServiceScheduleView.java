@@ -1,5 +1,6 @@
 package com.aat.application.views;
 
+import com.aat.application.core.data.service.ZJTService;
 import com.aat.application.core.form.GridViewParameter;
 import com.aat.application.core.form.StandardForm;
 import com.aat.application.core.form.TimeLineViewParameter;
@@ -14,6 +15,7 @@ import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.router.*;
 
 import java.util.List;
@@ -29,6 +31,9 @@ public class VehicleServiceScheduleView extends StandardFormView implements HasU
         gridViewParameter = new GridViewParameter(ZJTVehicleServiceSchedule.class, "");
         gridViewParameter.setDateFilterOn("planDate");
         gridViewParameter.setReadOnly(true);
+        gridViewParameter.setAllowInsert(false);
+        gridViewParameter.setAllowDelete(false);
+        gridViewParameter.setFieldsAsReadOnly(new String[]{ "vehicle", "serviceType" });
         super.setGridViewParameter(gridViewParameter);
     }
 
@@ -109,7 +114,11 @@ public class VehicleServiceScheduleView extends StandardFormView implements HasU
                         timeLineViewParameter.setGroupIDFieldName("vehicle");
                         timeLineViewParameter.setStartDateFieldNames(new String[]{"planDate"});
                         timeLineViewParameter.setSelectDefinition("vehicle.fleetid");
-                        timeLineViewParameter.setWhereDefinition("vehicle.zjt_vehicle_id");
+//                        timeLineViewParameter.setWhereDefinition("vehicle.zjt_vehicle_id");
+                        timeLineViewParameter.setWhereDefinitions(new String[]{"vehicle.zjt_vehicle_id", "serviceType.zjt_vehicleservicetype_id"});
+//                        timeLineViewParameter.setSubcategory("service-job");
+
+//                        timeLineViewParameter.setGroupClass(ZJTVehicleServiceJob.class);
                         timeLineViewParameter.setFromDefinition(ZJTVehicleServiceJob.class.getSimpleName());
                         timeLineViewParameter.setGroupName("vehicle");
                         break;
@@ -159,12 +168,21 @@ public class VehicleServiceScheduleView extends StandardFormView implements HasU
         MenuItem serviceJobTimeline = serviceJob.addSubItem("Timeline");
 //        serviceJobTimeline.addContextMenuClickListener(e -> UI.getCurrent().navigate("service-schedule/service-job/timeline/" + e.getRow().get(0).getRowKey()));
         serviceJobTimeline.addContextMenuClickListener(e -> {
+            String parameterVehicleId = "";
             for (Cell cell : e.getRow()) {
                 if (cell.getColName().equals("vehicle")) {
-                    UI.getCurrent().navigate("service-schedule/service-job/timeline/" + cell.getCellValue());
+                    parameterVehicleId = cell.getCellValue();
                     break;
                 }
             }
+            String parameterServiceTypeId = "";
+            for (Cell cell : e.getRow()) {
+                if (cell.getColName().equals("serviceType")) {
+                    parameterServiceTypeId = cell.getCellValue();
+                    break;
+                }
+            }
+            UI.getCurrent().navigate("service-schedule/service-job/timeline/" + parameterVehicleId + "." + e.getRow().get(0).getRowKey() + "." + parameterServiceTypeId);
         });
 
         MenuItem serviceType = contextMenu.addItem("Service Job Type");
@@ -180,12 +198,21 @@ public class VehicleServiceScheduleView extends StandardFormView implements HasU
         MenuItem serviceTypeTimeline = serviceType.addSubItem("Timeline");
 //        serviceTypeTimeline.addContextMenuClickListener(e -> UI.getCurrent().navigate("service-schedule/service-type/timeline/" + e.getRow().get(0).getRowKey()));
         serviceTypeTimeline.addContextMenuClickListener(e -> {
+            String parameterVehicleId = "";
             for (Cell cell : e.getRow()) {
                 if (cell.getColName().equals("vehicle")) {
-                    UI.getCurrent().navigate("service-schedule/service-type/timeline/" + cell.getCellValue());
+                    parameterVehicleId = cell.getCellValue();
                     break;
                 }
             }
+            String parameterServiceTypeId = "";
+            for (Cell cell : e.getRow()) {
+                if (cell.getColName().equals("serviceType")) {
+                    parameterServiceTypeId = cell.getCellValue();
+                    break;
+                }
+            }
+            UI.getCurrent().navigate("service-schedule/service-type/timeline/" + parameterVehicleId + "." + e.getRow().get(0).getRowKey() + "." + parameterServiceTypeId);
         });
 
         MenuItem task = contextMenu.addItem("Service Job Task");

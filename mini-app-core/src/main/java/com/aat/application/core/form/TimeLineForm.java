@@ -113,19 +113,25 @@ public abstract class TimeLineForm<S extends ZJTService> extends CommonForm {
             throw new Exception("Parameters are required, but not set");
         }
 
-
         StringBuilder query = new StringBuilder("SELECT p.")
-                .append(timeLineViewParameter.getGroupClassPKField())
-                .append(", p.").append(timeLineViewParameter.getGroupSelectDefinition());
+            .append(timeLineViewParameter.getGroupClassPKField())
+            .append(", p.").append(timeLineViewParameter.getGroupSelectDefinition());
 
 
         query.append(" FROM ").append(timeLineViewParameter.getGroupClass().getSimpleName()).append(" as p");
 
         if (timeLineViewParameter.getParameters() != null
                 && (int) timeLineViewParameter.getParameters()[0] != -1) {
-            query.append(" WHERE ").append("p.").append(timeLineViewParameter.getGroupClassPKField());
-            //TODO -set parameter
-            query.append(" = ").append(timeLineViewParameter.getParameters()[0]);
+            Object[] parameters = timeLineViewParameter.getParameters();
+            if (parameters.length > 1 && parameters[1] != null) {
+                query.append(" WHERE ").append("p.").append(timeLineViewParameter.getGroupClassPKField());
+                //TODO - set parameter
+                query.append(" = ").append(parameters[1]);
+            } else {
+                query.append(" WHERE ").append("p.").append(timeLineViewParameter.getGroupClassPKField());
+                //TODO - set parameter
+                query.append(" = ").append(parameters[0]);
+            }
         }
         return service.findEntityByQuery(query.toString());
     }
@@ -243,7 +249,12 @@ public abstract class TimeLineForm<S extends ZJTService> extends CommonForm {
 
         query.append(" FROM ").append(timeLineViewParameter.getFromDefinition()).append(" as p");
 
-        if (timeLineViewParameter.getWhereDefinition() != null) {
+        if (timeLineViewParameter.getWhereDefinitions() != null) {
+            query.append(" WHERE p.").append(timeLineViewParameter.getWhereDefinitions()[0]);
+            query.append(" = ").append(parameters[0]);
+            query.append(" AND p.").append(timeLineViewParameter.getWhereDefinitions()[1]);
+            query.append(" = ").append(parameters[2]);
+        } else if (timeLineViewParameter.getWhereDefinition() != null) {
             query.append(" WHERE p.").append(timeLineViewParameter.getWhereDefinition());
             //TODO -set parameter
             query.append(" = ").append(parameters[0]);

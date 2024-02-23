@@ -260,8 +260,8 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService> ex
 //        grid.setSummaryHeight(40);
 
         grid.setRowHeaders(List.of("checkbox"));
-        grid.sethScroll(true);
-        grid.setvScroll(true);
+        grid.sethScroll(false);
+        grid.setvScroll(false);
 
         grid.addColumnResizeListener(event -> {
             int colWidth = event.getColWidth();
@@ -284,6 +284,7 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService> ex
             grid.onEnable();
         grid.setbAllowDelete(gridViewParameter.isAllowDelete());
         grid.setbAllowInsert(gridViewParameter.isAllowInsert());
+        grid.setFieldsAsReadOnly(gridViewParameter.getFieldsAsReadOnly());
 //        grid.setTableWidth(500);
 //        grid.setTableHeight(750);
     }

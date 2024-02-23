@@ -43,22 +43,32 @@ public class StandardFormView extends CommonView {
 
     private void configureForm(Optional<String> filter) {
         String strFilter = filter.orElse("");
+        Integer[] filterObjectIds;
+        if (filterObjectId != null && !filterObjectId.isEmpty()) {
+            String[] parts = filterObjectId.split("\\.");
+            filterObjectIds = new Integer[parts.length];
+            for (int i = 0; i < parts.length; i++) {
+                filterObjectIds[i] = Integer.parseInt(parts[i]);
+            }
+        } else {
+            filterObjectIds = new Integer[]{-1};
+        }
 
         switch (strFilter) {
             case "timeline":
                 bGrid = false;
-                this.timeLineViewParameter.setParameters(new Integer[]{this.filterObjectId});
+                this.timeLineViewParameter.setParameters(filterObjectIds);
                 form = new TimeLineCommonForm(this.timeLineViewParameter, new BaseEntityService<>(repository));
                 break;
             case "grid":
                 bGrid = true;
-                gridViewParameter.setParameters(new Integer[]{filterObjectId});
+                gridViewParameter.setParameters(filterObjectIds);
                 form = new GridCommonForm<>(gridViewParameter, new BaseEntityService<>(repository), tableInfoService);
                 break;
             default:
                 if (gridViewParameter != null) {
                     bGrid = true;
-                    gridViewParameter.setParameters(new Integer[]{filterObjectId});
+                    gridViewParameter.setParameters(filterObjectIds);
                     if (gridViewParameter.getGroupClass() != null) {
                         gridViewParameter.setEntityClass(gridViewParameter.getGroupClass());
                     } else

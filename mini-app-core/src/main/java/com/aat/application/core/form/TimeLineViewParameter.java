@@ -67,6 +67,7 @@ public class TimeLineViewParameter {
      * e.g. d.orgid = ?
      */
     private String whereDefinition = null;
+    private String[] whereDefinitions = null;
     private String selectDefinition = null;
     private String groupSelectDefinition = null;
 
@@ -177,6 +178,15 @@ public class TimeLineViewParameter {
     public void setWhereDefinition(String whereDefinition) {
         this.whereDefinition = whereDefinition;
     }
+
+    public String[] getWhereDefinitions() {
+        return whereDefinitions;
+    }
+
+    public void setWhereDefinitions(String[] whereDefinitions) {
+        this.whereDefinitions = whereDefinitions;
+    }
+
 
     public String getSelectDefinition() {
         return selectDefinition;
