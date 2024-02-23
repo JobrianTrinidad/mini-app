@@ -26,6 +26,8 @@ public class ServiceJobTaskView extends StandardFormView implements HasUrlParame
     public ServiceJobTaskView(BaseEntityRepository repository, TableInfoService tableInfoService) {
         super(repository, tableInfoService);
         gridViewParameter = new GridViewParameter(ZJTVehicleServiceJobTask.class, "");
+        gridViewParameter.setAllowInsert(false);
+        gridViewParameter.setAllowDelete(false);
         super.setGridViewParameter(gridViewParameter);
     }
 
