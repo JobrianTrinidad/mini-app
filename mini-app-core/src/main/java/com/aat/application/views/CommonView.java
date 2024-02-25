@@ -16,7 +16,7 @@ public abstract class CommonView extends VerticalLayout implements RouterLayout,
     protected final BaseEntityRepository repository;
     protected CoreMainLayout layout;
     protected Class<?> LayoutClass;
-    protected int filterObjectId = -1;
+    protected String filterObjectId = null;
 
 
     public CommonView(BaseEntityRepository repository) {
@@ -59,9 +59,9 @@ public abstract class CommonView extends VerticalLayout implements RouterLayout,
         }
 
         if (event.getRouteParameters().getParameterNames().size() > 1) {
-            filterObjectId = Integer.parseInt(event.getRouteParameters().get("___url_parameter").orElse(""));
+            filterObjectId = event.getRouteParameters().get("___url_parameter").orElse("");
         } else
-            filterObjectId = -1;
+            filterObjectId = null;
     }
 
     @Override
