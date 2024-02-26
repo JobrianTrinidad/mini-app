@@ -30,3 +30,8 @@ vaadin-scroller[slot="drawer"] {
 [slot="drawer"]:is(header, footer):is(:empty) {
     display: none;
 }
+
+vaadin-vertical-layout {
+    position: relative;
+    z-index: 1;
+}
