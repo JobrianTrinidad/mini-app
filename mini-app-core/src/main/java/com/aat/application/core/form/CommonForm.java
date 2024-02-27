@@ -71,6 +71,9 @@ public abstract class CommonForm extends VerticalLayout {
             }
         });
 
+        startDatePicker.setLocale(Locale.UK);
+        endDatePicker.setLocale(Locale.UK);
+
         dateFilterComboBox.setItems(EnumDateFilter.values());
         dateFilterComboBox.addValueChangeListener(e -> updateDateFilter());
         dateFilterComboBox.setValue(EnumDateFilter.TM);
