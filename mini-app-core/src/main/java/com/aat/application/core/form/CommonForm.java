@@ -71,8 +71,10 @@ public abstract class CommonForm extends VerticalLayout {
             }
         });
 
-        startDatePicker.setLocale(Locale.UK);
-        endDatePicker.setLocale(Locale.UK);
+        DatePicker.DatePickerI18n i18n = new DatePicker.DatePickerI18n();
+        i18n.setDateFormat("dd/MM/yyyy");
+        startDatePicker.setI18n(i18n);
+        endDatePicker.setI18n(i18n);
 
         dateFilterComboBox.setItems(EnumDateFilter.values());
         dateFilterComboBox.addValueChangeListener(e -> updateDateFilter());
