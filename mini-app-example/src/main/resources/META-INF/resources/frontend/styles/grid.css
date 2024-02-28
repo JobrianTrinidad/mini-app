@@ -1,3 +1,7 @@
 .grid.scheduler-grid .hidden-input:checked~.custom-input {
     border: 2px solid #326f70;
 }
+
+.grid.scheduler-grid th .hidden-input:checked~.custom-input {
+    border: 2px solid white;
+}
