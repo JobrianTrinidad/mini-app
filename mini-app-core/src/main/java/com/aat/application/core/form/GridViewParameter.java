@@ -34,6 +34,7 @@ public class GridViewParameter {
     private boolean isReadOnly = false;
     private boolean isAllowDelete = true;
     private boolean isAllowInsert = true;
+    private boolean isMultiSelect = true;
     private  String[] fieldsAsReadOnly;
 
     public boolean isReadOnly() {
@@ -66,6 +67,14 @@ public class GridViewParameter {
 
     public void setFieldsAsReadOnly(String[] fieldsAsReadOnly) {
         this.fieldsAsReadOnly = fieldsAsReadOnly;
+    }
+
+    public boolean isMultiSelect() {
+        return isMultiSelect;
+    }
+
+    public void setMultiSelect(boolean multiSelect) {
+        this.isMultiSelect = multiSelect;
     }
 
     private String dateFilterOn;

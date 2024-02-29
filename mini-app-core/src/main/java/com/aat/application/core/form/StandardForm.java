@@ -13,6 +13,7 @@ import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
+import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
@@ -27,7 +28,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
-
+@CssImport(value = "./styles/grid.css")
 public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService> extends CommonForm {
 
     @Serial
@@ -285,6 +286,7 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService> ex
         grid.setbAllowDelete(gridViewParameter.isAllowDelete());
         grid.setbAllowInsert(gridViewParameter.isAllowInsert());
         grid.setFieldsAsReadOnly(gridViewParameter.getFieldsAsReadOnly());
+        grid.setMultiSelect(gridViewParameter.isMultiSelect());
 //        grid.setTableWidth(500);
 //        grid.setTableHeight(750);
     }

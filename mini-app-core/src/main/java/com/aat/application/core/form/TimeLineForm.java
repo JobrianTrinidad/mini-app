@@ -12,12 +12,13 @@ import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.dependency.CssImport;
 
 import java.io.Serial;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-
+@CssImport(value = "./styles/timeline.css")
 public abstract class TimeLineForm<S extends ZJTService> extends CommonForm {
 
     @Serial

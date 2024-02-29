@@ -34,6 +34,7 @@ public class VehicleServiceScheduleView extends StandardFormView implements HasU
         gridViewParameter.setAllowInsert(false);
         gridViewParameter.setAllowDelete(false);
         gridViewParameter.setFieldsAsReadOnly(new String[]{ "vehicle", "serviceType" });
+        gridViewParameter.setMultiSelect(false);
         super.setGridViewParameter(gridViewParameter);
     }
 
