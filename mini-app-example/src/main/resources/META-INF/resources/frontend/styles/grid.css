@@ -8,5 +8,22 @@
 @media (max-width: 800px) {
     .grid.scheduler-grid {
         width: 800px !important;
+        height: calc(100vh - 170px) !important;
+        overflow: scroll;
+    }
+    .grid.scheduler-grid .tui-grid-content-area {
+        min-height: calc(100vh - 170px);
+    }
+    vaadin-app-layout {
+        padding-right: 15px;
     }
 }
+.grid.scheduler-grid .tui-grid-lside-area, .grid.scheduler-grid .tui-grid-body-area, .grid.scheduler-grid .tui-grid-content-area, .grid.scheduler-grid .tui-grid-layer-state  {
+    z-index: 0 !important;
+}
+
+.grid.scheduler-grid .tui-grid-body-area, .grid.scheduler-grid .tui-grid-body-area {
+    height: auto !important;
+}
+
+
