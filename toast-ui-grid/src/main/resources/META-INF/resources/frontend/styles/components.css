@@ -1,0 +1,192 @@
+:host(.timeline-items-style) {
+    /* Add your styles for the timeline-items-style theme here */
+    /* For example: */
+    background-color: red;
+    color: white;
+}
+
+button {
+    border: none;
+}
+
+.link-button {
+    cursor: pointer;
+    text-decoration: underline;
+    color: blue;
+}
+
+.link-button:hover {
+    color: red;
+}
+
+select {
+    /* styling */
+    background-color: white;
+    border: thin solid blue;
+    display: inline-block;
+    font: inherit;
+    line-height: 1.5em;
+    padding: 0.5em 3.5em 0.5em 1em;
+
+    /* reset */
+
+    margin: 0;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+
+    background-image: linear-gradient(45deg, transparent 50%, #000 50%), linear-gradient(135deg, #000 50%, transparent 50%), linear-gradient(to right, #326f70, #326f70);
+    background-position: calc(100% - 15px) 0.8em, calc(100% - 8px) 0.8em, calc(100% - 2.5em) 0em;
+    background-size: 7px 7px, 7px 7px, 1px 100%;
+    background-repeat: no-repeat;
+}
+
+select:-moz-focusring {
+    color: transparent;
+    text-shadow: 0 0 0 #000;
+}
+
+.checkbox.tui-grid-row-header-checkbox, .checkbox.tui-grid-checkbox {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.hidden-input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.custom-input {
+    position: relative;
+    display: flex;
+    height: 16px;
+    width: 16px;
+    background-color: #fff;
+    border: 2px solid #326f70; /* Set the desired border color when not checked */
+}
+
+.hidden-input:checked ~ .custom-input {
+    background-color: #326f70;
+    border: 2px solid #fff; /* Set the desired border color when checked */
+}
+
+.tui-grid-table {
+    box-sizing: initial !important;
+}
+
+/*.tui-grid-body-area {*/
+/*    background-color: #66878840 !important;*/
+/*}*/
+
+.tui-grid-layer-editing {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-style: none !important;
+    padding: 0 !important;
+}
+
+.tui-grid-layer-selection {
+    background-color: #bd652f !important;
+}
+
+.tui-grid-layer-focus-border {
+    background-color: #326f70 !important;
+}
+
+.tui-grid-layer-focus-deactive .tui-grid-layer-focus-border {
+    background-color: #668788 !important;
+}
+
+.tui-grid-cell-header {
+    position: relative;
+    background-color: #326f70 !important;
+    border-color: #eee !important;
+    border-left-width: 0px !important;
+    border-right-width: 0px !important;
+    color: #fff !important;
+}
+
+.tui-grid-cell-header::after {
+    content: "";
+    position: absolute;
+    top: 20%;
+    right: 0;
+    height: 60%; /* Adjust the height as needed */
+    border-right: 2px solid #ffffff; /* Adjust the border styles as needed */
+}
+
+.tui-grid-cell-header:last-child::after {
+    border: none;
+}
+
+.tui-grid-cell-has-input.tui-grid-cell-row-header {
+    background-color: #66878800 !important;
+}
+
+.tui-grid-cell-editable {
+    background-color: #66878800 !important;
+}
+
+.tui-grid-cell {
+    border-style: none !important;
+}
+
+.tui-grid-cell .tui-grid-cell-content {
+    border-style: none !important;
+    color: #0000009A !important;
+}
+
+.tui-grid-cell-summary {
+    background-color: #66878840 !important;
+    text-align: end !important;
+}
+
+.DarkCyan {
+    --DarkCyan-100: #668788;
+    --DarkCyan-80: #668788CC;
+    --DarkCyan-60: #66878899;
+    --DarkCyan-40: #66878866;
+    --DarkCyan-20: #66878833;
+    --DarkCyan-0: #66878800;
+}
+
+.Sienna {
+    --Sienna-100: #7D443E;
+    --Sienna-80: #7D443ECC;
+    --Sienna-60: #7D443E99;
+    --Sienna-40: #7D443E66;
+    --Sienna-20: #7D443E33;
+    --Sienna-0: #7D443E00;
+}
+
+.Teal {
+    --Teal-100: #326f70;
+    --Teal-80: #326f70CC;
+    --Teal-60: #326f7099;
+    --Teal-40: #326f7066;
+    --Teal-20: #326f7033;
+    --Teal-0: #326f7000;
+}
+
+.Chocolate {
+    --Chocolate-100: #bd652f;
+    --Chocolate-80: #bd652fCC;
+    --Chocolate-60: #bd652f99;
+    --Chocolate-40: #bd652f66;
+    --Chocolate-20: #bd652f33;
+    --Chocolate-0: #bd652f00;
+}
+
+.SaddleBrown {
+    --SaddleBrown-100: #bd652f;
+    --SaddleBrown-80: #bd652fCC;
+    --SaddleBrown-60: #bd652f99;
+    --SaddleBrown-40: #bd652f66;
+    --SaddleBrown-20: #bd652f33;
+    --SaddleBrown-0: #bd652f00;
+}
