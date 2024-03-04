@@ -2,6 +2,7 @@ package com.aat.application.data.entity;
 
 import com.aat.application.annotations.BaseItems;
 import com.aat.application.annotations.ContentDisplayedInSelect;
+import com.aat.application.annotations.CustomComponent;
 import com.aat.application.annotations.DisplayName;
 import com.aat.application.core.data.entity.ZJTEntity;
 import com.vaadin.flow.router.PageTitle;
@@ -28,6 +29,19 @@ public class ZJTUser implements ZJTEntity {
     @ContentDisplayedInSelect(value = "name")
     @DisplayName(value = "Name")
     private String name = "";
+
+    @Column(name = "ad_image_id")
+    @DisplayName(value = "Signature")
+    @CustomComponent(value = "Signature")
+    private int adImageId;
+
+    public int getAdImageId() {
+        return adImageId;
+    }
+
+    public void setAdImageId(int adImageId) {
+        this.adImageId = adImageId;
+    }
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     @BaseItems

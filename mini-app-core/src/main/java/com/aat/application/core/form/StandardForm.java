@@ -314,7 +314,7 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService> ex
             if (!header.equals("id")) {
                 if (!(colType.equals("input") || colType.equals("date")
                         || colType.equals("input_multi") || colType.equals("date_multi")
-                        || colType.equals("check") || colType.equals("select_enum")))
+                        || colType.equals("check") || colType.equals("select_enum") || colType.equals("customComponent")))
                     query.append(", COALESCE(p.").append(header).append(", -1)");
                 else
                     query.append(", p.").append(header);
@@ -396,6 +396,10 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService> ex
                     break;
                 case "check":
                     column.setType("check");
+                    break;
+                case "CustomComponent":
+                    column.setCustomType(this.gridViewParameter.getHeaderOptions().get("CustomComponentName"));
+                    column.setType("CustomComponent");
                     break;
                 case "date":
                 case "date_multi":
@@ -583,7 +587,7 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService> ex
 
         String colType = this.gridViewParameter.getHeaderOptions().get(parameters[1].toString());
         if (!(colType.equals("input") || colType.equals("date")
-                || colType.equals("check") || colType.equals("select_enum"))) {
+                || colType.equals("check") || colType.equals("select_enum") || colType.equals("CustomComponent"))) {
             Class<?> selectClass;
             try {
                 selectClass = Class.forName(colType);

@@ -9,7 +9,7 @@ import type {JSX} from 'react';
 import React from 'react';
 import {createRoot, Root} from 'react-dom/client';
 import InputComponent from "../components/input/ada-input";
-import {CheckboxRenderer, RowNumberRenderer} from '../renderer/renderer';
+import {CheckboxRenderer, RowNumberRenderer, SignatureRenderer} from '../renderer/renderer';
 import DropDown from "../components/dropdown/index";
 import FeatureTable from "../components/Table/FeaturesTable";
 import TuiGrid, {ColumnInfo, FilterState, Row, RowKey, ModifiedRows} from 'tui-grid';
@@ -710,7 +710,21 @@ window.toastuigrid = {
                         },
                     },
                 }
-            }
+            } else if (column.editor && column.editor.type === "Signature") {
+                            column = {
+                                header: column.header,
+                                name: column.name,
+                                renderer: {
+                                    type: SignatureRenderer,
+                                    className: "tui-grid-Signature",
+                                    callback: onLoadModifiedInfo,
+                                    options: {
+                                        checkedTemplate: 'true',
+                                        uncheckedTemplate: 'false',
+                                    },
+                                },
+                            }
+                        }
 
             if (column.hasOwnProperty('editor') &&
                 column.editor.hasOwnProperty('options') &&

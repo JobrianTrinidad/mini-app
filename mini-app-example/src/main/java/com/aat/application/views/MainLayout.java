@@ -64,7 +64,16 @@ public class MainLayout extends CoreMainLayout {
         parent.addItem(new AppNavItem("Service Schedule Overview", "service-schedule-overview", LineAwesomeIcon.PRODUCT_HUNT.create())
                 .withParameter("layout", this.getClass().getName()));
 
+
         nav.addItem(parent);
+
+        parent = new AppNavItem("Custom Component");
+        parent.setIcon(LineAwesomeIcon.FOLDER.create());
+        nav.addItem(parent);
+        parent.addItem(new AppNavItem("mobile  camera", "camera-ap", LineAwesomeIcon.PRODUCT_HUNT.create())
+                .withParameter("layout", this.getClass().getName()));
+        parent.addItem(new AppNavItem("mobile  signature", "signature-ap", LineAwesomeIcon.PRODUCT_HUNT.create())
+                .withParameter("layout", this.getClass().getName()));
         return nav;
     }
 }

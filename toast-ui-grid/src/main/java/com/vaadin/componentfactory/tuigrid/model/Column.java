@@ -35,6 +35,7 @@ public class Column {
     private DateOption dateOption;
     private List<RelationOption> relationOptions;
     private String target;
+    private String customType;
     private boolean root;
     private String sortingType;
     private boolean sortable;
@@ -122,6 +123,15 @@ public class Column {
         this.target = target;
     }
 
+
+    public String getCustomType() {
+        return customType;
+    }
+
+    public void setCustomType(String customType) {
+        this.customType = customType;
+    }
+
     public Theme getInputTheme() {
         return inputTheme;
     }
@@ -167,12 +177,13 @@ public class Column {
                 this.toRelationJSON(js, this.relationOptions);
                 js.put("targetNames", this.getTarget());
                 editableJs.put("options", this.selectTheme.toJSON());
+            } else if (Objects.equals(getType(), "CustomComponent")){
+                editableJs.put("type", getCustomType()); // TODO
             } else {
                 editableJs.put("options", dateOption.toJSON());
             }
             js.put("editor", editableJs);
         }
-//        }
         return js.toJson();
     }
 
