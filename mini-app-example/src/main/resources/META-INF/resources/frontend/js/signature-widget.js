@@ -69,8 +69,8 @@ class LitSignaturePad extends LitElement {
       #signature {
         border: 1px solid var(--lumo-contrast-20pct);
         border-radius: var(--lumo-border-radius-s);
-        width: 100%;
-        height: 100%;
+          width: 24rem;
+          height: 12rem;
       }
     `;
   }
