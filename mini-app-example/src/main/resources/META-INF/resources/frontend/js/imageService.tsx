@@ -8,13 +8,9 @@ export interface ImageRequest {
 }
 
 export interface SaveImageResponse {
-    adImageId: number;
+    savedImageId: number;
     message: string;
-}
-
-export interface ErrorResponse {
-    adImageId: number;
-    message: string;
+    status: number;
 }
 
 // Define functions
@@ -30,7 +26,7 @@ export async function getImageById(id: number): Promise<AdImage | null> {
     }
 }
 
-export async function saveImage(imageRequest: ImageRequest): Promise<SaveImageResponse | ErrorResponse> {
+export async function saveImage(imageRequest: ImageRequest): Promise<SaveImageResponse | null> {
     try {
         // You might want to use a more descriptive URL for the POST request.
         const response: AxiosResponse<SaveImageResponse> = await axios.post<SaveImageResponse>('/images', imageRequest);

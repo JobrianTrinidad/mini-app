@@ -22,11 +22,11 @@ public class ImageController {
             adImage.setName(imageRequest.getName());
             adImage.setDescription(imageRequest.getDescription());
             adImage.setBinaryData(imageRequest.getImageData());
-            ADImage savedImageId = (ADImage) adImageService.addNewEntity(adImage);
-            SaveImageResponse response = new SaveImageResponse(Math.toIntExact(savedImageId.getAdImageId()), "Image saved successfully.");
+            ADImage savedImage = (ADImage) adImageService.addNewEntity(adImage);
+            SaveImageResponse response = new SaveImageResponse(savedImage.getAdImageId(), "Image saved successfully.", 200);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new SaveImageResponse(-1, "Failed to save image: " + e.getMessage()));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new SaveImageResponse(-1, "Failed to save image: " + e.getMessage(), 500));
         }
     }
 

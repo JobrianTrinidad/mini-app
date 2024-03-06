@@ -3,11 +3,13 @@ package com.aat.application.controller;
 public class SaveImageResponse {
     private int savedImageId;
     private String message;
+    private int status;
 
     // Constructor
-    public SaveImageResponse(int savedImageId, String message) {
+    public SaveImageResponse(int savedImageId, String message, int status) {
         this.savedImageId = savedImageId;
         this.message = message;
+        this.status = status;
     }
 
     // Getters and setters
@@ -25,6 +27,14 @@ public class SaveImageResponse {
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
     }
 }
 

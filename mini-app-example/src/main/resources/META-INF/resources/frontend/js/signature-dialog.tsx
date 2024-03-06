@@ -1,7 +1,8 @@
 import { html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
-import { ImageRequest, SaveImageResponse, ErrorResponse, getImageById, saveImage } from 'Frontend/generated/jar-resources/js/imageService.tsx';
+import { ImageRequest, SaveImageResponse, getImageById, saveImage } from 'Frontend/generated/jar-resources/js/imageService.tsx';
+
 import '@vaadin/button';
 import '@vaadin/dialog';
 import '@vaadin/email-field';
@@ -107,10 +108,17 @@ export class Example extends LitElement {
         };
 
         saveImage(myImage)
-          .then((response: SaveImageResponse | ErrorResponse) => {
-            if ('adImageId' in response) {
-              console.log('Image saved successfully. ID:', response.adImageId);
-               this.dialogOpened = false;
+          .then((response: SaveImageResponse) => {
+            if (response.status === 200) {
+              const customEvent = new CustomEvent('image-save-db', {
+                detail: {
+                  message: 'Image saved successfully. ID',
+                  imageID: response.savedImageId
+                }
+              });
+              this.dispatchEvent(customEvent);
+              this.dialogOpened = true;
+              console.log(response.message, response.savedImageId);
             } else {
               console.error('Failed to save image:', response.message);
                this.dialogOpened = false;
@@ -158,7 +166,7 @@ export class Example extends LitElement {
           this.shadowRoot.querySelector('vaadin-button').style.display = 'none';
 
           const img = document.createElement('img');
-          img.src = 'data:image/png;base64,' + binaryData;
+          img.src = 'data:image/png;base64,' + binaryData;// TODO - handle all image type
           img.alt = description;
           img.width = 200;
           img.height = 150;
