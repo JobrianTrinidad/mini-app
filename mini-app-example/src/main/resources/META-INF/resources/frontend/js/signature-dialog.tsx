@@ -102,14 +102,17 @@ export class Example extends LitElement {
         }
 
         const myImage: ImageRequest = {
-          name: "My Image",
-          description: "A beautiful landscape",
+          name: "My Image", // TODO get the user name
+          description: "A beautiful landscape", // Add static message
           imageData: base64String
         };
 
         saveImage(myImage)
           .then((response: SaveImageResponse) => {
             if (response.status === 200) {
+              this.dialogOpened = false;
+              this.value = response.savedImageId;
+              this.loadSignatureImage(response.savedImageId);
               const customEvent = new CustomEvent('image-save-db', {
                 detail: {
                   message: 'Image saved successfully. ID',
@@ -117,7 +120,6 @@ export class Example extends LitElement {
                 }
               });
               this.dispatchEvent(customEvent);
-              this.dialogOpened = true;
               console.log(response.message, response.savedImageId);
             } else {
               console.error('Failed to save image:', response.message);
@@ -152,8 +154,7 @@ export class Example extends LitElement {
     return bytes;
   }
 
-  private async signatureID(signID: number) {
-    this.signatureData = signID;
+  private async loadSignatureImage(signID: number) {
     if (signID > 0) {
       getImageById(signID)
         .then(imageData => {

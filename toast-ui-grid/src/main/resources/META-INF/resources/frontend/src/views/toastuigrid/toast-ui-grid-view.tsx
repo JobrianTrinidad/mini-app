@@ -717,7 +717,6 @@ window.toastuigrid = {
                                 renderer: {
                                     type: SignatureRenderer,
                                     className: "tui-grid-Signature",
-                                    callback: onLoadModifiedInfo,
                                     options: {
                                         checkedTemplate: 'true',
                                         uncheckedTemplate: 'false',

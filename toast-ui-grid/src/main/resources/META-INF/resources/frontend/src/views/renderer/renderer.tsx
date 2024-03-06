@@ -113,7 +113,7 @@ export class SignatureRenderer {
         const container = document.createElement('div');
         container.classList.add('signature-container-grid');
         const signatureDialog = document.createElement('signature-dialog');
-        signatureDialog.signatureID(this.value);
+        signatureDialog.loadSignatureImage(this.value);
         container.appendChild(signatureDialog);
         this.el = container;
         signatureDialog.addEventListener('image-save-db', (event) => {
@@ -128,7 +128,10 @@ export class SignatureRenderer {
 
     save = (): void => {
            var dispatch = this.tgrid.dispatch;
-           dispatch("setValue", this.tgrid.getFocusedCell()["rowKey"], this.tgrid.getFocusedCell()["columnName"], this.value.toString());
+           var rowKey = this.tgrid.getFocusedCell()["rowKey"];
+           var columnName = this.tgrid.getFocusedCell()["columnName"];
+           dispatch("setValue", rowKey , columnName, this.value.toString());
+           dispatch("finishEditing", rowKey, columnName, this.value.toString(), { save: true, triggeredByKey: false });
     }
 }
 
