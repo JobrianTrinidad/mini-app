@@ -72,6 +72,13 @@ class LitSignaturePad extends LitElement {
           width: 24rem;
           height: 12rem;
       }
+
+      @media screen and (max-width :342px){
+       #signature {
+          width: 15rem;
+          height: 8rem;
+            }
+      }
     `;
   }
 

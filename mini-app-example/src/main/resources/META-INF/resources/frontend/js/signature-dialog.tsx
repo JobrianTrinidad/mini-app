@@ -2,7 +2,6 @@ import { html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { ImageRequest, SaveImageResponse, ErrorResponse, getImageById, saveImage } from 'Frontend/generated/jar-resources/js/imageService.tsx';
-
 import '@vaadin/button';
 import '@vaadin/dialog';
 import '@vaadin/email-field';
@@ -19,7 +18,8 @@ export class Example extends LitElement {
 
   @state()
   private dialogOpened = false;
-
+ @state()
+  private showViewButton = false;
   private signaturePad: any = null;
   private imageData: string | null = null;
 
@@ -41,14 +41,14 @@ export class Example extends LitElement {
         ${dialogFooterRenderer(this.renderFooter, [])}
       ></vaadin-dialog>
 
-      <vaadin-button
-        @click="${() => {
-          this.dialogOpened = true;
-        }}"
+      <vaadin-button theme="primary"
+       @click="${this.open}"
       >
         Open Signature Dialog
       </vaadin-button>
-    `;
+
+
+          `;
   }
 
   private renderDialog = () => html`
@@ -62,10 +62,16 @@ export class Example extends LitElement {
     <vaadin-button @click="${this.clearSignature}">Reset</vaadin-button>
     <vaadin-button theme="primary" @click="${this.saveSignature}">Save</vaadin-button>
     <vaadin-button theme="primary" @click="${this.close}">Close</vaadin-button>
+
   `;
 
   private open() {
     this.dialogOpened = true;
+     if (this.signaturePadInitialized) {
+          if (this.signaturePad) {
+            this.signaturePad.clear();
+          }
+        }
   }
 
   private close() {
@@ -80,7 +86,7 @@ export class Example extends LitElement {
   private clearSignature() {
     if (this.signaturePadInitialized) {
       if (this.signaturePad) {
-        this.signaturePad.undo();
+        this.signaturePad.clear();
       }
     }
   }
@@ -104,8 +110,10 @@ export class Example extends LitElement {
           .then((response: SaveImageResponse | ErrorResponse) => {
             if ('adImageId' in response) {
               console.log('Image saved successfully. ID:', response.adImageId);
+               this.dialogOpened = false;
             } else {
               console.error('Failed to save image:', response.message);
+               this.dialogOpened = false;
             }
           })
           .catch((error) => {
@@ -113,6 +121,7 @@ export class Example extends LitElement {
           });
       }
     }
+     this.showViewButton = true;
   }
 
   private registerSignature(component: HTMLElement) {
@@ -159,5 +168,11 @@ export class Example extends LitElement {
           console.error("Error fetching image data:", error);
         });
     }
+    else {
+       if (!signID || signID.length === 0) {
+         button.style.display = 'block';
+       }
+     }
   }
+
 }
