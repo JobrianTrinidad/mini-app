@@ -171,6 +171,12 @@ class LitSignaturePad extends LitElement {
     );
   }
 
+  getEncodeImage() {
+   if (!this.signaturePad) return;
+      var uri = this.signaturePad.toDataURL(this.type, this.encodingOptions);
+   return uri;
+  }
+
   dotSizeChanged() {
     if (!this.signaturePad) return;
     this.signaturePad.dotSize = this.dotSize;

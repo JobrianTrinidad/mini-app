@@ -95,7 +95,7 @@ export class SignatureRenderer {
     public el: HTMLElement;
 
     constructor(props: {
-        value: string; // Assuming the value is a base64 encoded image or signature data
+        value: number; // Assuming the value is a base64 encoded image or signature data
         grid: TuiGrid;
         rowKey: RowKey;
         columnInfo: ColumnInfo & {
@@ -105,24 +105,25 @@ export class SignatureRenderer {
             };
         };
     }) {
-        const signatureData: string = props.value;
+        const signatureID: number = Number(props.value);
 
         // Create a container element for the signature
         const container = document.createElement('div');
         container.classList.add('signature-container-grid');
 
         // If signatureData is null, initialize signature pad within the container
-        if (signatureData === null || signatureData === "-1") {
+//         if (signatureData === null || signatureData === -1) {
             // Initialize signature pad within the container
             const signaturebtn = document.createElement('signature-dialog');
+            signaturebtn.signatureID(signatureID);
             container.appendChild(signaturebtn);
-        } else {
-            // Create an img element to display the signature image
-            const signatureImg = document.createElement('img');
-            signatureImg.classList.add('signature-img-grid');
-            signatureImg.src = `data:image/png;base64,${signatureData}`; // Assuming the signature data is base64 encoded
-            container.appendChild(signatureImg);
-        }
+//         } else {
+//             // Create an img element to display the signature image
+//             const signatureImg = document.createElement('img');
+//             signatureImg.classList.add('signature-img-grid');
+//             signatureImg.src = `data:image/png;base64,${signatureData}`; // Assuming the signature data is base64 encoded
+//             container.appendChild(signatureImg);
+//         }
 
         this.el = container;
     }

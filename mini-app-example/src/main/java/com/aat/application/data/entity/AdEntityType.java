@@ -2,7 +2,7 @@ package com.aat.application.data.entity;
 
 import com.aat.application.core.data.entity.ZJTEntity;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.util.Date;
 
 @Entity

@@ -2,15 +2,14 @@ package com.aat.application.views;
 
 import com.aat.application.component.Camera;
 import com.aat.application.core.form.CustCompViewParameter;
-import com.aat.application.data.entity.AdImage;
-import com.aat.application.data.entity.ZJTPricingType;
+import com.aat.application.data.entity.ADImage;
 import com.aat.application.data.repository.BaseEntityRepository;
 import com.aat.application.data.service.TableInfoService;
 import com.vaadin.flow.router.BeforeEvent;
 import com.vaadin.flow.router.HasUrlParameter;
 import com.vaadin.flow.router.*;
 
-@Route(value = "camera-ap/:subcategory?/:filter?", layout = MainLayout.class)
+@Route(value = "camera/:subcategory?/:filter?", layout = MainLayout.class)
 public class CameraView extends StandardFormView implements HasUrlParameter<String> {
     private String subcategory;
     private String filter;
@@ -18,7 +17,7 @@ public class CameraView extends StandardFormView implements HasUrlParameter<Stri
     public CameraView(BaseEntityRepository repository, TableInfoService tableInfoService) {
         super(repository, tableInfoService);
         Camera camera = new Camera();
-        CustCompViewParameter custCompViewParameter = new CustCompViewParameter(AdImage.class, "", camera);
+        CustCompViewParameter custCompViewParameter = new CustCompViewParameter(ADImage.class, "", camera);
         super.custCompViewParameter(custCompViewParameter);
     }
 
