@@ -14,7 +14,7 @@ import type { DialogOpenedChangedEvent } from '@vaadin/dialog';
 import { applyTheme } from 'Frontend/generated/theme';
 
 @customElement('signature-dialog')
-export class Example extends LitElement {
+export class SignatureDialog extends LitElement {
 
   @state()
   private dialogOpened = false;
@@ -160,7 +160,6 @@ export class Example extends LitElement {
         }
       });
       this.dispatchEvent(customEvent);
-      console.log(response.message, response.savedImageId);
     } else {
       console.error('Failed to save image:', response.message);
       this.dialogOpened = false;
@@ -168,7 +167,7 @@ export class Example extends LitElement {
   }
 
   private registerSignature(component: HTMLElement) {
-    console.log(component); // TODO- if need to call the server method
+//     console.log(component); // TODO- if need to call the server method
   }
 
   private base64ToByteArray(base64String: string): Uint8Array {
@@ -191,7 +190,6 @@ export class Example extends LitElement {
     if (signID > 0) {
       getImageById(signID)
         .then(imageData => {
-          console.log(imageData);
           const adImageId = imageData.adImageId;
           const binaryData = imageData.binaryData;
           const description = imageData.description;
@@ -211,7 +209,7 @@ export class Example extends LitElement {
           console.error("Error fetching image data:", error);
         });
     }
-    else
+    else if(this.shadowRoot)
     {
       this.shadowRoot.querySelector('vaadin-button').style.display = "";
       const img = this.shadowRoot.querySelector('img');
