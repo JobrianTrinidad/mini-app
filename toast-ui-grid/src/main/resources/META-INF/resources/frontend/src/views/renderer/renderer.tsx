@@ -130,8 +130,9 @@ export class SignatureRenderer {
            var dispatch = this.tgrid.dispatch;
            var rowKey = this.tgrid.getFocusedCell()["rowKey"];
            var columnName = this.tgrid.getFocusedCell()["columnName"];
-           dispatch("setValue", rowKey , columnName, this.value.toString());
-           dispatch("finishEditing", rowKey, columnName, this.value.toString(), { save: true, triggeredByKey: false });
+           var columnValue = (this.value <= 0 ? null : this.value.toString());
+           dispatch("setValue", rowKey , columnName, columnValue);
+           dispatch("finishEditing", rowKey, columnName, columnValue, { save: true, triggeredByKey: false });
     }
 }
 

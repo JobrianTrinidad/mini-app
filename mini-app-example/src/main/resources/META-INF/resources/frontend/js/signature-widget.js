@@ -252,6 +252,10 @@ class LitSignaturePad extends LitElement {
     this.signatureCanvas.getContext("2d").scale(ratio, ratio);
     this.signaturePad.fromDataURL(dataUrl);
   }
+
+  isEmpty() {
+    return this.signaturePad.isEmpty();
+  }
 }
 
 customElements.define("lit-signature-pad", LitSignaturePad);

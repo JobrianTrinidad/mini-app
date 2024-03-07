@@ -34,6 +34,9 @@ import elemental.json.JsonNull;
 import elemental.json.JsonObject;
 import elemental.json.JsonValue;
 import elemental.json.impl.JreJsonArray;
+import elemental.json.impl.JreJsonNull;
+import elemental.json.impl.JreJsonNumber;
+import elemental.json.impl.JreJsonString;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -714,10 +717,14 @@ public class TuiGrid extends Div {
     public void onUpdateData(JsonObject eventData) {
         JsonObject itemChanged = eventData.getArray("changes").get(0);
         JsonObject record = eventData.get("record");
+        String value = null;
+        if (itemChanged.get("value") instanceof JreJsonString) {
+            value = itemChanged.getString("value");;
+        }
 
         ItemChangeEvent event = new ItemChangeEvent(
                 this, itemChanged.getString("columnName"),
-                itemChanged.getString("value"),
+                value,
                 (int) record.get("id").asNumber(), true);
 
         RuntimeException exception = null;

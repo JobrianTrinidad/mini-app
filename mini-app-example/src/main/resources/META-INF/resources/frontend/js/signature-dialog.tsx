@@ -1,8 +1,7 @@
 import { html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
+import { ImageRequest, ImageResponse, getImageById, saveImage, updateImage, deleteImage } from 'Frontend/generated/jar-resources/js/imageService.tsx';
 import { ifDefined } from 'lit/directives/if-defined.js';
-import { ImageRequest, SaveImageResponse, getImageById, saveImage } from 'Frontend/generated/jar-resources/js/imageService.tsx';
-
 import '@vaadin/button';
 import '@vaadin/dialog';
 import '@vaadin/email-field';
@@ -19,10 +18,8 @@ export class Example extends LitElement {
 
   @state()
   private dialogOpened = false;
- @state()
-  private showViewButton = false;
+
   private signaturePad: any = null;
-  private imageData: string | null = null;
 
   protected override createRenderRoot() {
     const root = super.createRenderRoot();
@@ -43,41 +40,42 @@ export class Example extends LitElement {
       ></vaadin-dialog>
 
       <vaadin-button theme="primary"
-       @click="${this.open}"
+       @click="${this.openNewSignature}"
       >
      Signature
       </vaadin-button>
-
-
-          `;
+      <img src="./" style="display: none;" />
+      `;
   }
 
   private renderDialog = () => html`
     <lit-signature-pad
       id="signaturePad"
       @ready="${this.handleSignaturePadReady}"
+      .img=${this.imageSrc}
     >
-    <img src="${this.imageSrc}" alt="Signature">
     </lit-signature-pad>
-
-
-
-
   `;
 
   private renderFooter = () => html`
     <vaadin-button @click="${this.clearSignature}">Reset</vaadin-button>
     <vaadin-button theme="primary" @click="${this.saveSignature}">Save</vaadin-button>
     <vaadin-button theme="primary" @click="${this.close}">Close</vaadin-button>
-
   `;
+
   private loadImage(imageSrc: string) {
-  this.dialogOpened = true
     this.imageSrc = imageSrc;
+    this.dialogOpened = true
   }
+
+  private openNewSignature(){
+    this.imageSrc =null;
+    this.clearSignature();
+    this.dialogOpened = true;
+  }
+
   private open() {
     this.dialogOpened = true;
-
   }
 
   private close() {
@@ -90,57 +88,87 @@ export class Example extends LitElement {
   }
 
   private clearSignature() {
-    if (this.signaturePadInitialized) {
-      if (this.signaturePad) {
-        this.signaturePad.clear();
-      }
+    if (this.signaturePadInitialized && this.signaturePad) {
+      this.signaturePad.clear();
     }
   }
 
   private saveSignature() {
-    if (this.signaturePadInitialized) {
-      if (this.signaturePad) {
-        let base64String = this.signaturePad.getEncodeImage();
-        const prefix = "data:image";
-        if (base64String.startsWith(prefix)) {
-          base64String = base64String.slice(base64String.indexOf(',') + 1);
-        }
-
-        const myImage: ImageRequest = {
-          name: "My Image", // TODO get the user name
-          description: "A beautiful landscape", // Add static message
-          imageData: base64String
-        };
-
-        saveImage(myImage)
-          .then((response: SaveImageResponse) => {
-            if (response.status === 200) {
-              this.dialogOpened = false;
-              this.value = response.savedImageId;
-              this.loadSignatureImage(response.savedImageId);
-              const customEvent = new CustomEvent('image-save-db', {
-                detail: {
-                  message: 'Image saved successfully. ID',
-                  imageID: response.savedImageId
-                }
-              });
-              this.dispatchEvent(customEvent);
-              console.log(response.message, response.savedImageId);
-            } else {
-              console.error('Failed to save image:', response.message);
-               this.dialogOpened = false;
-            }
-          })
-          .catch((error) => {
-            console.error('Error:', error);
-          });
+    if (this.signaturePadInitialized && this.signaturePad) {
+      const id = this.value !== undefined ? this.value : -1;
+      if(this.signaturePad.isEmpty() && id <= 0)
+      {
+        return;
       }
+      else if(this.signaturePad.isEmpty() &&  id > 0)
+      {
+           deleteImage(id)
+            .then((response: ImageResponse) => {
+               this.handleImageResponse(response);
+            })
+            .catch((error) => {
+              console.error('Error:', error);
+            });
+      }
+      else
+      {
+          let base64String = this.signaturePad.getEncodeImage();
+          const prefix = "data:image";
+          if (base64String.startsWith(prefix)) {
+            base64String = base64String.slice(base64String.indexOf(',') + 1);
+          }
+
+          const myImage: ImageRequest = {
+            name: "Signature",
+            description: "Signature",
+            imageData: base64String
+          };
+
+          if(id <= 0)
+          {
+            saveImage(myImage)
+              .then((response: ImageResponse) => {
+                 this.handleImageResponse(response);
+              })
+              .catch((error) => {
+                console.error('Error:', error);
+              });
+          }
+          else
+          {
+            updateImage(id, myImage)
+              .then((response: ImageResponse) => {
+                this.handleImageResponse(response);
+              })
+              .catch((error) => {
+                console.error('Error:', error);
+              });
+          }
+        }
     }
-     this.showViewButton = true;
+  }
+
+  private handleImageResponse(response: ImageResponse) {
+    if (response.status === 200) {
+      this.dialogOpened = false;
+      this.value = response.savedImageId;
+      this.loadSignatureImage(this.value);
+      const customEvent = new CustomEvent('image-save-db', {
+        detail: {
+          message: response.message,
+          imageID: response.savedImageId
+        }
+      });
+      this.dispatchEvent(customEvent);
+      console.log(response.message, response.savedImageId);
+    } else {
+      console.error('Failed to save image:', response.message);
+      this.dialogOpened = false;
+    }
   }
 
   private registerSignature(component: HTMLElement) {
-    console.log(component);
+    console.log(component); // TODO- if need to call the server method
   }
 
   private base64ToByteArray(base64String: string): Uint8Array {
@@ -169,36 +197,27 @@ export class Example extends LitElement {
           const description = imageData.description;
           const id = imageData.id;
           const name = imageData.name;
+          this.value = adImageId;
           this.shadowRoot.querySelector('vaadin-button').style.display = 'none';
 
-          const img = document.createElement('img');
-          img.src = 'data:image/png;base64,' + binaryData;// TODO - handle all image type
+          const img = this.shadowRoot.querySelector('img');
+          img.src = 'data:image/png;base64,' + binaryData; // TODO - handle all image type
           img.alt = description;
-          img.width = 200;
-          img.height = 150;
+          img.style = "height:37px; width: 90%;";
           this.shadowRoot.appendChild(img);
-             img.addEventListener('click', () => {
-                                      this.loadImage(img.src)
-
-                                    });
+          img.addEventListener('click', () => this.loadImage(img.src));
         })
         .catch(error => {
           console.error("Error fetching image data:", error);
         });
     }
-    else {
-       if (!signID || signID.length === 0) {
-         button.style.display = 'block';
-       }
-     }
+    else
+    {
+      this.shadowRoot.querySelector('vaadin-button').style.display = "";
+      const img = this.shadowRoot.querySelector('img');
+      img.src = "";
+      img.alt = "";
+      img.style.display = "none";
+    }
   }
-
-private loadImageIntoSignaturePad(image: string, description: string) {
-  const signaturePad = this.shadowRoot.getElementById('signaturePad');
-   signaturePad.src = image;
-
-  this.dialogOpened = true;
-}
-
-
 }

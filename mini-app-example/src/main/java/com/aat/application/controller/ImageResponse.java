@@ -1,12 +1,12 @@
 package com.aat.application.controller;
 
-public class SaveImageResponse {
+public class ImageResponse {
     private int savedImageId;
     private String message;
     private int status;
 
     // Constructor
-    public SaveImageResponse(int savedImageId, String message, int status) {
+    public ImageResponse(int savedImageId, String message, int status) {
         this.savedImageId = savedImageId;
         this.message = message;
         this.status = status;

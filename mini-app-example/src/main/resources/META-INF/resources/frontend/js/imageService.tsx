@@ -7,7 +7,7 @@ export interface ImageRequest {
     imageData: string;
 }
 
-export interface SaveImageResponse {
+export interface ImageResponse {
     savedImageId: number;
     message: string;
     status: number;
@@ -26,16 +26,39 @@ export async function getImageById(id: number): Promise<AdImage | null> {
     }
 }
 
-export async function saveImage(imageRequest: ImageRequest): Promise<SaveImageResponse | null> {
+export async function saveImage(imageRequest: ImageRequest): Promise<ImageResponse | null> {
     try {
-        // You might want to use a more descriptive URL for the POST request.
-        const response: AxiosResponse<SaveImageResponse> = await axios.post<SaveImageResponse>('/images', imageRequest);
+        const response: AxiosResponse<ImageResponse> = await axios.post<ImageResponse>('/images', imageRequest);
         return response.data;
     } catch (error) {
-        // It's good practice to catch errors and provide a fallback response.
         return {
             adImageId: -1,
             message: `Failed to save image: ${(error as Error).message}`
+        };
+    }
+}
+
+export async function updateImage(id: number, updatedImage: ImageRequest): Promise<ImageResponse | null> {
+    try {
+        const response: AxiosResponse<ImageResponse> = await axios.put<ImageResponse>(`/images/${id}`, updatedImage);
+        return response.data;
+    } catch (error) {
+        return {
+            adImageId: -1,
+            message: `Failed to update image: ${(error as Error).message}`
+        };
+    }
+}
+
+export async function deleteImage(id: number): Promise<ImageResponse> {
+    try {
+        const response: AxiosResponse<ImageResponse> = await axios.delete(`/images/${id}`);
+        return response.data;
+    } catch (error) {
+        console.error('Error deleting image:', error);
+        return {
+            adImageId: -1,
+            message: `Failed to delete image: ${(error as Error).message}`
         };
     }
 }
