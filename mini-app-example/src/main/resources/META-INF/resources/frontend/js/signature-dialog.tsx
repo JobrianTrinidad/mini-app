@@ -45,7 +45,7 @@ export class Example extends LitElement {
       <vaadin-button theme="primary"
        @click="${this.open}"
       >
-        Open Signature Dialog
+     Signature
       </vaadin-button>
 
 
@@ -56,7 +56,13 @@ export class Example extends LitElement {
     <lit-signature-pad
       id="signaturePad"
       @ready="${this.handleSignaturePadReady}"
-    ></lit-signature-pad>
+    >
+    <img src="${this.imageSrc}" alt="Signature">
+    </lit-signature-pad>
+
+
+
+
   `;
 
   private renderFooter = () => html`
@@ -65,14 +71,13 @@ export class Example extends LitElement {
     <vaadin-button theme="primary" @click="${this.close}">Close</vaadin-button>
 
   `;
-
+  private loadImage(imageSrc: string) {
+  this.dialogOpened = true
+    this.imageSrc = imageSrc;
+  }
   private open() {
     this.dialogOpened = true;
-     if (this.signaturePadInitialized) {
-          if (this.signaturePad) {
-            this.signaturePad.clear();
-          }
-        }
+
   }
 
   private close() {
@@ -172,6 +177,10 @@ export class Example extends LitElement {
           img.width = 200;
           img.height = 150;
           this.shadowRoot.appendChild(img);
+             img.addEventListener('click', () => {
+                                      this.loadImage(img.src)
+
+                                    });
         })
         .catch(error => {
           console.error("Error fetching image data:", error);
@@ -183,5 +192,13 @@ export class Example extends LitElement {
        }
      }
   }
+
+private loadImageIntoSignaturePad(image: string, description: string) {
+  const signaturePad = this.shadowRoot.getElementById('signaturePad');
+   signaturePad.src = image;
+
+  this.dialogOpened = true;
+}
+
 
 }
