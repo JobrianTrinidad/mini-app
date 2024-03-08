@@ -166,7 +166,7 @@ public class GridViewParameter {
                 headerTypeOptions.put(field.getName(), field.getType());
                 headerNames.put(field.getName(), field.getAnnotation(DisplayName.class).value());
                 headerOptions.put(field.getName(), "CustomComponent");
-                headerOptions.put("CustomComponentName", field.getAnnotation(CustomComponent.class).value());
+                headerOptions.put("CustomComponentName_" + field.getName(), field.getAnnotation(CustomComponent.class).value());
 
             }
             else if (field.getAnnotation(jakarta.persistence.Column.class) != null) {

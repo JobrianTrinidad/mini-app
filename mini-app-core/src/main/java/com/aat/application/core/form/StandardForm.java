@@ -398,7 +398,7 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService> ex
                     column.setType("check");
                     break;
                 case "CustomComponent":
-                    column.setCustomType(this.gridViewParameter.getHeaderOptions().get("CustomComponentName"));
+                    column.setCustomType(this.gridViewParameter.getHeaderOptions().get("CustomComponentName_" + header));
                     column.setType("CustomComponent");
                     break;
                 case "date":
