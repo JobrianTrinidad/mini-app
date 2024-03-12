@@ -1,6 +1,7 @@
 package com.aat.application.core.form;
 
 import com.aat.application.annotations.ContentDisplayedInSelect;
+import com.aat.application.annotations.CustomComponent;
 import com.aat.application.annotations.DisplayName;
 import com.aat.application.annotations.MultiLineField;
 import com.vaadin.flow.router.PageTitle;
@@ -160,7 +161,15 @@ public class GridViewParameter {
             if (field.getAnnotation(ContentDisplayedInSelect.class) != null) {
                 fieldDisplayedInSelect = field.getName();
             }
-            if (field.getAnnotation(jakarta.persistence.Column.class) != null) {
+            if (field.getAnnotation(CustomComponent.class) != null) {
+                fieldNames.add(field.getName());
+                headerTypeOptions.put(field.getName(), field.getType());
+                headerNames.put(field.getName(), field.getAnnotation(DisplayName.class).value());
+                headerOptions.put(field.getName(), "CustomComponent");
+                headerOptions.put("CustomComponentName_" + field.getName(), field.getAnnotation(CustomComponent.class).value());
+
+            }
+            else if (field.getAnnotation(jakarta.persistence.Column.class) != null) {
                 fieldNames.add(field.getName());
                 String strAdd = "";
                 if (field.getAnnotation(MultiLineField.class) != null)

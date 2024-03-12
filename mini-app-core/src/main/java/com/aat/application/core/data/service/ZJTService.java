@@ -17,4 +17,7 @@ public interface ZJTService {
     <T> T addNewEntity(Class<?> entityClass);
 
     ZJTEntity addNewEntity(ZJTEntity entity);
+
+    ZJTEntity findEntityByID(Class<?> entityClass, int id);
+
 }

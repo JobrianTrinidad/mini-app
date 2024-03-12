@@ -1,16 +1,18 @@
 package com.aat.application.views;
 
-import com.aat.application.core.form.CommonForm;
-import com.aat.application.core.form.GridViewParameter;
-import com.aat.application.core.form.StandardForm;
-import com.aat.application.core.form.TimeLineViewParameter;
+import com.aat.application.core.form.*;
 import com.aat.application.data.repository.BaseEntityRepository;
 import com.aat.application.data.service.BaseEntityService;
 import com.aat.application.data.service.TableInfoService;
+import com.aat.application.form.CustomCompCommonForm;
 import com.aat.application.form.GridCommonForm;
 import com.aat.application.form.TimeLineCommonForm;
-import com.vaadin.componentfactory.tuigrid.event.*;
+import com.vaadin.componentfactory.tuigrid.event.ItemAddEvent;
+import com.vaadin.componentfactory.tuigrid.event.ItemChangeEvent;
+import com.vaadin.componentfactory.tuigrid.event.ItemDeleteEvent;
+import com.vaadin.componentfactory.tuigrid.event.ItemMultiSelectEvent;
 import com.vaadin.componentfactory.tuigrid.model.AATContextMenu;
+import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.router.BeforeEnterEvent;
 
@@ -22,6 +24,8 @@ public class StandardFormView extends CommonView {
     protected CommonForm form;
     private final TableInfoService tableInfoService;
     private GridViewParameter gridViewParameter;
+
+    private CustCompViewParameter custCompViewParameter;
     private TimeLineViewParameter timeLineViewParameter;
     protected AATContextMenu contextMenu;
     private String name;
@@ -65,8 +69,16 @@ public class StandardFormView extends CommonView {
                 gridViewParameter.setParameters(filterObjectIds);
                 form = new GridCommonForm<>(gridViewParameter, new BaseEntityService<>(repository), tableInfoService);
                 break;
+            case "component":
+                bGrid = false;
+                form = new CustomCompCommonForm<>(custCompViewParameter, new BaseEntityService<>(repository));
+                break;
             default:
-                if (gridViewParameter != null) {
+                if (custCompViewParameter != null){
+                    bGrid = false;
+                    form = new CustomCompCommonForm<>(custCompViewParameter, new BaseEntityService<>(repository));
+                }
+                else if (gridViewParameter != null) {
                     bGrid = true;
                     gridViewParameter.setParameters(filterObjectIds);
                     if (gridViewParameter.getGroupClass() != null) {
@@ -135,5 +147,9 @@ public class StandardFormView extends CommonView {
 
     public boolean isbGrid() {
         return bGrid;
+    }
+
+    protected void custCompViewParameter(CustCompViewParameter custCompViewParameter) {
+        this.custCompViewParameter = custCompViewParameter;
     }
 }
