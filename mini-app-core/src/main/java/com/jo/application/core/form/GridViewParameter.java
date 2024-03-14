@@ -1,7 +1,7 @@
 package com.jo.application.core.form;
 
 import com.jo.application.annotations.ContentDisplayedInSelect;
-import com.jo.application.annotations.CustomComponent;
+import com.jo.application.annotations.component.CustomComponent;
 import com.jo.application.annotations.DisplayName;
 import com.jo.application.annotations.MultiLineField;
 import com.vaadin.flow.router.PageTitle;

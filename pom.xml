@@ -40,7 +40,7 @@
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>${project.groupId}</groupId>
+                <groupId>com.jo.application</groupId>
                 <artifactId>mini-app-core</artifactId>
                 <version>${project.version}</version>
             </dependency>
