@@ -178,6 +178,11 @@ public class BaseEntityRepository {
         return typedQuery.getResultList();
     }
 
+
+    /**
+     * Expose entity manager to run query directly for greater control
+     * @return
+     */
     public EntityManager getEntityManager() {
         return entityManager;
     }
