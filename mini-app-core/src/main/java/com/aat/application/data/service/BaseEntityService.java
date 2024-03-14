@@ -48,4 +48,9 @@ public class BaseEntityService<T> implements ZJTService {
     public ZJTEntity addNewEntity(ZJTEntity entity) {
         return generalRepository.addNewEntity(entity);
     }
+
+    @Override
+    public ZJTEntity findEntityByID(Class<?> entityClass, int id) {
+        return generalRepository.findEntityById(entityClass, id);
+    }
 }

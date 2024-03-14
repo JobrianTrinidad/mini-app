@@ -22,13 +22,14 @@
     z-index: 0 !important;
 }
 
-.grid.scheduler-grid .tui-grid-body-area, .grid.scheduler-grid .tui-grid-body-area {
-    height: auto !important;
-}
-
 @media (min-width: 801px) {
 .grid.scheduler-grid .tui-grid-content-area, .grid.scheduler-grid .tui-grid-container .tui-grid-content-area {
      min-height: calc(100vh - 170px);
  }
+}
+
+.signature-container-grid {
+   text-align: center !important;
+   background-color: white !important;
 }
 
