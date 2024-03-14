@@ -177,4 +177,8 @@ public class BaseEntityRepository {
 
         return typedQuery.getResultList();
     }
+
+    public EntityManager getEntityManager() {
+        return entityManager;
+    }
 }
