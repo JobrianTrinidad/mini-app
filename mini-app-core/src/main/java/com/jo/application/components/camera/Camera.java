@@ -1,4 +1,4 @@
-package com.jo.application.component;
+package com.jo.application.components.camera;
 
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.HasComponents;

@@ -1,4 +1,4 @@
-package com.jo.application.data.config;
+package com.jo.application.config;
 
 import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilderCustomizer;
 import org.springframework.context.annotation.Bean;

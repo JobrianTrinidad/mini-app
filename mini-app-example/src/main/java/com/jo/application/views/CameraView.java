@@ -1,7 +1,7 @@
 package com.jo.application.views;
 
 import com.jo.application.data.entity.ADImage;
-import com.jo.application.component.Camera;
+import com.jo.application.components.camera.Camera;
 import com.jo.application.core.form.CustCompViewParameter;
 import com.jo.application.data.repository.BaseEntityRepository;
 import com.jo.application.data.service.TableInfoService;

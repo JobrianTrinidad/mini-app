@@ -2,7 +2,7 @@ package com.jo.application.data.entity;
 
 import com.jo.application.annotations.BaseItems;
 import com.jo.application.annotations.ContentDisplayedInSelect;
-import com.jo.application.annotations.CustomComponent;
+import com.jo.application.annotations.component.CustomComponent;
 import com.jo.application.annotations.DisplayName;
 import com.jo.application.core.data.entity.ZJTEntity;
 import com.vaadin.flow.router.PageTitle;
