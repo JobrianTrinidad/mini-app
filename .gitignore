@@ -1,0 +1,7 @@
+
+/mini-app-core/target
+/mini-app-example/frontend/generated
+/mini-app-example/src/main/dev-bundle/webapp/VAADIN/build
+/mini-app-example/target
+/toast-ui-grid/target
+/.idea
