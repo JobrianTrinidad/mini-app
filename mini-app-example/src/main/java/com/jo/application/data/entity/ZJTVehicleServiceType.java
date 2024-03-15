@@ -46,6 +46,10 @@ public class ZJTVehicleServiceType implements ZJTEntity {
     @DisplayName(value = "Plan Date")
     private LocalDateTime planDate;
 
+    @Column
+    @DisplayName (value = "Interval Type")
+    private IntervalType intervalType = IntervalType.S;
+
     @OneToMany(mappedBy = "serviceType", cascade = CascadeType.ALL)
     @BaseItems
     private List<ZJTServiceTypeKit> serviceTypeKits;
@@ -106,5 +110,11 @@ public class ZJTVehicleServiceType implements ZJTEntity {
         this.km_interval = km_interval;
     }
 
+    public IntervalType getIntervalType() {
+        return intervalType;
+    }
 
+    public void setIntervalType(IntervalType intervalType) {
+        this.intervalType = intervalType;
+    }
 }
