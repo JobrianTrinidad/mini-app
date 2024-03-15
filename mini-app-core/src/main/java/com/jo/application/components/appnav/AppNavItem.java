@@ -71,6 +71,13 @@ public class AppNavItem extends Component {
         setLabel(label);
         routePath = path;
         setIcon(icon);
+        getElement().executeJs(
+                "const shadow = this.shadowRoot; " +
+                        "if (shadow) { " +
+                        "    shadow.innerHTML += '<style>slot{ white-space: pre-line !important; }</style>'; " +
+                        "}"
+        );
+
     }
 
     /**
