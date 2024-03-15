@@ -1,23 +1,19 @@
 vaadin-scroller[slot="drawer"] {
     padding: var(--lumo-space-s);
-}
 
+}
 #drawer {
     background-color: #66878840;
 }
-
 .bg-warning {
     background-color: yellow;
 }
-
 .bg-success {
     background-color: blue;
 }
-
 .bg-dangerous {
     background-color: red;
 }
-
 [slot="drawer"]:is(header, footer) {
     display: flex;
     align-items: center;
@@ -25,13 +21,52 @@ vaadin-scroller[slot="drawer"] {
     padding: var(--lumo-space-s) var(--lumo-space-m);
     min-height: var(--lumo-size-xl);
     box-sizing: border-box;
-}
 
+}
 [slot="drawer"]:is(header, footer):is(:empty) {
-    display: none;
-}
+    display: block;
 
+}
 vaadin-vertical-layout {
     position: relative;
     z-index: 1;
+}
+vaadin-app-layout::part(drawer){
+background-color:#326F70;
+}
+vaadin-drawer-toggle::part(icon){
+color:#326F70;
+}
+vcf-nav  {
+color:white;
+}
+
+vcf-nav-item::part(toggle-button){
+color:white !important;
+}
+
+vcf-nav-item::part(item):active{
+font-size: 16px;
+}
+vaadin-button {
+color:white !important;
+background-color:#326F70 !important;
+}
+@media (min-width: 1001px) and (max-width : 1440px) {
+    vcf-nav-item {
+        padding-bottom: 5px;
+    }
+}
+@media (min-width: 310px) and (max-width : 1000px) {
+    vcf-nav-item {
+        padding-bottom: 9px;
+    }
+}
+@media (min-width: 1441px){
+    vcf-nav-item {
+        padding-bottom: 9px;
+    }
+}
+vaadin-horizontal-layout.aat-toolbar {
+    margin-bottom: -7px !important;
 }

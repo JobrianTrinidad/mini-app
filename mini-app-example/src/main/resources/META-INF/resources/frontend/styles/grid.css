@@ -24,7 +24,7 @@
 
 @media (min-width: 801px) {
 .grid.scheduler-grid .tui-grid-content-area, .grid.scheduler-grid .tui-grid-container .tui-grid-content-area {
-     min-height: calc(100vh - 170px);
+     min-height: calc(97vh - 170px);
  }
 }
 
