@@ -70,3 +70,11 @@ background-color:#326F70 !important;
 vaadin-horizontal-layout.aat-toolbar {
     margin-bottom: -7px !important;
 }
+
+html {
+--lumo-primary-text-color: hsl(0deg 0% 100%);
+}
+
+vcf-nav vcf-nav-item[active] {
+    font-weight: bold !important;
+}
