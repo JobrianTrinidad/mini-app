@@ -72,9 +72,20 @@ vaadin-horizontal-layout.aat-toolbar {
 }
 
 html {
---lumo-primary-text-color: hsl(0deg 0% 100%);
+    --lumo-primary-text-color: hsl(0deg 0% 100%);
+    --lumo-button-background-color: hsl(180.97deg 38.27% 31.76%);
+    --_lumo-button-background-color: hsl(180.97deg 38.27% 31.76%);
 }
 
 vcf-nav vcf-nav-item[active] {
     font-weight: bold !important;
+}
+
+.link-button {
+    color: #306c6f !important;
+}
+
+.link-button:focus,
+.link-button:hover {
+    color: var(--lumo-header-text-color);
 }
