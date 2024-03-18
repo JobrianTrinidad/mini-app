@@ -16,6 +16,7 @@ import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.router.*;
 
+import java.util.List;
 import java.util.Optional;
 
 @Route(value = "service-type/:subcategory?/:filter?", layout = MainLayout.class)
@@ -44,6 +45,17 @@ public class ServiceTypeView extends StandardFormView implements HasUrlParameter
                             break;
                         case "service-type-task":
                             entity = new ZJTServiceTypeTask();
+                            int nextSeqNo = 10;
+                            String sql = "select * from zjt_servicetypetask where zjt_vehicleservicetype_id = :id order by seq_no desc limit 1";
+                            List<ZJTServiceTypeTask> lastTask =  repository.getEntityManager().createNativeQuery(sql, ZJTServiceTypeTask.class)
+                                    .setParameter("id", serviceType.getId())
+                                    .getResultList();
+                            if (lastTask.size() == 1) {
+                                nextSeqNo = lastTask.get(0).getSeqNo() + 10;
+                            }
+
+                            ((ZJTServiceTypeTask) entity).setSeqNo(nextSeqNo);
+
                             ((ZJTServiceTypeTask) entity).setServiceType(serviceType);
                             break;
                         default:
