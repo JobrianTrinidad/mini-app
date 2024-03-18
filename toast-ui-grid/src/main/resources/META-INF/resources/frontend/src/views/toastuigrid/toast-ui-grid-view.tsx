@@ -174,7 +174,7 @@ window.toastuigrid = {
         };
         const handleSearchResult = (result: Cell): void => {
             gridInst = container.grid.table;
-            gridInst.focusAt(result.row, result.column);
+            gridInst.focusAt(result.row, result.column-1);
         }
         const handleKeyDown = (event: KeyboardEvent): void => {
             gridInst = container.grid.table;

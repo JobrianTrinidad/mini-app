@@ -45,3 +45,15 @@ vaadin-scroller[slot='drawer'] {
   -webkit-mask-repeat: var(--mask-repeat);
   -webkit-mask-position: var(--mask-position);
 }
+    .find-button {
+    margin-right: 8px;
+    background-color: #326F70;
+    margin-left: 8px;
+    width: 4rem;
+    color: white;
+}
+    .close-button {
+    background-color:#326F70;
+    color: white;
+    width: 4rem;
+}

@@ -57,25 +57,25 @@ const ExcelSheet = forwardRef<HTMLDivElement, ExcelSheetProps>((props: ExcelShee
         };
     }, [searchValue, currentSearchIndex, props.range]);
 
-    const handleSearch = (e: React.FormEvent): void => {
-        e.preventDefault();
-        const searchKey = searchValue.toLowerCase();
+        const handleSearch = (e: React.FormEvent): void => {
+            e.preventDefault();
+            const searchKey = searchValue.toLowerCase();
 
-        for (let row: number = 0; row < props.range.length; row++) {
-            for (let col: number = 0; col < props.range[row].length; col++) {
-                const cell = props.range[row][col];
-                if (cell.value.toString().toLowerCase().includes(searchKey)) {
-                    props.onSearchResult({row, column: props.range[row][col].column, value: cell.value});
-                    setSearchResult({row, column: props.range[row][col].column, value: cell.value});
-                    setCurrentSearchIndex(row * props.range[row].length + col);
-                    return;
+            for (let row: number = 0; row < props.range.length; row++) {
+                for (let col: number = 0; col < props.range[row].length; col++) {
+                    const cell = props.range[row][col];
+                    if (cell.value.toString().toLowerCase().includes(searchKey)) {
+                        props.onSearchResult({row, column: props.range[row][col].column, value: cell.value});
+                        setSearchResult({row, column: props.range[row][col].column, value: cell.value});
+                        setCurrentSearchIndex(row * props.range[row].length + col);
+                        findNext(searchValue, currentSearchIndex, props.range);
+                        return;
+                    }
                 }
             }
-        }
-
-        setSearchResult(''); // Value not found
-        setCurrentSearchIndex(null);
-    };
+            setSearchResult(''); // Value not found
+            setCurrentSearchIndex(null);
+        };
 
     const findNext = (searchValue: string, currentSearchIndex: number, range: Cell[][]): void => {
         const searchKey: string = searchValue.toLowerCase();
@@ -85,7 +85,6 @@ const ExcelSheet = forwardRef<HTMLDivElement, ExcelSheetProps>((props: ExcelShee
             if (nextIndex >= range.length * range[0].length) {
                 nextIndex = 0;
             }
-
             for (let index: number = nextIndex; index < range.length * range[0].length; index++) {
                 const cell = getCellFromIndex(index, range);
                 if (cell?.value.toString().toLowerCase().includes(searchKey)) {
@@ -152,32 +151,36 @@ const ExcelSheet = forwardRef<HTMLDivElement, ExcelSheetProps>((props: ExcelShee
             setCurrentSearchIndex(beforeIndex);
         }
     }
-
-    return (
-        <div ref={ref}>
-            {showSearchInput && (
-                <form onSubmit={handleSearch}>
-                    <Input
-                        ref={searchInputRef}
-                        defaultValue={searchValue}
-                        type="text"
-                        onChange={e => setSearchValue(e.target.value)}
-                        style={{
-                            backgroundColor: '#66878858',
-                            opacity: 1,
-                            width: '20em',
-                            height: '100%',
-                            border: '1px solid #326f70',
-                            outline: 'none',
-                        }}
-                        _focusVisible={{outline: "none"}}
-                        _hover={{outline: "none"}}
-                    />
-                    <button type="submit">Find</button>
-                </form>
-            )}
-        </div>
-    );
+         const handleClose = () => {
+              setShowSearchInput(false);
+          };
+        return (
+            <div ref={ref}>
+                {showSearchInput && (
+                    <form onSubmit={handleSearch}>
+                        <Input
+                            ref={searchInputRef}
+                            defaultValue={searchValue}
+                            type="text"
+                            onChange={e => setSearchValue(e.target.value)}
+                            style={{
+                                backgroundColor: '#66878858',
+                                opacity: 1,
+                                width: '20em',
+                                height: '100%',
+                                border: '1px solid #326f70',
+                                outline: 'none',
+                            }}
+                            _focusVisible={{outline: "none"}}
+                            _hover={{outline: "none"}}
+                        />
+                        <button type="submit" className="find-button">Find</button>
+                        <span></span>
+                        <button type="close" className="close-button"onClick={handleClose}>Close</button>
+                    </form>
+                )}
+            </div>
+        );
 });
 
 export default ExcelSheet;
