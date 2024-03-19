@@ -72,7 +72,7 @@ vaadin-horizontal-layout.aat-toolbar {
 }
 
 html {
-    --lumo-primary-text-color: hsl(0deg 0% 100%);
+    --lumo-primary-text-color: hsl(214, 35%, 15%);
     --lumo-button-background-color: hsl(180.97deg 38.27% 31.76%);
     --_lumo-button-background-color: hsl(180.97deg 38.27% 31.76%);
 }
