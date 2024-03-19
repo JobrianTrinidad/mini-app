@@ -59,6 +59,8 @@ public class TuiGridOption {
     public boolean bAllowInsert = true;
     public  boolean multiSelectStatus = true;
 
+    public int pageSize = 50;
+
     public String toJSON() {
         JsonObject js = Json.createObject();
         Optional.ofNullable(convertColumnsToJson()).ifPresent(v -> js.put("columns", "[" + v + "]"));
@@ -115,6 +117,9 @@ public class TuiGridOption {
         if (this.contextMenu != null) {
             Optional.ofNullable(this.contextMenu.convertChildrenToJson()).ifPresent(v -> js.put("contextmenu", "[" + v + "]"));
         }
+
+        if(this.pageSize > 0)
+            js.put("pageSize", this.pageSize);
 
         return js.toJson();
     }

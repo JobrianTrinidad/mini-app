@@ -22,6 +22,7 @@ interface FeatureTableProps {
     treeColumnOptions?: OptTree;
     rowHeight?: number | 'auto';
     minBodyHeight?: number;
+    pageSize?: number | 50;
     onEditingStart?: (ev: TuiGridEvent) => void;
     onEditingFinish?: (ev: TuiGridEvent) => void;
     onSelection?: (ev: TuiGridEvent) => void;
@@ -53,6 +54,7 @@ const FeatureTable: React.FC<FeatureTableProps> = React.forwardRef<HTMLDivElemen
             treeColumnOptions,
             rowHeight,
             minBodyHeight,
+            pageSize,
             onSelection,
             onCheck,
             onCheckAll,
@@ -61,7 +63,7 @@ const FeatureTable: React.FC<FeatureTableProps> = React.forwardRef<HTMLDivElemen
             onFocusChange,
             onAfterChange,
             onColumnResize,
-            handleSearchResult,
+            handleSearchResult
         }: FeatureTableProps,
         ref: React.Ref<HTMLDivElement>
     ) => {
@@ -71,7 +73,7 @@ const FeatureTable: React.FC<FeatureTableProps> = React.forwardRef<HTMLDivElemen
 
         function loadRows(lengthOfLoaded: number, allData: OptRow[]): OptRow[] {
             const rows: OptRow[] = [];
-            let endPoint: number = lengthOfLoaded + 50 <= allData.length ? lengthOfLoaded + 50 : allData.length
+            let endPoint: number = lengthOfLoaded + pageSize <= allData.length ? lengthOfLoaded + pageSize : allData.length
             for (let i: number = lengthOfLoaded; i < endPoint; i += 1) {
                 const row: OptRow = {};
                 for (let j: number = 0; j < columns.length; j += 1) {
@@ -170,9 +172,21 @@ const FeatureTable: React.FC<FeatureTableProps> = React.forwardRef<HTMLDivElemen
 
             getGridInstance(grid);
 
+            const handleKeyDown = (event: KeyboardEvent): void => {
+                if (event.key === 'PageDown') {
+                    if (grid.getFilterState() === null)
+                        grid.appendRows(loadRows(grid.getData().length, TableData));
+                    else
+                        grid.appendRows(loadRows(grid.getFilteredData().length, grid.getFilteredData()));
+                }
+            };
+
+            document.addEventListener('keydown', handleKeyDown);
+
             return (): void => {
                 if (grid) {
                     grid.destroy();
+                    document.removeEventListener('keydown', handleKeyDown);
                 }
             };
         }, []);

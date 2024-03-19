@@ -15,11 +15,13 @@ import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.dialog.Dialog;
+import com.vaadin.flow.component.html.NativeLabel;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.value.ValueChangeMode;
 
@@ -87,6 +89,8 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService> ex
         btnColumnSettings.setIcon(new Icon(VaadinIcon.TWIN_COL_SELECT));
         btnColumnSettings.addClickListener(e -> {
             selectedItems = twinColSelect.getSelectedItems();
+            if (tableInfo.getPageSize() != null)
+                twinColSelDialog.getElement().executeJs("var value = $0; console.log(this);  var numberField = this.getElementById('PageSizeNumber'); console.log(numberField); numberField.value = value;", tableInfo.getPageSize().doubleValue());
             twinColSelDialog.open();
         });
 
@@ -174,8 +178,17 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService> ex
         twinColSelect.setItems(sortedHeaderNames);
         twinColSelect.select(tempDisplayedHeaderNames);
 
+        NativeLabel label = new NativeLabel("Page Size");
+        NumberField numberPageSize = new NumberField();
+        numberPageSize.setId("PageSizeNumber");
+        if (tableInfo.getPageSize() != null)
+            numberPageSize.setValue(tableInfo.getPageSize().doubleValue());
+        HorizontalLayout pageSizePanel = new HorizontalLayout(label, numberPageSize);
+        pageSizePanel.setAlignItems(Alignment.CENTER);
+
         Button btnOk = new Button("OK");
         Button btnCancel = new Button("Cancel");
+
         Checkbox autoWidthSave = new Checkbox("Save Column Width", true);
         autoWidthSave.addValueChangeListener(e -> bSavedWidth = e.getValue());
         HorizontalLayout btnPanel = new HorizontalLayout(btnCancel, btnOk, autoWidthSave);
@@ -218,6 +231,9 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService> ex
             if (bSavedWidth)
                 finalTableInfo.setWidths(allowedWidths.toString());
             finalTableInfo.setHeaders(this.gridViewParameter.getHeaders().toString());
+            if (numberPageSize.getValue() != null && numberPageSize.getValue() > 0)
+                finalTableInfo.setPageSize(numberPageSize.getValue().intValue());
+
             tableInfoService.save(finalTableInfo);
             tableInfo = finalTableInfo;
 
@@ -225,13 +241,14 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService> ex
                 this.loadGrid();
             else grid.removeFromParent();
 
+            grid.setRowCountOnElement("rowcount");
             twinColSelDialog.close();
         });
 
         btnCancel.addClickListener(e -> twinColSelDialog.close());
 
         twinColSelDialog = new Dialog();
-        twinColSelDialog.add(new VerticalLayout(twinColSelect, btnPanel));
+        twinColSelDialog.add(new VerticalLayout(twinColSelect, pageSizePanel, btnPanel));
         twinColSelDialog.setCloseOnEsc(true);
         twinColSelDialog.setCloseOnOutsideClick(true);
     }
@@ -252,6 +269,9 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService> ex
 
         List<Column> columns = this.getColumns();
         grid.setColumns(columns);
+
+        if (tableInfo.getPageSize() != null)
+            grid.setPageSize(tableInfo.getPageSize());
 
 //        List<Summary> summaries = List.of(
 //                new Summary(columns.get(columns.size() - 1).getColumnBaseOption().getName(), Summary.OperationType.rowcount));

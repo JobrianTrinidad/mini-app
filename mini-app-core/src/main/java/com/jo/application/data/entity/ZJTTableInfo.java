@@ -2,8 +2,6 @@ package com.jo.application.data.entity;
 
 import jakarta.persistence.*;
 
-import java.util.List;
-
 @Entity
 @Table(name = "zjt_table_info")
 public class ZJTTableInfo {
@@ -20,6 +18,9 @@ public class ZJTTableInfo {
 
     @Column(name = "column_width")
     private String widths;
+
+    @Column(name = "page_size")
+    private Integer pageSize;
 
     public String getTable_name() {
         return table_name;
@@ -43,5 +44,13 @@ public class ZJTTableInfo {
 
     public void setWidths(String widths) {
         this.widths = widths;
+    }
+
+    public Integer getPageSize() {
+        return pageSize;
+    }
+
+    public void setPageSize(Integer pageSize) {
+        this.pageSize = pageSize;
     }
 }

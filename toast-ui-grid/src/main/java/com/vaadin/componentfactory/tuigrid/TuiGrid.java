@@ -885,4 +885,8 @@ public class TuiGrid extends Div {
             return "[]"; // Empty array if fieldsAsReadOnly is null or empty
         }
     }
+
+    public void setPageSize(int pageSize) {
+       tuiGridOption.pageSize  = pageSize;
+    }
 }

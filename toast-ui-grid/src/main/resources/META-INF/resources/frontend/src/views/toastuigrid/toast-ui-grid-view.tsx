@@ -324,6 +324,7 @@ window.toastuigrid = {
                 scrollY={parsedOptions.scrollY}
                 // minRowHeight={"90%"}
                 // minBodyHeight={120}
+                pageSize={parsedOptions.pageSize ? parsedOptions.pageSize : 50}
                 rowHeaders={parsedOptions.rowHeaders ? this.getRowHeaders(parsedOptions.rowHeaders) : null}
                 treeColumnOptions={parsedOptions.treeColumnOptions ? JSON.parse(parsedOptions.treeColumnOptions) : null}
                 onAfterChange={onAfterChange}
