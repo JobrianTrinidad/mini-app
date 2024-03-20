@@ -630,7 +630,8 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService> ex
         if (gridViewParameter.isRequireParameter() && parameters == null) {
             throw new Exception("Parameters are required, but not set");
         }
-        if(this.gridViewParameter.getHeaderTypeOptions().get(parameters[1].toString()).isEnum())
+        Class<?> aClass = this.gridViewParameter.getHeaderTypeOptions().get(parameters[1].toString());
+        if(aClass != null && aClass.isEnum())
         {
             parameters[2] = createEnumObject(Class.forName(this.gridViewParameter.getHeaderTypeOptions().get(parameters[1].toString()).getName()), parameters[2].toString());
         }
