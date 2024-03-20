@@ -27,6 +27,11 @@ public class CustomCompCommonForm<T extends ZJTEntity> extends CustomComponentFo
     }
 
     @Override
+    public void setDataToGridRow(int rowKey, String data) {
+
+    }
+
+    @Override
     public int onUpdateItem(Object[] objects) throws Exception {
         return 0;
     }

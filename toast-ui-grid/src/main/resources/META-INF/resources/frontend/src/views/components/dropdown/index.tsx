@@ -48,9 +48,14 @@ class DropDown implements CellEditor {
 
     mounted(): void {
         const selectElement: HTMLSelectElement = this.el as HTMLSelectElement;
-
-        // Set the selectedIndex to the desired value
-        selectElement.selectedIndex = this.props.value;
+        for (var i = 0; i < selectElement.options.length; i++) {
+            // Check if the value matches the target value
+            if (selectElement.options[i].value === this.props.value) {
+                // Found the matching option, print its index
+                selectElement.selectedIndex = i;
+                break; // Exit the loop after finding the first match
+            }
+        }
     }
 
     renderDropDown() {

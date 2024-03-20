@@ -1,5 +1,7 @@
 package com.jo.application.core.form;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jo.application.annotations.ContentDisplayedInSelect;
 import com.jo.application.core.component.TwinColSelect;
 import com.jo.application.core.data.entity.ZJTEntity;
@@ -368,6 +370,8 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService> ex
                         } else if (obj instanceof LocalDateTime) {
                             DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy h:mm a", Locale.ENGLISH);
                             return ((LocalDateTime) obj).format(inputFormatter);
+                        } else if (obj != null && obj.getClass().isEnum()) {
+                            return Objects.toString(((Enum<?>)obj).name(), "");
                         } else {
                             return Objects.toString(obj, "");
                         }
@@ -396,7 +400,8 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService> ex
 
         for (String header : this.gridViewParameter.getHeaders()) {
             String headerName = this.gridViewParameter.getHeaderNames().get(header);
-            ColumnBaseOption baseOption = new ColumnBaseOption(nId++, headerName, header, colWidths.get(this.gridViewParameter.getHeaders().indexOf(header)), "center", "");
+            int headerIndex = this.gridViewParameter.getHeaders().indexOf(header);
+            ColumnBaseOption baseOption = new ColumnBaseOption(nId++, headerName, header, (colWidths.size() < headerIndex) ? colWidths.get(headerIndex) : 0, "center", "");
             com.vaadin.componentfactory.tuigrid.model.Column column = new com.vaadin.componentfactory.tuigrid.model.Column(baseOption);
             column.setEditable(true);
             column.setSortable(true);
@@ -433,7 +438,7 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService> ex
                     List<RelationOption> elementsList = new ArrayList<>();
                     Class<?> fieldEnum = this.gridViewParameter.getHeaderTypeOptions().get(header);
                     for (Enum<?> elementList : getEnumConstants(fieldEnum)) {
-                        RelationOption option = new RelationOption(elementList.toString(), String.valueOf(index++));
+                        RelationOption option = new RelationOption(elementList.toString(), elementList.name());
                         elementsList.add(option);
                     }
                     column.setRelationOptions(elementsList);
@@ -590,11 +595,24 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService> ex
             grid.setRowCountOnElement("rowcount");
             ZJTEntity entityData = service.addNewEntity(entity);
             grid.setIDToGridRow(itemId, entityData.getId());
+
+            ObjectMapper objectMapper = new ObjectMapper();
+            String json = objectMapper.writeValueAsString(entity);
+            setDataToGridRow(itemId, json);
             return entityData;
-        } catch (RuntimeException e) {
+        } catch (JsonProcessingException | RuntimeException e) {
             e.fillInStackTrace();
         }
         return null;
+    }
+
+    @Override
+    public void setDataToGridRow(int itemId, String data) {
+        try {
+            grid.setDataToGridRow(itemId, data);
+        } catch (RuntimeException e) {
+            e.fillInStackTrace();
+        }
     }
 
     public int onUpdateItem(Object[] parameters) throws Exception {
@@ -604,7 +622,10 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService> ex
         if (gridViewParameter.isRequireParameter() && parameters == null) {
             throw new Exception("Parameters are required, but not set");
         }
-
+        if(this.gridViewParameter.getHeaderTypeOptions().get(parameters[1].toString()).isEnum())
+        {
+            parameters[2] = createEnumObject(Class.forName(this.gridViewParameter.getHeaderTypeOptions().get(parameters[1].toString()).getName()), parameters[2].toString());
+        }
         String colType = this.gridViewParameter.getHeaderOptions().get(parameters[1].toString());
         if (!(colType.equals("input") || colType.equals("date")
                 || colType.equals("check") || colType.equals("select_enum") || colType.equals("CustomComponent"))) {
@@ -630,6 +651,15 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService> ex
         grid.setRowCountOnElement("rowcount");
 
         return service.updateEntityByQuery(query.toString(), parameters);
+    }
+
+    public <T extends Enum<T>> T createEnumObject(Class<?> enumClass, String value) {
+        try {
+            return Enum.valueOf((Class<T>) enumClass, value);
+        } catch (Exception e) {
+            e.fillInStackTrace();
+            return null;
+        }
     }
 
     public int onDeleteItemChecked() throws Exception {

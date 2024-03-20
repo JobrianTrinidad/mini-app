@@ -1,5 +1,8 @@
 package com.jo.application.core.data.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
 public interface ZJTEntity {
     int getId();
 

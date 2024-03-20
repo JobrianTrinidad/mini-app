@@ -46,8 +46,9 @@ public class ZJTVehicleServiceType implements ZJTEntity {
     @DisplayName(value = "Plan Date")
     private LocalDateTime planDate;
 
-    @Column
+    @Column(name = "interval_type")
     @DisplayName (value = "Interval Type")
+    @Enumerated(EnumType.STRING)
     private IntervalType intervalType = IntervalType.S;
 
     @OneToMany(mappedBy = "serviceType", cascade = CascadeType.ALL)

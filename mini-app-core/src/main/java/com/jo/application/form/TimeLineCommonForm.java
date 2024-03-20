@@ -26,6 +26,11 @@ public class TimeLineCommonForm extends TimeLineForm<ZJTService> {
     }
 
     @Override
+    public void setDataToGridRow(int rowKey, String data) {
+
+    }
+
+    @Override
     public int onUpdateItem(Object[] objects) {
         return 0;
     }

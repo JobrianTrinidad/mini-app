@@ -33,6 +33,8 @@ public abstract class CommonForm extends VerticalLayout {
 
     abstract public ZJTEntity onNewItem(ZJTEntity entity, int id);
 
+    abstract public void setDataToGridRow(int rowKey, String data);
+
     abstract public int onUpdateItem(Object[] objects) throws Exception;
 
     abstract public int onDeleteItemChecked() throws Exception;

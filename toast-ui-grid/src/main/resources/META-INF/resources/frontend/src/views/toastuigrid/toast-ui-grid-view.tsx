@@ -1019,6 +1019,28 @@ window.toastuigrid = {
         container.grid.table.setRow(rowKey, rowValue);
     },
 
+    setDataToGridRow: function (container: HTMLElement & {
+        grid: JSX.Element & { table: TuiGrid }
+    }, rowKey: number, data: String): void {
+        let rowValue: OptRow = container.grid.table.getRow(rowKey);
+        let rowData = JSON.parse(data);
+        for (var key in rowValue) {
+            // Check if the key exists in the second object
+            if (rowData.hasOwnProperty(key)) {
+                    if (rowData[key] && typeof rowData[key] === 'object' && typeof rowValue[key] === 'string') {
+                        // Match the id property of the serviceType object in obj1 with the string value of serviceType in obj2
+                        if (rowData[key].id === parseInt(rowValue[key])) {
+                            // If they match, update the serviceType property in obj2
+                            rowValue[key] = rowData[key].id.toString();
+                        }
+                    } else if (rowData[key] !== rowValue[key]) {
+                        rowValue[key] = rowData[key].toString();
+                    }
+                }
+            }
+        container.grid.table.setRow(rowKey, rowValue);
+    },
+
     setRowCount: function (container: HTMLElement & {
         grid: JSX.Element & { table: TuiGrid }
     }, elementId: string): void {

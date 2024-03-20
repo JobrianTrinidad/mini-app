@@ -5,3 +5,5 @@
 /mini-app-example/target
 /toast-ui-grid/target
 /.idea
+/mini-app-example/node_modules
+/mini-app-example/frontend/.vite

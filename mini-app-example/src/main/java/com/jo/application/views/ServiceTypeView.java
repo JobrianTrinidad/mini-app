@@ -1,12 +1,12 @@
 package com.jo.application.views;
 
+import com.jo.application.core.data.entity.ZJTEntity;
+import com.jo.application.core.form.GridViewParameter;
+import com.jo.application.core.form.TimeLineViewParameter;
 import com.jo.application.data.entity.ZJTServiceTypeKit;
 import com.jo.application.data.entity.ZJTServiceTypeTask;
 import com.jo.application.data.entity.ZJTVehicleServiceJob;
 import com.jo.application.data.entity.ZJTVehicleServiceType;
-import com.jo.application.core.data.entity.ZJTEntity;
-import com.jo.application.core.form.GridViewParameter;
-import com.jo.application.core.form.TimeLineViewParameter;
 import com.jo.application.data.repository.BaseEntityRepository;
 import com.jo.application.data.service.TableInfoService;
 import com.vaadin.componentfactory.tuigrid.model.AATContextMenu;
@@ -64,7 +64,6 @@ public class ServiceTypeView extends StandardFormView implements HasUrlParameter
                 } else
                     entity = new ZJTVehicleServiceType();
 
-//                form.onNewItem((GuiItem) ev.getItem());
                 form.onNewItem(entity, ((GuiItem) ev.getItem()).getId());
                 this.setMessageStatus("This is new added value " + ((GuiItem) ev.getItem()).getRecordData().get(1));
             });
