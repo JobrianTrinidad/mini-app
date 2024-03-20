@@ -336,7 +336,7 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService> ex
             if (!header.equals("id")) {
                 if (!(colType.equals("input") || colType.equals("date")
                         || colType.equals("input_multi") || colType.equals("date_multi")
-                        || colType.equals("check") || colType.equals("select_enum") || colType.equals("customComponent")))
+                        || colType.equals("check") || colType.equals("select_enum") || colType.equals("CustomComponent")))
                     query.append(", COALESCE(p.").append(header).append(", -1)");
                 else
                     query.append(", p.").append(header);
@@ -370,6 +370,14 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService> ex
                         } else if (obj instanceof LocalDateTime) {
                             DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy h:mm a", Locale.ENGLISH);
                             return ((LocalDateTime) obj).format(inputFormatter);
+                        } else if (obj instanceof int[]) {
+                            int[] integers = (int[]) obj;
+                            StringBuilder builder = new StringBuilder();
+                            for (int integer : integers) {
+                                builder.append(String.valueOf(integer));
+                                builder.append(", "); // Add a separator if needed
+                            }
+                            return builder.toString();
                         } else if (obj != null && obj.getClass().isEnum()) {
                             return Objects.toString(((Enum<?>)obj).name(), "");
                         } else {

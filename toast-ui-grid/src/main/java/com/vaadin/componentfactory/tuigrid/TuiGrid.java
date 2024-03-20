@@ -717,9 +717,18 @@ public class TuiGrid extends Div {
     public void onUpdateData(JsonObject eventData) {
         JsonObject itemChanged = eventData.getArray("changes").get(0);
         JsonObject record = eventData.get("record");
-        String value = null;
+        Object value = null;
         if (itemChanged.get("value") instanceof JreJsonString) {
-            value = itemChanged.getString("value");;
+            value = itemChanged.getString("value");
+        } else if (itemChanged.get("value") instanceof JreJsonArray) {
+            value = convertJsonArrayToIntArray(itemChanged.getArray("value"));
+
+        } else if (itemChanged.get("value") instanceof JreJsonNumber) {
+            value = itemChanged.getNumber("value");
+        } else if (itemChanged.get("value") instanceof JreJsonNull) {
+            value = null;
+        } else {
+            value = itemChanged.get("value");
         }
 
         ItemChangeEvent event = new ItemChangeEvent(
@@ -734,6 +743,14 @@ public class TuiGrid extends Div {
             exception = e;
             event.setCancelled(true);
         }
+    }
+
+    public int[] convertJsonArrayToIntArray(JsonArray jsonArray) {
+        int[] intArray = new int[jsonArray.length()];
+        for (int i = 0; i < jsonArray.length(); i++) {
+            intArray[i] = (int)jsonArray.get(i).asNumber();
+        }
+        return intArray;
     }
 
     @ClientCallable

@@ -97,7 +97,7 @@ export class SignatureRenderer {
     public tgrid: TuiGrid;
 
     constructor(props: {
-        value: number; // Assuming the value is a base64 encoded image or signature data
+        value: number;
         grid: TuiGrid;
         rowKey: RowKey;
         columnInfo: ColumnInfo & {
@@ -130,9 +130,52 @@ export class SignatureRenderer {
            var dispatch = this.tgrid.dispatch;
            var rowKey = this.tgrid.getFocusedCell()["rowKey"];
            var columnName = this.tgrid.getFocusedCell()["columnName"];
-           var columnValue = (this.value <= 0 ? null : this.value.toString());
+           var columnValue = (this.value <= 0 ? null : this.value);
            dispatch("setValue", rowKey , columnName, columnValue);
            dispatch("finishEditing", rowKey, columnName, columnValue, { save: true, triggeredByKey: false });
     }
 }
 
+export class CameraRenderer {
+    public el: HTMLElement;
+    public value: number[];
+    public tgrid: TuiGrid;
+
+    constructor(props: {
+        value: number[];
+        grid: TuiGrid;
+        rowKey: RowKey;
+        columnInfo: ColumnInfo & {
+            renderer: SignatureRenderer & {
+                callback: CallbackFunction;
+                className: string;
+            };
+        };
+    }) {
+         this.value = props.value.split(',').filter(Boolean).map(Number);
+         this.tgrid = props.grid;
+         const container = document.createElement('div');
+         container.classList.add('camera-container-grid');
+         const cameraComponent = document.createElement('camera-component');
+         cameraComponent.loadImageFile(this.value);
+         container.appendChild(cameraComponent);
+         this.el = container;
+         cameraComponent.addEventListener('image-save-db', (event) => {
+             this.value = event.detail.imageID
+             this.save()
+        });
+    }
+
+    getElement(): HTMLElement {
+        return this.el;
+    }
+
+    save = (): void => {
+           var dispatch = this.tgrid.dispatch;
+           var rowKey = this.tgrid.getFocusedCell()["rowKey"];
+           var columnName = this.tgrid.getFocusedCell()["columnName"];
+           var columnValue = (this.value <= 0 ? null : this.value);
+           dispatch("setValue", rowKey , columnName, columnValue);
+           dispatch("finishEditing", rowKey, columnName, columnValue, { save: true, triggeredByKey: false });
+    }
+}

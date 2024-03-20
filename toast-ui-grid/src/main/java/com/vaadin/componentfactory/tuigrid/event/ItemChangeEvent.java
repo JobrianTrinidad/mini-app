@@ -29,10 +29,10 @@ public class ItemChangeEvent extends ComponentEvent<TuiGrid> {
 
     private final String colName;
     private final int row;
-    private String colValue;
+    private Object colValue;
     private boolean cancelled = false;
 
-    public ItemChangeEvent(TuiGrid source, String colName, String colValue, int row, boolean fromClient) {
+    public ItemChangeEvent(TuiGrid source, String colName, Object colValue, int row, boolean fromClient) {
         super(source, fromClient);
         this.colName = colName;
         this.colValue = colValue;
@@ -55,11 +55,11 @@ public class ItemChangeEvent extends ComponentEvent<TuiGrid> {
         this.cancelled = cancelled;
     }
 
-    public String getColValue() {
+    public Object getColValue() {
         return colValue;
     }
 
-    public void setColValue(String colValue) {
+    public void setColValue(Object colValue) {
         this.colValue = colValue;
     }
 
