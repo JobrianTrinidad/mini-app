@@ -107,7 +107,7 @@ export class SignatureRenderer {
             };
         };
     }) {
-        this.value = Number(props.value);
+        this.value = props.value != null ? Number(props.value) : null;
         this.tgrid = props.grid;
         // Create a container element for the signature
         const container = document.createElement('div');
@@ -152,7 +152,7 @@ export class CameraRenderer {
             };
         };
     }) {
-         this.value = props.value.split(',').filter(Boolean).map(Number);
+         this.value = props.value != null ? props.value.split(',').filter(Boolean).map(Number) : null;
          this.tgrid = props.grid;
          const container = document.createElement('div');
          container.classList.add('camera-container-grid');

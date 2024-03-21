@@ -176,20 +176,24 @@ class CameraComponent extends LitElement {
         {
             for (const imageId of imageIds)
             {
-              getImageById(imageId)
-                .then(imageData => {
-                  const adImageId = imageData.adImageId;
-                  const binaryData = imageData.binaryData;
-                  const description = imageData.description;
-                  const id = imageData.id;
-                  const fileName = imageData.name;
-                  this.fileMap.set(id,  { name: fileName , fileData: binaryData});
-                  this.fileIds = [...this.fileIds, id];
-                  this.dispatchEvent(new CustomEvent('update-button-count'));
-                })
-                .catch(error => {
-                  console.error("Error fetching image data:", error);
-                });
+              if(imageId > 0) {
+                  getImageById(imageId)
+                    .then(imageData => {
+                      if(imageData) {
+                          const adImageId = imageData.adImageId;
+                          const binaryData = imageData.binaryData;
+                          const description = imageData.description;
+                          const id = imageData.id;
+                          const fileName = imageData.name;
+                          this.fileMap.set(id,  { name: fileName , fileData: binaryData});
+                          this.fileIds = [...this.fileIds, id];
+                          this.dispatchEvent(new CustomEvent('update-button-count'));
+                      }
+                    })
+                    .catch(error => {
+                      console.error("Error fetching image data:", error);
+                    });
+                }
             }
         }
      }

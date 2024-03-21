@@ -187,23 +187,25 @@ export class SignatureDialog extends LitElement {
   }
 
   private async loadSignatureImage(signID: number) {
-    if (signID > 0) {
+    if (signID !== null && signID > 0) {
       getImageById(signID)
         .then(imageData => {
-          const adImageId = imageData.adImageId;
-          const binaryData = imageData.binaryData;
-          const description = imageData.description;
-          const id = imageData.id;
-          const name = imageData.name;
-          this.value = adImageId;
-          this.shadowRoot.querySelector('vaadin-button').style.display = 'none';
+          if(imageData) {
+              const adImageId = imageData.adImageId;
+              const binaryData = imageData.binaryData;
+              const description = imageData.description;
+              const id = imageData.id;
+              const name = imageData.name;
+              this.value = adImageId;
+              this.shadowRoot.querySelector('vaadin-button').style.display = 'none';
 
-          const img = this.shadowRoot.querySelector('img');
-          img.src = 'data:image/png;base64,' + binaryData; // TODO - handle all image type
-          img.alt = description;
-          img.style = "height:37px; width: 90%;";
-          this.shadowRoot.appendChild(img);
-          img.addEventListener('click', () => this.loadImage(img.src));
+              const img = this.shadowRoot.querySelector('img');
+              img.src = 'data:image/png;base64,' + binaryData; // TODO - handle all image type
+              img.alt = description;
+              img.style = "height:37px; width: 90%;";
+              this.shadowRoot.appendChild(img);
+              img.addEventListener('click', () => this.loadImage(img.src));
+          }
         })
         .catch(error => {
           console.error("Error fetching image data:", error);
