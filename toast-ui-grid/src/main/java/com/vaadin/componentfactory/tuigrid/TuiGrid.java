@@ -56,6 +56,7 @@ import java.util.stream.Collectors;
 @NpmPackage(value = "@chakra-ui/icons", version = "^2.1.0")
 @NpmPackage(value = "tui-grid", version = "^4.21.22")
 @NpmPackage(value = "tui-context-menu", version = "^2.1.9")
+@NpmPackage(value = "tui-pagination", version = "^3.4.1")
 @JsModule("./src/views/toastuigrid/toast-ui-grid-view.tsx")
 @JsModule("./src/views/components/Table/FeaturesTable.tsx")
 @JsModule("./src/views/components/Table/ExcelSheet.tsx")

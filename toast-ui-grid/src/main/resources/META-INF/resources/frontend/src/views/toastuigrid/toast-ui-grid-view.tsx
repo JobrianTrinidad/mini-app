@@ -18,6 +18,7 @@ import {OptColumn, OptRow} from 'tui-grid/types/options';
 import {TuiGridEvent} from "tui-grid/types/event";
 import {Cell} from "../components/Table/ExcelSheet";
 import TextareaComponent from "../components/textarea";
+import Pagination from 'tui-pagination';
 
 declare global {
     interface Window {
@@ -223,6 +224,7 @@ window.toastuigrid = {
                 && event.code === "Insert") {
                 if(bAllowInsert){
                     event.preventDefault();
+                    gridInst.getPagination().movePageTo(gridInst.getPagination()._getLastPage());
                     this.onAddRecord(container);
                 }
             } else if (parsedOptions.autoSave === true

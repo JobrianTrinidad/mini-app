@@ -167,7 +167,7 @@ const ExcelSheet = forwardRef<HTMLDivElement, ExcelSheetProps>((props: ExcelShee
                                 backgroundColor: '#66878858',
                                 opacity: 1,
                                 width: '20em',
-                                height: '100%',
+                                height: '110%',
                                 border: '1px solid #326f70',
                                 outline: 'none',
                             }}

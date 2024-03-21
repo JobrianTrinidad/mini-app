@@ -5,6 +5,8 @@ import {TuiGridEvent} from "tui-grid/types/event";
 import {OptColumn, OptGrid, OptHeader, OptRow, OptRowHeader, OptSummaryData, OptTree} from "tui-grid/types/options";
 import {CreateMenuGroups} from "tui-grid/types/store";
 import {ColumnOptions} from "tui-grid/types/store/column";
+import Pagination from 'tui-pagination';
+import 'tui-pagination/dist/tui-pagination.css';
 
 interface FeatureTableProps {
     getGridInstance: (gridInstance: TuiGrid) => void;
@@ -73,8 +75,7 @@ const FeatureTable: React.FC<FeatureTableProps> = React.forwardRef<HTMLDivElemen
 
         function loadRows(lengthOfLoaded: number, allData: OptRow[]): OptRow[] {
             const rows: OptRow[] = [];
-            let endPoint: number = lengthOfLoaded + pageSize <= allData.length ? lengthOfLoaded + pageSize : allData.length
-            for (let i: number = lengthOfLoaded; i < endPoint; i += 1) {
+            for (let i: number = lengthOfLoaded; i < allData.length; i += 1) {
                 const row: OptRow = {};
                 for (let j: number = 0; j < columns.length; j += 1) {
                     row[columns[j].name] = allData[i][columns[j].name];
@@ -105,15 +106,12 @@ const FeatureTable: React.FC<FeatureTableProps> = React.forwardRef<HTMLDivElemen
                 // ...(rowHeight && {rowHeight}),
                 rowHeight: 'auto',
                 ...(minBodyHeight && {minBodyHeight}),
+                pageOptions: {
+                  useClient: true, // Enable client-side pagination
+                  perPage: pageSize, // Items per page
+                },
             });
             gridInstanceRef.current = grid;
-            grid.on('scrollEnd' as GridEventName, (): void => {
-                if (grid.getFilterState() === null)
-                    grid.appendRows(loadRows(grid.getData().length, TableData));
-                else
-                    grid.appendRows(loadRows(grid.getFilteredData().length, grid.getFilteredData()));
-
-            });
 
             grid.on('focusChange' as GridEventName, (ev: TuiGridEvent): void => {
                 if (onFocusChange) {
@@ -171,16 +169,33 @@ const FeatureTable: React.FC<FeatureTableProps> = React.forwardRef<HTMLDivElemen
             });
 
             getGridInstance(grid);
-
-            const handleKeyDown = (event: KeyboardEvent): void => {
-                if (event.key === 'PageDown') {
-                    if (grid.getFilterState() === null)
-                        grid.appendRows(loadRows(grid.getData().length, TableData));
-                    else
-                        grid.appendRows(loadRows(grid.getFilteredData().length, grid.getFilteredData()));
+            function handleKeyDown(event) {
+                // Check if the left arrow key (keyCode 37) is pressed with the Alt key
+                if (event.keyCode === 37 && event.altKey) {
+                    grid.getPagination().movePageTo(grid.getPagination()._getRelativePage("prev"));
                 }
-            };
+                // Check if the right arrow key (keyCode 39) is pressed with the Alt key
+                else if (event.keyCode === 39 && event.altKey) {
+                  grid.getPagination().movePageTo(grid.getPagination()._getRelativePage("next"));
+                }
+               // Check if the Up arrow key (keyCode 38) is pressed with the Alt key
+               else if (event.keyCode === 38 && event.altKey) { // Up arrow key
+                  grid.getPagination().movePageTo(grid.getPagination()._getMorePageIndex("next"));
+               }
+               // Check if the Down arrow key (keyCode 40) is pressed with the Alt key
+               else if (event.keyCode === 40 && event.altKey) { // Down arrow key
+                  grid.getPagination().movePageTo(grid.getPagination()._getMorePageIndex("prev"));
+               }
+               // Check if the key pressed is the page up key (keyCode 33) or the page down key (keyCode 34)
+               if (event.keyCode === 33) { // Page up key
+                 grid.getPagination().movePageTo(grid.getPagination()._getLastPage());
+               }
+               else if (event.keyCode === 34) { // Page down key
+                 grid.getPagination().movePageTo(1);
+               }
+            }
 
+            // Add event listener for keydown event
             document.addEventListener('keydown', handleKeyDown);
 
             return (): void => {
