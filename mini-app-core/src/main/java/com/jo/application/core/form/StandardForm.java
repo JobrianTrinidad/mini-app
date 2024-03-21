@@ -67,7 +67,7 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService> ex
         this.gridViewParameter = gridViewParameter;
         this.service = service;
         this.tableInfoService = tableInfoService;
-        this.setHeight("calc(100vh - 60px)");
+        this.setHeight("calc(-130px + 100vh)");
         dateFilterOn = gridViewParameter.getDateFilterOn();
 
         initColSelDialog();
