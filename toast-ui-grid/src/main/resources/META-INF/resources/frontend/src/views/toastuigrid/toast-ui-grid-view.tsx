@@ -224,7 +224,8 @@ window.toastuigrid = {
                 && event.code === "Insert") {
                 if(bAllowInsert){
                     event.preventDefault();
-                    gridInst.getPagination().movePageTo(gridInst.getPagination()._getLastPage());
+                    if(gridInst.getPagination().getCurrentPage() !==  gridInst.getPagination()._getLastPage())
+                        gridInst.getPagination().movePageTo(gridInst.getPagination()._getLastPage());
                     this.onAddRecord(container);
                 }
             } else if (parsedOptions.autoSave === true
