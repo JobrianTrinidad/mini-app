@@ -10,7 +10,7 @@ import React from 'react';
 import {createRoot, Root} from 'react-dom/client';
 import InputComponent from "../components/input/ada-input";
 import {CheckboxRenderer, RowNumberRenderer, SignatureRenderer, CameraRenderer} from '../renderer/renderer';
-import DropDown from "../components/dropdown/index";
+import DropDownEditor from "../components/dropdown/index";
 import FeatureTable from "../components/Table/FeaturesTable";
 import TuiGrid, {ColumnInfo, FilterState, Row, RowKey, ModifiedRows} from 'tui-grid';
 import ContextMenu from 'tui-context-menu';
@@ -770,7 +770,7 @@ window.toastuigrid = {
                     align: column.align,
                     formatter: "listItemText",
                     editor: {
-                        type: DropDown,
+                        type: DropDownEditor,
                         options: {
                             ...column.editor.options,
                             listItems: column["depth0"] ? JSON.parse(column["depth0"]) : []
