@@ -133,9 +133,9 @@ const DropDown: React.FC<DropDownProps & { onValueChange: (newValue: number) => 
          ref={dropdownRef}
          style={{
            position: "absolute",
-           [popupPosition === "bottom" ? "top" : "bottom"]: popupPosition === "bottom" ? `calc(100% + ${height}px)` : `calc(100% + 40px)`,
+           [popupPosition === "bottom" ? "top" : "bottom"]: popupPosition === "bottom" ? `calc(13% + ${height}px)` : `calc(-15% + 40px)`,
            left: 0,
-           width: "100%",
+         width: "91%",
            maxHeight: "200px",
            overflowY: "auto",
            backgroundColor: "#fff",
@@ -146,6 +146,8 @@ const DropDown: React.FC<DropDownProps & { onValueChange: (newValue: number) => 
            margin: 0,
            padding: 0,
            listStyle: "none",
+           transition: "all 0.3s ease",
+           backgroundColor: "#f4f4f4",
          }}
        >
          {filteredItems.map((item: Option) => (
@@ -153,9 +155,10 @@ const DropDown: React.FC<DropDownProps & { onValueChange: (newValue: number) => 
              key={item.value}
              onClick={() => handleOptionSelect(item)}
              style={{
-               padding: "8px",
-               cursor: "pointer",
-               borderBottom: "1px solid #ccc",
+              paddingLeft: "7px",
+              cursor: "pointer",
+              borderBottom: "solid 0.5px #326f70",
+              zIndex: 1000,
              }}
            >
              {item.text}
