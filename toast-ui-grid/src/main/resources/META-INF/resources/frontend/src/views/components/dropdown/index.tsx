@@ -111,7 +111,7 @@ const DropDown: React.FC<DropDownProps & { onValueChange: (newValue: number) => 
     // TODO- set focus
 
   return (
-    <Box position="relative">
+    <Box position="relative" style={{width: "100%" }} >
       <Input
         placeholder={placeholder}
         value={inputValue}
@@ -192,6 +192,7 @@ class DropDownEditor implements CellEditor {
     } = props;
 
     const container = document.createElement("div");
+    container.style.width = "90%";
     ReactDOM.render(
       <DropDown
         height={height}
