@@ -1,4 +1,4 @@
-import React, {useEffect, useRef} from 'react';
+import React, {useEffect, useRef , useState } from 'react';
 import ExcelSheet, {Cell} from "./ExcelSheet";
 import TuiGrid, {GridEventName, Row} from 'tui-grid';
 import {TuiGridEvent} from "tui-grid/types/event";
@@ -72,7 +72,6 @@ const FeatureTable: React.FC<FeatureTableProps> = React.forwardRef<HTMLDivElemen
         const gridRef = useRef<HTMLDivElement>(null);
         const excelRef = useRef<HTMLDivElement>(null);
         const gridInstanceRef = useRef<TuiGrid | null>(null);
-
         function loadRows(lengthOfLoaded: number, allData: OptRow[]): OptRow[] {
             const rows: OptRow[] = [];
             for (let i: number = lengthOfLoaded; i < allData.length; i += 1) {
@@ -157,9 +156,19 @@ const FeatureTable: React.FC<FeatureTableProps> = React.forwardRef<HTMLDivElemen
             });
 
             grid.on('columnResize' as GridEventName, (ev: TuiGridEvent): void => {
-                if (onColumnResize) {
-                    onColumnResize(ev);
-                }
+            if (onColumnResize) {
+                    const gridBodyContainers = document.querySelectorAll('.tui-grid-body-container');
+                    const gridBodyArea = document.querySelectorAll('.tui-grid-body-area');
+                    if (gridBodyContainers.length >= 2) {
+                        const secondGridBodyContainer = gridBodyContainers[1];
+                        const secondGridBodyArea = gridBodyArea[1]
+                        const currentWidth = parseInt(secondGridBodyContainer.style.width, 10);
+                        if (currentWidth > 1591) {
+                            secondGridBodyArea.classList.add('scrollbar-x');
+                        }
+                    }
+                onColumnResize(ev);
+            }
             });
 
             grid.on('mousedown' as GridEventName, (ev: TuiGridEvent): void => {
@@ -204,8 +213,20 @@ const FeatureTable: React.FC<FeatureTableProps> = React.forwardRef<HTMLDivElemen
                     document.removeEventListener('keydown', handleKeyDown);
                 }
             };
-        }, []);
+        }, [TableData, columns, summary, columnOptions, header, width, bodyHeight, scrollX, scrollY, rowHeaders, treeColumnOptions, minBodyHeight, pageSize, getGridInstance]);
+             useEffect(() => {
+               const gridBodyContainers = document.querySelectorAll('.tui-grid-body-container');
+                const gridBodyArea = document.querySelectorAll('.tui-grid-body-area');
+                if (gridBodyContainers.length >= 2) {
+                    const secondGridBodyContainer = gridBodyContainers[1];
+                    const secondGridBodyArea = gridBodyArea[1]
+                    const currentHeight = parseInt(secondGridBodyContainer.style.height, 10);
+                    if (currentHeight >= 530) {
+                        secondGridBodyArea.classList.add('scrollbar-y');
+                    }
 
+                }
+        }, [pageSize , columns]);
         function setOption(option: OptGrid): void {
             if (gridInstanceRef.current) {
                 if (option.data)

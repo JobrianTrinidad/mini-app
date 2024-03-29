@@ -190,3 +190,9 @@ select:-moz-focusring {
     --SaddleBrown-20: #bd652f33;
     --SaddleBrown-0: #bd652f00;
 }
+.scrollbar-x {
+     overflow-x: auto !important;
+ }
+ .scrollbar-y {
+      overflow-y: auto !important;
+  }
