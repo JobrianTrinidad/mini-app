@@ -51,6 +51,7 @@ class InputComponent implements CellEditor {
                 maxLength={columnInfo.editor.options.maxLength}
                 onChange={handleChange}
                 size={columnInfo.editor.options.size}
+                textAlign = {columnInfo.editor.options.align}
                 style={{
                     backgroundColor: columnInfo.editor.options.backgroundColor,
                     opacity: columnInfo.editor.options.opacity,
@@ -58,6 +59,7 @@ class InputComponent implements CellEditor {
                     height: columnInfo.editor.options.height,
                     border: columnInfo.editor.options.border,
                     outline: columnInfo.editor.options.outline,
+                    textAlign: columnInfo.editor.options.align,
                 }}
                 _focusVisible={{outline: "none"}}
                 _hover={{outline: "none"}}

@@ -34,6 +34,7 @@ public class Theme {
     private String border;
     private String outline;
     private String butBackground;
+    private String align;
 
     public String toJSON() {
         JsonObject js = Json.createObject();
@@ -48,6 +49,7 @@ public class Theme {
         Optional.ofNullable(getBorder()).ifPresent(v -> js.put("border", getBorder()));
         Optional.ofNullable(getOutline()).ifPresent(v -> js.put("outline", getOutline()));
         Optional.ofNullable(getButBackground()).ifPresent(v -> js.put("butBackground", getButBackground()));
+        Optional.ofNullable(getAlign()).ifPresent(v -> js.put("align", getAlign()));
 
         return js.toJson();
     }
@@ -122,6 +124,14 @@ public class Theme {
 
     public void setButBackground(String butBackground) {
         this.butBackground = butBackground;
+    }
+
+    public String getAlign() {
+        return align;
+    }
+
+    public void setAlign(String align) {
+        this.align = align;
     }
 
     public Theme() {

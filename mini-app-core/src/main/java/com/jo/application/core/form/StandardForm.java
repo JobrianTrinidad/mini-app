@@ -182,10 +182,18 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService> ex
 
         NativeLabel label = new NativeLabel("Page Size");
         NumberField numberPageSize = new NumberField();
+        numberPageSize.setMaxWidth("100px");
         numberPageSize.setId("PageSizeNumber");
         if (tableInfo.getPageSize() != null)
             numberPageSize.setValue(tableInfo.getPageSize().doubleValue());
-        HorizontalLayout pageSizePanel = new HorizontalLayout(label, numberPageSize);
+
+        NativeLabel fcLabel = new NativeLabel("Number Frozen Column");
+        NumberField numberFC = new NumberField();
+        numberFC.setMaxWidth("100px");
+        numberFC.setId("PageSizeNumber");
+        if (tableInfo.getFrozenCount() != null)
+            numberFC.setValue(tableInfo.getFrozenCount().doubleValue());
+        HorizontalLayout pageSizePanel = new HorizontalLayout(label, numberPageSize, fcLabel, numberFC);
         pageSizePanel.setAlignItems(Alignment.CENTER);
 
         Button btnOk = new Button("OK");
@@ -235,6 +243,8 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService> ex
             finalTableInfo.setHeaders(this.gridViewParameter.getHeaders().toString());
             if (numberPageSize.getValue() != null && numberPageSize.getValue() > 0)
                 finalTableInfo.setPageSize(numberPageSize.getValue().intValue());
+            if (numberFC.getValue() != null && numberFC.getValue() > 0)
+                finalTableInfo.setFrozenCount(numberFC.getValue().intValue());
 
             tableInfoService.save(finalTableInfo);
             tableInfo = finalTableInfo;
@@ -274,7 +284,9 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService> ex
 
         if (tableInfo.getPageSize() != null)
             grid.setPageSize(tableInfo.getPageSize());
-
+        if (tableInfo.getFrozenCount() != null)
+            grid.setFrozenCount(tableInfo.getFrozenCount());
+//
 //        List<Summary> summaries = List.of(
 //                new Summary(columns.get(columns.size() - 1).getColumnBaseOption().getName(), Summary.OperationType.rowcount));
 
@@ -349,7 +361,6 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService> ex
 
         if (gridViewParameter.getWhereDefinition() != null && (int) parameters[0] != -1) {
             query.append(" WHERE ").append("p.").append(gridViewParameter.getWhereDefinition());
-            //TODO -set parameter
             query.append(" = ").append(parameters[0]);
 //            if (dateFilterOn != null) {
 //                addConditionWhenFilteringDate(query);
@@ -398,18 +409,20 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService> ex
 
         List<Integer> colWidths = getColumnWidths();
 
-        Theme inputTheme = new Theme();
-        inputTheme.setBorder("1px solid #326f70");
-        inputTheme.setBackgroundColor("#66878858");
-        inputTheme.setOutline("none");
-        inputTheme.setWidth("90%");
-        inputTheme.setHeight("100%");
-        inputTheme.setOpacity(1);
-
         for (String header : this.gridViewParameter.getHeaders()) {
+
+            Theme inputTheme = new Theme();
+            inputTheme.setBorder("1px solid #326f70");
+            inputTheme.setBackgroundColor("#66878858");
+            inputTheme.setOutline("none");
+            inputTheme.setWidth("90%");
+            inputTheme.setHeight("100%");
+            inputTheme.setOpacity(1);
+            inputTheme.setAlign("left");
+
             String headerName = this.gridViewParameter.getHeaderNames().get(header);
             int headerIndex = this.gridViewParameter.getHeaders().indexOf(header);
-            ColumnBaseOption baseOption = new ColumnBaseOption(nId++, headerName, header, (colWidths.size() < headerIndex) ? colWidths.get(headerIndex) : 0, "center", "");
+            ColumnBaseOption baseOption = new ColumnBaseOption(nId++, headerName, header, (colWidths.size() < headerIndex) ? colWidths.get(headerIndex) : 0, "left", "");
             com.vaadin.componentfactory.tuigrid.model.Column column = new com.vaadin.componentfactory.tuigrid.model.Column(baseOption);
             column.setEditable(true);
             column.setSortable(true);
@@ -426,13 +439,21 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService> ex
                 case "input":
                 case "input_multi":
                     column.setType("input");
+                    if (this.gridViewParameter.getHeaderOptions().get(header + "_type").equalsIgnoreCase("Number")) {
+                        column.getColumnBaseOption().setAlign("right");
+                        inputTheme.setAlign("right");
+                    }
                     break;
                 case "check":
                     column.setType("check");
+                    column.getColumnBaseOption().setAlign("center");
+                    inputTheme.setAlign("center");
                     break;
                 case "CustomComponent":
                     column.setCustomType(this.gridViewParameter.getHeaderOptions().get("CustomComponentName_" + header));
                     column.setType("CustomComponent");
+                    column.getColumnBaseOption().setAlign("center");
+                    inputTheme.setAlign("center");
                     break;
                 case "date":
                 case "date_multi":

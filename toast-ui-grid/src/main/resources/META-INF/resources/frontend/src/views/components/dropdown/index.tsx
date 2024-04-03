@@ -53,7 +53,7 @@ const DropDown: React.FC<DropDownProps & { onValueChange: (newValue: number) => 
 }) => {
   const [inputValue, setInputValue] = useState("");
   const [filteredItems, setFilteredItems] = useState(listItems);
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(true);
   const dropdownRef = useRef<HTMLUListElement>(null);
   const [popupPosition, setPopupPosition] = useState<"bottom" | "top">("bottom");
 
@@ -107,8 +107,6 @@ const DropDown: React.FC<DropDownProps & { onValueChange: (newValue: number) => 
         setPopupPosition("bottom");
       }
     }, [isDropdownOpen]);
-
-    // TODO- set focus
 
   return (
     <Box position="relative" style={{width: "100%" }} >

@@ -22,6 +22,9 @@ public class ZJTTableInfo {
     @Column(name = "page_size")
     private Integer pageSize;
 
+    @Column(name = "frozenCount")
+    private Integer frozenCount;
+
     public String getTable_name() {
         return table_name;
     }
@@ -52,5 +55,13 @@ public class ZJTTableInfo {
 
     public void setPageSize(Integer pageSize) {
         this.pageSize = pageSize;
+    }
+
+    public Integer getFrozenCount() {
+        return frozenCount;
+    }
+
+    public void setFrozenCount(Integer frozenCount) {
+        this.frozenCount = frozenCount;
     }
 }

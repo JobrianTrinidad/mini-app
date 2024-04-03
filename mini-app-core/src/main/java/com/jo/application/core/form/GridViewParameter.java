@@ -8,6 +8,7 @@ import com.vaadin.flow.router.PageTitle;
 import jakarta.persistence.Id;
 
 import java.lang.reflect.Field;
+import java.math.BigDecimal;
 import java.util.*;
 
 /**
@@ -186,7 +187,12 @@ public class GridViewParameter {
                         headerOptions.put(field.getName(), "input" + strAdd);
                         break;
                 }
-
+                if (field.getType() == BigDecimal.class || field.getType() == Integer.class || field.getType() == int.class ||  field.getType() == double.class || field.getType() == float.class)
+                    headerOptions.put(field.getName() + "_type", "Number");
+                else if (field.getType() == Boolean.class || field.getType() == boolean.class)
+                    headerOptions.put(field.getName() + "_type", "Boolean");
+                else
+                    headerOptions.put(field.getName() + "_type", "String");
                 headerNames.put(field.getName(), field.getAnnotation(DisplayName.class).value());
             }
             if (field.getAnnotation(jakarta.persistence.Enumerated.class) != null) {
