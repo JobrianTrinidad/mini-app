@@ -35,6 +35,11 @@ class CameraComponent extends LitElement {
                 width: 100%;
                 display: flex;
             }
+
+            vaadin-button {
+                color: white !important;
+                background-color: rgb(50, 111, 112) !important;
+            }
         `;
 	}
 
