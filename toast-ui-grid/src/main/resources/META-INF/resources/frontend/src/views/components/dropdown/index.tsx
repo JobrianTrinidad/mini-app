@@ -56,40 +56,85 @@ const DropDown: React.FC<DropDownProps & { onValueChange: (newValue: number) => 
   const [isDropdownOpen, setIsDropdownOpen] = useState(true);
   const dropdownRef = useRef<HTMLUListElement>(null);
   const [popupPosition, setPopupPosition] = useState<"bottom" | "top">("bottom");
-
+  const [selectedIndex, setSelectedIndex] = useState<number | null>(-1);
+  const inputRef = useRef<HTMLInputElement>(null); // Ref for the input element
   useEffect(() => {
-    setInputValue(listItems.find(item => item.value === value)?.text || ''); // Set initial input value
+    const selectedItem = listItems.find(item => item.value === value);
+    setInputValue(selectedItem?.text || ''); // Set initial input value
+    if (selectedItem) {
+        setSelectedIndex(listItems.indexOf(selectedItem));
+    }
+
+    if(inputRef != null)
+        inputRef.current.focus();
+
+      const handleScroll = (event) => {
+        event.stopPropagation(); // Prevent the scroll event from bubbling up
+      };
+
+      dropdownRef.current.addEventListener('wheel', handleScroll, { passive: false }); // Add scroll event listener
+
+      return () => {
+        dropdownRef.current.removeEventListener('wheel', handleScroll); // Remove scroll event listener on component unmount
+      };
   }, []); // Run only once on mount
 
+  useEffect(() => {
+    if (selectedIndex !== null && dropdownRef.current) {
+      const selectedElement = dropdownRef.current.children[selectedIndex];
+      if (selectedElement) {
+        selectedElement.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
+      }
+    }
+  }, [selectedIndex]);
+
   const handleInputChange = (event) => {
+    setInputValue(event.target.value);
     const input = event.target.value.toLowerCase();
-    setInputValue(input);
 
     // Filter the listItems based on the input value
-    const filtered = listItems.filter((item) =>
-      item.text.toLowerCase().includes(input)
-    );
-    setFilteredItems(filtered);
-  };
+    let filtered;
+    if (input !== '') {
+        // Split input value into tokens
+        const tokens = new Set(input.split(' '));
 
-  const handleOptionSelect = (selectedValue) => {
-    const selectedItem = listItems.find((item) => item.value === selectedValue.value);
-    if (selectedItem) {
-      setInputValue(selectedItem.text);
-      onValueChange(selectedItem.value); // Call onValueChange to update initialValue
+        // Filter listItems based on whether each item.text contains all tokens
+        filtered = listItems.filter((item) => {
+            const lowercasedItemText = item.text.toLowerCase();
+            // Check if all tokens are present in the lowercased item text
+            return Array.from(tokens).every(token => lowercasedItemText.includes(token));
+        });
+    } else {
+        // If input is empty, show all listItems
+        filtered = listItems;
     }
-    setIsDropdownOpen(false); // Close dropdown after selecting option
+
+    setFilteredItems(filtered);
+    setSelectedIndex(0);
   };
 
-  const handleInputKeyDown = (event) => {
-    // Prevent typing values not in the list
-//     if (!listItems.some((item) => item.text.toLowerCase() === event.key.toLowerCase())) {
-//       event.preventDefault();
-//     }
-  };
+    const handleOptionSelect = (selectedValue) => {
+        const selectedItem = listItems.find((item) => item.value === selectedValue.value);
+        if (selectedItem) {
+          setInputValue(selectedItem.text);
+          onValueChange(selectedItem.value); // Call onValueChange to update initialValue
+        }
+        setIsDropdownOpen(false); // Close dropdown after selecting option
+    };
+
+
+
+    const handleInputKeyDown = (event) => {
+        if (event.key === "ArrowUp" && selectedIndex !== null) {
+          setSelectedIndex(prevIndex => (prevIndex === 0 ? filteredItems.length - 1 : prevIndex - 1));
+        } else if (event.key === "ArrowDown" && selectedIndex !== null) {
+          setSelectedIndex(prevIndex => (prevIndex === filteredItems.length - 1 ? 0 : prevIndex + 1));
+        } else if (event.key === "Enter" && selectedIndex !== null) {
+          handleOptionSelect(filteredItems[selectedIndex]);
+        }
+    };
 
     useEffect(() => {
-        // TODO - get the grid hide & position of the component to decide pop up position
       const inputRect = dropdownRef.current?.getBoundingClientRect();
       if (!inputRect)
       {
@@ -111,6 +156,7 @@ const DropDown: React.FC<DropDownProps & { onValueChange: (newValue: number) => 
   return (
     <Box position="relative" style={{width: "100%" }} >
       <Input
+        ref={inputRef} // Assign ref to the input element
         placeholder={placeholder}
         value={inputValue}
         onChange={handleInputChange}
@@ -146,17 +192,20 @@ const DropDown: React.FC<DropDownProps & { onValueChange: (newValue: number) => 
            listStyle: "none",
            transition: "all 0.3s ease",
            backgroundColor: "#f4f4f4",
+           overscrollBehavior: "contain",
          }}
        >
-         {filteredItems.map((item: Option) => (
+         {filteredItems.map((item: Option, index) => (
            <li
              key={item.value}
              onClick={() => handleOptionSelect(item)}
+             onMouseEnter={() => setSelectedIndex(index)} // Set selected index on mouse enter
              style={{
               paddingLeft: "7px",
               cursor: "pointer",
               borderBottom: "solid 0.5px #326f70",
               zIndex: 1000,
+              backgroundColor: selectedIndex === index ? "#ccc" : "transparent",
              }}
            >
              {item.text}
