@@ -193,6 +193,10 @@ select:-moz-focusring {
 .scrollbar-x {
      overflow-x: auto !important;
  }
- .scrollbar-y {
-      overflow-y: auto !important;
-  }
+.scrollbar-y {
+    overflow-y: auto !important;
+ }
+
+.tui-grid-cell-has-input .tui-grid-cell-content {
+    padding: 4px 20px;
+}

@@ -56,8 +56,9 @@ class CheckboxComponent implements CellEditor {
         const inputRef = createRef<HTMLInputElement>(); // Change the ref type to HTMLInputElement
 
         const inputElement = (
-            <label className="checkbox tui-grid-row-header-checkbox">
+            <label className="checkbox tui-grid-row-header-checkbox" width={width} >
                 <input
+                    width={width}
                     ref={inputRef}
                     type="checkbox"
                     className="hidden-input"

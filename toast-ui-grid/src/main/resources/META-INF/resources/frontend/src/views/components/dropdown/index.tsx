@@ -154,7 +154,7 @@ const DropDown: React.FC<DropDownProps & { onValueChange: (newValue: number) => 
     }, [isDropdownOpen]);
 
   return (
-    <Box position="relative" style={{width: "100%" }} >
+    <Box position="relative" style={{width: width }} >
       <Input
         ref={inputRef} // Assign ref to the input element
         placeholder={placeholder}

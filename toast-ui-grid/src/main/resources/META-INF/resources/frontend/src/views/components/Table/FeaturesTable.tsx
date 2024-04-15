@@ -157,16 +157,14 @@ const FeatureTable: React.FC<FeatureTableProps> = React.forwardRef<HTMLDivElemen
 
             grid.on('columnResize' as GridEventName, (ev: TuiGridEvent): void => {
             if (onColumnResize) {
-                    const gridBodyContainers = document.querySelectorAll('.tui-grid-body-container');
-                    const gridBodyArea = document.querySelectorAll('.tui-grid-body-area');
-                    if (gridBodyContainers.length >= 2) {
-                        const secondGridBodyContainer = gridBodyContainers[1];
-                        const secondGridBodyArea = gridBodyArea[1]
-                        const currentWidth = parseInt(secondGridBodyContainer.style.width, 10);
-                        if (currentWidth > 1591) {
-                            secondGridBodyArea.classList.add('scrollbar-x');
-                        }
+                const sGridDiv = document.querySelectorAll('.scheduler-grid');
+                const gridBodyContainers = document.querySelectorAll('.tui-grid-body-container');
+                const gridBodyArea = document.querySelectorAll('.tui-grid-body-area');
+                if (gridBodyContainers.length >= 2 && gridBodyArea.length >= 2 && sGridDiv.length >= 1) {
+                    if (gridBodyContainers[0].offsetWidth + gridBodyContainers[1].offsetWidth  > sGridDiv[0].offsetWidth) {
+                        gridBodyArea[1].classList.add('scrollbar-x');
                     }
+                }
                 onColumnResize(ev);
             }
             });
@@ -219,18 +217,19 @@ const FeatureTable: React.FC<FeatureTableProps> = React.forwardRef<HTMLDivElemen
             };
         }, [TableData, columns, summary, columnOptions, header, width, bodyHeight, scrollX, scrollY, rowHeaders, treeColumnOptions, minBodyHeight, pageSize, getGridInstance]);
              useEffect(() => {
-               const gridBodyContainers = document.querySelectorAll('.tui-grid-body-container');
+                const sGridDiv = document.querySelectorAll('.scheduler-grid');
+                const gridBodyContainers = document.querySelectorAll('.tui-grid-body-container');
                 const gridBodyArea = document.querySelectorAll('.tui-grid-body-area');
-                if (gridBodyContainers.length >= 2) {
-                    const secondGridBodyContainer = gridBodyContainers[1];
-                    const secondGridBodyArea = gridBodyArea[1]
-                    const currentHeight = parseInt(secondGridBodyContainer.style.height, 10);
-                    if (currentHeight >= 530) {
-                        secondGridBodyArea.classList.add('scrollbar-y');
+                if (gridBodyContainers.length >= 2 && gridBodyArea.length >= 2 && sGridDiv.length >= 1) {
+                    if (gridBodyContainers[0].offsetWidth + gridBodyContainers[1].offsetWidth  > sGridDiv[0].offsetWidth) {
+                        gridBodyArea[1].classList.add('scrollbar-x');
                     }
-
+                    if (gridBodyContainers[1].offsetHeight  > sGridDiv[0].offsetHeight) {
+                        gridBodyArea[1].classList.add('scrollbar-y');
+                    }
                 }
         }, [pageSize , columns]);
+
         function setOption(option: OptGrid): void {
             if (gridInstanceRef.current) {
                 if (option.data)

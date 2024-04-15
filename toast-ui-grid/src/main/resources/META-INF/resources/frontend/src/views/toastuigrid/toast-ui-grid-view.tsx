@@ -704,6 +704,9 @@ window.toastuigrid = {
                 column = {
                     header: column.header,
                     name: column.name,
+                    width: column.width,
+                    whiteSpace: column.whiteSpace,
+                    align: column.align,
                     renderer: {
                         type: CheckboxRenderer,
                         className: "tui-grid-checkbox",
@@ -718,6 +721,9 @@ window.toastuigrid = {
                 column = {
                     header: column.header,
                     name: column.name,
+                    width: column.width,
+                    whiteSpace: column.whiteSpace,
+                    align: column.align,
                     renderer: {
                         type: SignatureRenderer,
                         className: "tui-grid-Signature",
@@ -731,6 +737,9 @@ window.toastuigrid = {
               column = {
                   header: column.header,
                   name: column.name,
+                  width: column.width,
+                  whiteSpace: column.whiteSpace,
+                  align: column.align,
                   renderer: {
                       type: CameraRenderer,
                       className: "tui-grid-Camera",
@@ -766,6 +775,7 @@ window.toastuigrid = {
                 const tempColumn = {
                     header: column.header,
                     name: column.name,
+                    width: column.width,
                     whiteSpace: column.whiteSpace,
                     align: column.align,
                     formatter: "listItemText",

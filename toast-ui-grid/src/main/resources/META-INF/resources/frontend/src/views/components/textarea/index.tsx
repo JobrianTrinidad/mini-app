@@ -20,6 +20,7 @@ class TextareaComponent implements CellEditor {
         this.el = document.createElement('textarea');
         this.el.value = props.value;
         this.el.style.height = 'auto'; // Set initial height to auto
+        this.el.style.padding = "0px 5px";
         this.el.addEventListener('input', this.autoResize);
         this.el.addEventListener('blur', this.save);
     }

@@ -245,6 +245,8 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService> ex
                 finalTableInfo.setPageSize(numberPageSize.getValue().intValue());
             if (numberFC.getValue() != null && numberFC.getValue() > 0)
                 finalTableInfo.setFrozenCount(numberFC.getValue().intValue());
+            else
+                finalTableInfo.setFrozenCount(null);
 
             tableInfoService.save(finalTableInfo);
             tableInfo = finalTableInfo;
@@ -422,7 +424,7 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService> ex
 
             String headerName = this.gridViewParameter.getHeaderNames().get(header);
             int headerIndex = this.gridViewParameter.getHeaders().indexOf(header);
-            ColumnBaseOption baseOption = new ColumnBaseOption(nId++, headerName, header, (colWidths.size() < headerIndex) ? colWidths.get(headerIndex) : 0, "left", "");
+            ColumnBaseOption baseOption = new ColumnBaseOption(nId++, headerName, header, (colWidths.size() > headerIndex) ? colWidths.get(headerIndex) : 0, "left", "");
             com.vaadin.componentfactory.tuigrid.model.Column column = new com.vaadin.componentfactory.tuigrid.model.Column(baseOption);
             column.setEditable(true);
             column.setSortable(true);

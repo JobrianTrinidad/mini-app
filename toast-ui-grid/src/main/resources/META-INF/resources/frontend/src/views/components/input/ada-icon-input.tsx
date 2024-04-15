@@ -29,9 +29,10 @@ const InputIconComponent: FC<InputIconComponentProps> = ({
                     onChange={handleChange}
                     style={{
                         width: `${width}`,
-                        backgroundColor: `${backgroundColor}`,
+                        backgroundColor: `${butBackground}`,
                         border: `${border}`,
-                        outline: `${outline}`
+                        outline: `${outline}`,
+                        padding: '0px 5px',
                     }}
                 />
                 <button style={{
