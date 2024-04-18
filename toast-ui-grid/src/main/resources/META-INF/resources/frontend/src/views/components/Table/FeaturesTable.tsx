@@ -111,7 +111,7 @@ const FeatureTable: React.FC<FeatureTableProps> = React.forwardRef<HTMLDivElemen
                 },
             });
             gridInstanceRef.current = grid;
-             grid.focusAt(0,0)
+            grid.focusAt(0, 0);
             grid.on('focusChange' as GridEventName, (ev: TuiGridEvent): void => {
                 if (onFocusChange) {
                     onFocusChange(ev);
@@ -174,7 +174,6 @@ const FeatureTable: React.FC<FeatureTableProps> = React.forwardRef<HTMLDivElemen
 
             grid.on('beforeFilter' as GridEventName, (ev: TuiGridEvent): void => {
             });
-
             getGridInstance(grid);
             function handleKeyDown(event) {
                 // Check if the left arrow key (keyCode 37) is pressed with the Alt key
@@ -205,7 +204,6 @@ const FeatureTable: React.FC<FeatureTableProps> = React.forwardRef<HTMLDivElemen
                  grid.getPagination().movePageTo(1);
                }
             }
-
             // Add event listener for keydown event
             document.addEventListener('keydown', handleKeyDown);
 
