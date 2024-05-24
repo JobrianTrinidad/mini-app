@@ -69,7 +69,7 @@ window.toastuigrid = {
         let resizedColumn: { columnName: string, width: number } | null = null;
         if (container && container.grid)
             return;
-
+        container.isNewRecord = false;
         let hostElement: Element | null = document.querySelector('vaadin-app-layout');
         let shadowRoot: ShadowRoot | null = hostElement!.shadowRoot;
         let contentElement: Element | null = shadowRoot!.querySelector('[content]');
@@ -569,6 +569,9 @@ window.toastuigrid = {
         grid: JSX.Element & { table: TuiGrid },
         filterId: string,
     }): void {
+        if(container.isNewRecord)
+            return;
+        container.isNewRecord = true;
         let gridInst: TuiGrid = container.grid.table;
         let row: OptRow = {};
         let position: Number = 1;
@@ -1043,6 +1046,12 @@ window.toastuigrid = {
         let rowValue: OptRow = container.grid.table.getRow(rowKey);
         rowValue["id"] = itemId;
         container.grid.table.setRow(rowKey, rowValue);
+    },
+
+    newRecordSaved: function (container: HTMLElement & {
+        grid: JSX.Element & { table: TuiGrid }
+    }): void {
+        container.isNewRecord = false;
     },
 
     setDataToGridRow: function (container: HTMLElement & {

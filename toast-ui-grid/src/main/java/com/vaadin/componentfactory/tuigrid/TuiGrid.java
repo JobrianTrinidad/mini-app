@@ -756,18 +756,22 @@ public class TuiGrid extends Div {
 
     @ClientCallable
     public void onAddRecord(JsonObject eventData) {
-        GuiItem item = convertJsonToItem(eventData);
-        this.items = new ArrayList<>(this.items);
-        this.items.add(item);
-
-        ItemAddEvent addEvent = new ItemAddEvent(this, item, true);
-
-        RuntimeException exception = null;
         try {
-            fireEvent(addEvent);
-        } catch (RuntimeException e) {
-            exception = e;
-            addEvent.setCancelled(true);
+            GuiItem item = convertJsonToItem(eventData);
+            this.items = new ArrayList<>(this.items);
+            this.items.add(item);
+
+            ItemAddEvent addEvent = new ItemAddEvent(this, item, true);
+
+            RuntimeException exception = null;
+            try {
+                fireEvent(addEvent);
+            } catch (RuntimeException e) {
+                exception = e;
+                addEvent.setCancelled(true);
+            }
+        } finally {
+            this.getElement().executeJs("toastuigrid.newRecordSaved($0);", this);
         }
     }
 
