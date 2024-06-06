@@ -111,7 +111,11 @@ const FeatureTable: React.FC<FeatureTableProps> = React.forwardRef<HTMLDivElemen
                 },
             });
             gridInstanceRef.current = grid;
-             grid.focusAt(0,0)
+            setFocusToFirstCell();
+            grid.on('afterDrawBody' as GridEventName, (ev: TuiGridEvent): void => {
+                 setFocusToFirstCell();
+            });
+
             grid.on('focusChange' as GridEventName, (ev: TuiGridEvent): void => {
                 if (onFocusChange) {
                     onFocusChange(ev);
@@ -172,30 +176,30 @@ const FeatureTable: React.FC<FeatureTableProps> = React.forwardRef<HTMLDivElemen
             grid.on('mousedown' as GridEventName, (ev: TuiGridEvent): void => {
             });
 
-            grid.on('beforeFilter' as GridEventName, (ev: TuiGridEvent): void => {
+            grid.on('afterFilter' as GridEventName, (ev: TuiGridEvent): void => {
+                 setFocusToFirstCell();
             });
-
             getGridInstance(grid);
             function handleKeyDown(event) {
                 // Check if the left arrow key (keyCode 37) is pressed with the Alt key
                 if (event.keyCode === 37 && event.altKey) {
                     grid.getPagination().movePageTo(grid.getPagination()._getRelativePage("prev"));
-                    grid.focusAt(0,0)
+                    setFocusToFirstCell();
                 }
                 // Check if the right arrow key (keyCode 39) is pressed with the Alt key
                 else if (event.keyCode === 39 && event.altKey) {
                   grid.getPagination().movePageTo(grid.getPagination()._getRelativePage("next"));
-                  grid.focusAt(0,0)
+                  setFocusToFirstCell();
                 }
                // Check if the Up arrow key (keyCode 38) is pressed with the Alt key
                else if (event.keyCode === 38 && event.altKey) { // Up arrow key
                   grid.getPagination().movePageTo(grid.getPagination()._getMorePageIndex("next"));
-                  grid.focusAt(0,0)
+                  setFocusToFirstCell();
                }
                // Check if the Down arrow key (keyCode 40) is pressed with the Alt key
                else if (event.keyCode === 40 && event.altKey) { // Down arrow key
                   grid.getPagination().movePageTo(grid.getPagination()._getMorePageIndex("prev"));
-                  grid.focusAt(0,0)
+                  setFocusToFirstCell();
                }
                // Check if the key pressed is the page up key (keyCode 33) or the page down key (keyCode 34)
                if (event.keyCode === 33) { // Page up key
@@ -205,9 +209,16 @@ const FeatureTable: React.FC<FeatureTableProps> = React.forwardRef<HTMLDivElemen
                  grid.getPagination().movePageTo(1);
                }
             }
-
             // Add event listener for keydown event
             document.addEventListener('keydown', handleKeyDown);
+
+            function setFocusToFirstCell() {
+                // Check if the grid has any rows
+                if (grid.getRowCount() > 0) {
+                    // If there are rows, set focus to the first cell (top-left cell)
+                    grid.focusAt(0, 0);
+                }
+            }
 
             return (): void => {
                 if (grid) {
