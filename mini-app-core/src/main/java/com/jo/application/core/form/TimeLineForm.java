@@ -108,7 +108,7 @@ public abstract class TimeLineForm<S extends ZJTService> extends CommonForm {
 
     private List<Object[]> configureGroup() throws Exception {
         if (!timeLineViewParameter.isValid()) {
-            throw new Exception("TuiGrid Definition is not valid.");
+            throw new Exception("Timeline parameter Definition is not valid.");
         }
         if (timeLineViewParameter.isRequireParameter() && timeLineViewParameter.getParameters() == null) {
             throw new Exception("Parameters are required, but not set");
@@ -134,6 +134,8 @@ public abstract class TimeLineForm<S extends ZJTService> extends CommonForm {
                 query.append(" = ").append(parameters[0]);
             }
         }
+
+        query.append(" ORDER BY ").append(timeLineViewParameter.getGroupSelectDefinition());
         return service.findEntityByQuery(query.toString());
     }
 
