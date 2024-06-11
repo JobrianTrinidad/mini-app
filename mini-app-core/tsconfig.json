@@ -31,6 +31,7 @@
   },
   "include": [
     "frontend/**/*",
+    "frontend/*.d.ts",
     "types.d.ts"
   ],
   "exclude": [
