@@ -31,7 +31,7 @@
   },
   "include": [
     "frontend/**/*",
-    "frontend/*.d.ts",
+    "src/main/resources/META-INF/resources/frontend/js/**/*",
     "types.d.ts"
   ],
   "exclude": [
