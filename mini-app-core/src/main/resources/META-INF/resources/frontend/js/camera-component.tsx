@@ -2,7 +2,7 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { LitElement, html, css } from 'lit-element';
 import { dialogFooterRenderer, dialogRenderer } from '@vaadin/dialog/lit.js';
 import { Dialog } from '@vaadin/dialog';
-import { ImageRequest, ImageResponse, getImageById,	saveImage, updateImage,	deleteImage } from 'Frontend/generated/jar-resources/js/imageService.tsx';
+import { ImageRequest, ImageResponse, getImageById,	saveImage, updateImage,	deleteImage } from 'Frontend/generated/jar-resources/js/imageService';
 
 @customElement('camera-component')
 class CameraComponent extends LitElement {
