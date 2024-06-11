@@ -20,6 +20,7 @@ public class ServiceScheduleOverview extends StandardFormView implements HasUrlP
         timeLineViewParameter.setDateFilterOn("planDate");
         timeLineViewParameter.setSelectDefinition("fleetid");
         timeLineViewParameter.setGroupSelectDefinition("fleetid");
+        timeLineViewParameter.setGroupCSSClass("fuelcardname1");
         super.setTimeLineViewParameter(timeLineViewParameter);
     }
 
