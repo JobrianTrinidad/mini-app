@@ -78,6 +78,8 @@ public class TimeLineViewParameter {
     private Object[] parameters;
     private String dateFilterOn;
 
+    private String groupCSSClass = null;
+
     /**
      * This is to test if the definition is valid or not
      * this assists the developer if the call is valid
@@ -252,5 +254,13 @@ public class TimeLineViewParameter {
 
     public void setPageName(String pageName) {
         this.pageName = pageName;
+    }
+
+    public String getGroupCSSClass() {
+        return groupCSSClass;
+    }
+
+    public void setGroupCSSClass(String groupCSSClass) {
+        this.groupCSSClass = groupCSSClass;
     }
 }

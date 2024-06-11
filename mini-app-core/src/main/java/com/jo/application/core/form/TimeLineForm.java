@@ -119,6 +119,11 @@ public abstract class TimeLineForm<S extends ZJTService> extends CommonForm {
             .append(", p.").append(timeLineViewParameter.getGroupSelectDefinition());
 
 
+        if (timeLineViewParameter.getGroupCSSClass() == null) {
+            query.append(", null ");
+        } else {
+            query.append(", p.").append(timeLineViewParameter.getGroupCSSClass());
+        }
         query.append(" FROM ").append(timeLineViewParameter.getGroupClass().getSimpleName()).append(" as p");
 
         if (timeLineViewParameter.getParameters() != null
@@ -282,7 +287,7 @@ public abstract class TimeLineForm<S extends ZJTService> extends CommonForm {
             ItemGroup itemGroup = new ItemGroup();
             itemGroup.setTreeLevel(0);
             itemGroup.setNestedGroups(null);
-            itemGroup.setClassName("");
+            itemGroup.setClassName((String) groupResult[2]);
             itemGroup.setVisible(true);
             itemGroup.setId((Integer) groupResult[0]);
             itemGroup.setContent((String) groupResult[1]);
