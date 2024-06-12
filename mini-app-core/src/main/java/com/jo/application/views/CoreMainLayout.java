@@ -9,6 +9,8 @@ import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dependency.CssImport;
+import com.vaadin.flow.component.dependency.JsModule;
+import com.vaadin.flow.component.dependency.NpmPackage;
 import com.vaadin.flow.component.html.*;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -25,7 +27,11 @@ import com.vaadin.flow.theme.lumo.LumoUtility;
 @PageTitle("Main")
 //@Route(value = "")
 @CssImport("./styles/styles.css")
-@CssImport("./styles/styles.css")
+@JsModule("./js/signature-widget.js")
+@JsModule("./js/camera-component.tsx")
+@JsModule("./js/signature-dialog.tsx")
+@JsModule("./js/imageService.tsx")
+@NpmPackage(value = "signature_pad", version = "4.0.4")
 public class CoreMainLayout extends AppLayout implements RouterLayout, BeforeEnterObserver {
     private H2 viewTitle;
     protected AppNav nav;
