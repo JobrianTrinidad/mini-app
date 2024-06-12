@@ -177,6 +177,14 @@
                         <goals>
                             <goal>prepare-frontend</goal>
                         </goals>
+                        <configuration>
+                            <!-- Specify Node.js version -->
+                            <nodeVersion>v14.17.0</nodeVersion>
+                            <!-- Optionally specify npm version -->
+<!--                            <npmVersion>6.14.13</npmVersion>-->
+<!--                            &lt;!&ndash; Optional: Specify if Node.js should be downloaded &ndash;&gt;-->
+<!--                            <nodeDownload>true</nodeDownload>-->
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
@@ -214,6 +222,10 @@
                                 <phase>compile</phase>
                             </execution>
                         </executions>
+                        <configuration>
+                            <nodeVersion>v14.17.0</nodeVersion>
+                            <nodeDownloadRoot>https://nodejs.org/dist/</nodeDownloadRoot>
+                        </configuration>
                     </plugin>
                 </plugins>
             </build>
