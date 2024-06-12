@@ -13,6 +13,7 @@
     <properties>
         <java.version>17</java.version>
         <vaadin.version>24.1.4</vaadin.version>
+        <node.version>v18.16.1</node.version>
         <selenium.version>4.10.0</selenium.version>
     </properties>
 
@@ -179,7 +180,7 @@
                         </goals>
                         <configuration>
                             <!-- Specify Node.js version -->
-                            <nodeVersion>v14.17.0</nodeVersion>
+                            <nodeVersion>${node.version}</nodeVersion>
                             <!-- Optionally specify npm version -->
 <!--                            <npmVersion>6.14.13</npmVersion>-->
 <!--                            &lt;!&ndash; Optional: Specify if Node.js should be downloaded &ndash;&gt;-->
@@ -223,7 +224,7 @@
                             </execution>
                         </executions>
                         <configuration>
-                            <nodeVersion>v14.17.0</nodeVersion>
+                            <nodeVersion>${node.version}</nodeVersion>
                             <nodeDownloadRoot>https://nodejs.org/dist/</nodeDownloadRoot>
                         </configuration>
                     </plugin>
