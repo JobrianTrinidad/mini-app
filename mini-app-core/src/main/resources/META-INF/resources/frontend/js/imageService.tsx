@@ -13,6 +13,13 @@ export interface ImageResponse {
     status: number;
 }
 
+export interface AdImage {
+    adImageId: number;
+    name: string;
+    binaryData: Uint8Array | ArrayBuffer | null; // Use appropriate type for binary data
+    description?: string; // Optional property
+}
+
 // Define functions
 export async function getImageById(id: number): Promise<AdImage | null> {
     try {
@@ -32,8 +39,9 @@ export async function saveImage(imageRequest: ImageRequest): Promise<ImageRespon
         return response.data;
     } catch (error) {
         return {
-            adImageId: -1,
-            message: `Failed to save image: ${(error as Error).message}`
+            savedImageId: -1,
+            message: `Failed to save image: ${(error as Error).message}`,
+            status: -1
         };
     }
 }
@@ -44,8 +52,9 @@ export async function updateImage(id: number, updatedImage: ImageRequest): Promi
         return response.data;
     } catch (error) {
         return {
-            adImageId: -1,
-            message: `Failed to update image: ${(error as Error).message}`
+            savedImageId: -1,
+            message: `Failed to update image: ${(error as Error).message}`,
+            status: -1
         };
     }
 }
@@ -57,8 +66,9 @@ export async function deleteImage(id: number): Promise<ImageResponse> {
     } catch (error) {
         console.error('Error deleting image:', error);
         return {
-            adImageId: -1,
-            message: `Failed to delete image: ${(error as Error).message}`
+            savedImageId: -1,
+            message: `Failed to delete image: ${(error as Error).message}`,
+            status: -1
         };
     }
 }
