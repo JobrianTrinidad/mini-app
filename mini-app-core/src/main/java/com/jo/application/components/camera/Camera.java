@@ -44,6 +44,6 @@ public class Camera extends VerticalLayout {
     private void initSignature() {
 
         this.getElement()
-                .callJsFunction("registerCamera",this);
+                .callJsFunction("registerCamera", this);
     }
 }

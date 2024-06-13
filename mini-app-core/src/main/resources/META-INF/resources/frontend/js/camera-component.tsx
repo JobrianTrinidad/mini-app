@@ -1,3 +1,4 @@
+import '@vaadin/upload';
 import { customElement, property, state } from 'lit/decorators.js';
 import { LitElement, html, css } from 'lit';
 import { dialogFooterRenderer, dialogRenderer } from '@vaadin/dialog/lit.js';
