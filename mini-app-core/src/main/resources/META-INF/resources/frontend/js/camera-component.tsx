@@ -36,7 +36,7 @@ class CameraComponent extends LitElement {
 
         vaadin-button {
             color: white !important;
-            background-color: rgb(50, 111, 112) !important;
+            background-color: var(--_lumo-button-background-color) !important;;
         }
     `;
 

@@ -16,7 +16,7 @@ public class ImageController {
     @Autowired
     private ADImageService adImageService;
 
-    @PostMapping("/images")
+    @PostMapping
     public ResponseEntity<ImageResponse> saveImage(@RequestBody ImageRequest imageRequest) {
         try {
             ADImage adImage = new ADImage();
