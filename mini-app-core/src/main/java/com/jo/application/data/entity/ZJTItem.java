@@ -25,6 +25,9 @@ public class ZJTItem implements ZJTEntity {
     @Column
     private String className;
 
+    @Column
+    private String style;
+
     public ZJTItem() {
         this.startTime = LocalDateTime.now(); // Set start time to current time
         this.endTime = LocalDateTime.now(); // Set end time to current time
@@ -107,5 +110,13 @@ public class ZJTItem implements ZJTEntity {
 
     public void setClassName(String className) {
         this.className = className;
+    }
+
+    public String getStyle() {
+        return style;
+    }
+
+    public void setStyle(String style) {
+        this.style = style;
     }
 }
