@@ -1,6 +1,6 @@
 import { html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { ImageRequest, ImageResponse, getImageById, saveImage, updateImage, deleteImage } from 'Frontend/generated/jar-resources/js/imageService';
+import { ImageRequest, ImageResponse, getImageById, saveImage, updateImage, deleteImage } from 'Frontend/generated/jar-resources/js/imageService.tsx';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import '@vaadin/button';
 import '@vaadin/dialog';
