@@ -2,6 +2,8 @@ package com.jo.application.controller;
 
 import com.jo.application.data.entity.ADImage;
 import com.jo.application.data.service.ADImageService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,9 +15,14 @@ import java.util.Optional;
 @RequestMapping("/")
 public class ImageController {
 
+    private static final Logger logger = LoggerFactory.getLogger(ImageController.class);
+
     @Autowired
     private ADImageService adImageService;
 
+    public ImageController() {
+        logger.info("ImageController initialized.");
+    }
     @PostMapping("/images")
     public ResponseEntity<ImageResponse> saveImage(@RequestBody ImageRequest imageRequest) {
         try {
