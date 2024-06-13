@@ -45,7 +45,7 @@ public class CoreMainLayout extends AppLayout implements RouterLayout, BeforeEnt
     public CoreMainLayout() {
         // Set context path in JavaScript
         String contextPath = VaadinServlet.getCurrent().getServletContext().getContextPath();
-        if(StringUtils.isBlank(contextPath)) {
+        if(!StringUtils.isBlank(contextPath)) {
             Page page = UI.getCurrent().getPage();
             page.executeJs("window.contextPath = $0;", contextPath);
         }
