@@ -9,15 +9,20 @@ import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dependency.CssImport;
+import com.vaadin.flow.component.dependency.JsModule;
+import com.vaadin.flow.component.dependency.NpmPackage;
 import com.vaadin.flow.component.html.*;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.page.Page;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.RouterLayout;
+import com.vaadin.flow.server.VaadinServlet;
 import com.vaadin.flow.server.VaadinSession;
 import com.vaadin.flow.theme.lumo.LumoUtility;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * The main view is a top-level placeholder for other views.
@@ -25,7 +30,11 @@ import com.vaadin.flow.theme.lumo.LumoUtility;
 @PageTitle("Main")
 //@Route(value = "")
 @CssImport("./styles/styles.css")
-@CssImport("./styles/styles.css")
+@JsModule("./js/signature-widget.js")
+@JsModule("./js/camera-component.tsx")
+@JsModule("./js/signature-dialog.tsx")
+@JsModule("./js/imageService.tsx")
+@NpmPackage(value = "signature_pad", version = "4.0.4")
 public class CoreMainLayout extends AppLayout implements RouterLayout, BeforeEnterObserver {
     private H2 viewTitle;
     protected AppNav nav;
@@ -34,6 +43,12 @@ public class CoreMainLayout extends AppLayout implements RouterLayout, BeforeEnt
     Button btnGoOriginView = new Button("");
 
     public CoreMainLayout() {
+        // Set context path in JavaScript
+        String contextPath = VaadinServlet.getCurrent().getServletContext().getContextPath();
+        if(!StringUtils.isBlank(contextPath)) {
+            Page page = UI.getCurrent().getPage();
+            page.executeJs("window.contextPath = $0;", contextPath);
+        }
         setPrimarySection(Section.DRAWER);
         addHeaderContent();
     }

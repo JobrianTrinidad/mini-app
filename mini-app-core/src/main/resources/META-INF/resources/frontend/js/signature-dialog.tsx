@@ -1,4 +1,4 @@
-import { html, LitElement } from 'lit';
+import { html, LitElement, css } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { ImageRequest, ImageResponse, getImageById, saveImage, updateImage, deleteImage } from 'Frontend/generated/jar-resources/js/imageService.tsx';
 import { ifDefined } from 'lit/directives/if-defined.js';
@@ -20,6 +20,13 @@ export class SignatureDialog extends LitElement {
   private dialogOpened = false;
 
   private signaturePad: any = null;
+
+  static styles = css`
+          vaadin-button {
+              color: white !important;
+              background-color: var(--_lumo-button-background-color) !important;;
+          }
+      `;
 
   protected override createRenderRoot() {
     const root = super.createRenderRoot();
