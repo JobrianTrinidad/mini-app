@@ -44,11 +44,12 @@ public class TimeLineViewParameter {
      * Name of the column for the enddate
      * e. pd.birthdate +  interval '1' day  (based on postgres datetime function)
      */
-    private String endDateFieldName = null;
+    private String[] endDateFieldName = null;
 
     /**
      * Name of the column for the class
      * Classname is the CSS name to control the appearance of the item
+     *
      */
     private String classNameFieldName = null;
 
@@ -70,6 +71,8 @@ public class TimeLineViewParameter {
     private String[] whereDefinitions = null;
     private String selectDefinition = null;
     private String groupSelectDefinition = null;
+
+    private String itemCSSClassField = null;
 
     private Class<?> groupClass;
     private String groupClassPKField;
@@ -110,7 +113,7 @@ public class TimeLineViewParameter {
     }
 
 
-    public TimeLineViewParameter(String[] titleFieldName, String groupIDFieldName, String[] startDateFieldNames, String endDateFieldName, String classNameFieldName, String fromDefinition) {
+    public TimeLineViewParameter(String[] titleFieldName, String groupIDFieldName, String[] startDateFieldNames, String[] endDateFieldName, String classNameFieldName, String fromDefinition) {
         this.titleFieldName = titleFieldName;
         this.groupIDFieldName = groupIDFieldName;
         this.startDateFieldNames = startDateFieldNames;
@@ -149,11 +152,11 @@ public class TimeLineViewParameter {
         this.startDateFieldNames = startDateFieldNames;
     }
 
-    public String getEndDateFieldName() {
+    public String[] getEndDateFieldName() {
         return endDateFieldName;
     }
 
-    public void setEndDateFieldName(String endDateFieldName) {
+    public void setEndDateFieldName(String[] endDateFieldName) {
         this.endDateFieldName = endDateFieldName;
     }
 
@@ -263,4 +266,5 @@ public class TimeLineViewParameter {
     public void setGroupCSSClass(String groupCSSClass) {
         this.groupCSSClass = groupCSSClass;
     }
+
 }

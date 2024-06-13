@@ -4,6 +4,8 @@
 
 .timeline .vis-item.vis-selected {
     z-index: 3;
+    border-color: #000000;
+    border-width: 3px;
 }
 
 .timeline .vis-timeline {

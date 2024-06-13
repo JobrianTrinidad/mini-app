@@ -45,33 +45,58 @@ public class BaseEntityRepository {
         for (Object[] result : results) {
             String title = "new item";
             String groupID = null;
-            LocalDateTime startDate = LocalDateTime.now();
+            String className = null;
+            String style = null;
+            //must be paired in sequence - startdate1, enddate1, startdate2, enddate2
+            LocalDateTime startDate = null;
+            LocalDateTime endDate = null;
             if (result[0] != null) {
                 title = (String) result[0];
             }
             if (result[1] != null) {
                 groupID = String.valueOf(((ZJTEntity) result[1]).getId());
             }
-            int nStartDateId = 0;
-            for (Object resultObj : result) {
-                if (resultObj instanceof LocalDateTime) {
-                    startDate = (LocalDateTime) resultObj;
-                    DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy h:mm a", Locale.ENGLISH);
-                    String formattedDate = startDate.format(inputFormatter);
-                    startDate = LocalDateTime.parse(formattedDate, inputFormatter);
-                    ZJTItem item = new ZJTItem(title, groupID, startDate);
-                    item.setStartDateId(nStartDateId++);
-                    items.add(item);
+            if (result[2] != null) {
+                className = (String) result[2];
+                if (className.isEmpty()) {
+                    className = null;
+                } else if (className.startsWith("#")) {  //hex color
+                    style = "background-color : " + className + ";";
+                    className = null;
+
                 }
             }
-//            if (result[2] != null && result[2] instanceof LocalDateTime) {
-//                startDate = (LocalDateTime) result[2];
-//                DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy h:mm a", Locale.ENGLISH);
-//                String formattedDate = startDate.format(inputFormatter);
-//                startDate = LocalDateTime.parse(formattedDate, inputFormatter);
-//                ZJTItem item = new ZJTItem(title, groupID, startDate);
-//                items.add(item);
-//            }
+
+
+            boolean isStartandEndPaired = false;
+            for (Object resultObj : result) {
+                int nStartDateId = 0;
+                if (resultObj instanceof LocalDateTime) {
+                    if (startDate == null) {
+                        startDate = (LocalDateTime) resultObj;
+                    } else {
+                        endDate = (LocalDateTime) resultObj;
+                        isStartandEndPaired = true;
+                    }
+                }
+                if (isStartandEndPaired) {
+                    DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm", Locale.ENGLISH);
+                    String formattedDate = startDate.format(inputFormatter);
+                    startDate = LocalDateTime.parse(formattedDate, inputFormatter);
+                    formattedDate = endDate.format(inputFormatter);
+                    endDate = LocalDateTime.parse(formattedDate, inputFormatter);
+                    ZJTItem item = new ZJTItem(title, groupID, startDate, endDate, className);
+                    item.setStartDateId(nStartDateId);
+                    if (style != null) {
+                        item.setStyle(style);
+                    }
+                    items.add(item);
+                    startDate = null;
+                    endDate = null;
+                    nStartDateId++; //next series if applicable
+                }
+            }
+
         }
         return items;
     }
