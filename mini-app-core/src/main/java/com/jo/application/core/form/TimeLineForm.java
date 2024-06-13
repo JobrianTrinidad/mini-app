@@ -35,7 +35,7 @@ public abstract class TimeLineForm<S extends ZJTService> extends CommonForm {
         this.timeLineViewParameter = timeLineViewParameter;
         this.service = service;
         dateFilterOn = timeLineViewParameter.getDateFilterOn();
-        addClassName("demo-app-form");
+        addClassName("mobile-app-form");
         configureTimeLine();
         try {
             configureToolbar();
@@ -171,6 +171,10 @@ public abstract class TimeLineForm<S extends ZJTService> extends CommonForm {
             timeline = new Timeline(items, itemGroups);
 
         timeline.setTimelineRange(LocalDateTime.of(2023, 1, 1, 0, 0, 0), LocalDateTime.of(2024, 12, 25, 0, 0, 0));
+
+        //height must be specified otherwise timeline will just expand beyond screen size
+        //TODO - must adjust based on screen resolution
+        timeline.setHeight("800px");
 
         timeline.setMultiselect(true);
         timeline.setVerticalScroll(true);
