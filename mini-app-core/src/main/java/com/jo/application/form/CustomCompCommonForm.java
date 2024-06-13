@@ -52,7 +52,7 @@ public class CustomCompCommonForm<T extends ZJTEntity> extends CustomComponentFo
     }
 
     @Override
-    public void addCustomButton(Button button) {
+    public void addCustomButton(int index, Button button) {
 
     }
 

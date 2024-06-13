@@ -605,7 +605,14 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService> ex
     }
 
     public void addCustomButton(Button button) {
-        toolbar.add(button);
+        addCustomButton(-1, button);
+    }
+    public void addCustomButton(int index, Button button) {
+        if (index < 0) {
+            toolbar.add(button);
+        } else {
+            toolbar.addComponentAtIndex(index, button);
+        }
     }
 
     public void onNewItem(GuiItem item) {

@@ -43,7 +43,7 @@ public abstract class CommonForm extends VerticalLayout {
 
     abstract public void setMessageStatus(String msg);
 
-    abstract public void addCustomButton(Button button);
+    abstract public void addCustomButton(int index, Button button);
 
     abstract public String getHamburgerText();
 

@@ -12,7 +12,7 @@ public class TimeLineCommonForm extends TimeLineForm<ZJTService> {
     public TimeLineCommonForm(TimeLineViewParameter timeLineViewParameter,
                               ZJTService service) {
         super(timeLineViewParameter, service);
-        addClassName("demo-app-form");
+        addClassName("mobile-app-form");
     }
 
     @Override
@@ -51,7 +51,13 @@ public class TimeLineCommonForm extends TimeLineForm<ZJTService> {
     }
 
     @Override
-    public void addCustomButton(Button button) {
+    public void addCustomButton(int index, Button button) {
+        if (index < 0) {
+            getToolbar().add(button);
+        } else {
+            getToolbar().addComponentAtIndex(index, button);
+        }
 
     }
+
 }
