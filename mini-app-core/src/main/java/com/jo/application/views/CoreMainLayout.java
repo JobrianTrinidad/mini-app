@@ -14,10 +14,12 @@ import com.vaadin.flow.component.dependency.NpmPackage;
 import com.vaadin.flow.component.html.*;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.page.Page;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.RouterLayout;
+import com.vaadin.flow.server.VaadinServlet;
 import com.vaadin.flow.server.VaadinSession;
 import com.vaadin.flow.theme.lumo.LumoUtility;
 
@@ -33,6 +35,7 @@ import com.vaadin.flow.theme.lumo.LumoUtility;
 @JsModule("./js/imageService.tsx")
 @NpmPackage(value = "signature_pad", version = "4.0.4")
 public class CoreMainLayout extends AppLayout implements RouterLayout, BeforeEnterObserver {
+
     private H2 viewTitle;
     protected AppNav nav;
     private Div content;
@@ -40,6 +43,10 @@ public class CoreMainLayout extends AppLayout implements RouterLayout, BeforeEnt
     Button btnGoOriginView = new Button("");
 
     public CoreMainLayout() {
+        // Set context path in JavaScript
+        String contextPath = VaadinServlet.getCurrent().getServletContext().getContextPath();
+        Page page = UI.getCurrent().getPage();
+        page.executeJs("window.contextPath = $0;", contextPath);
         setPrimarySection(Section.DRAWER);
         addHeaderContent();
     }
