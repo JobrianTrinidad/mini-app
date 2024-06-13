@@ -6,6 +6,7 @@ import com.jo.application.core.form.TimeLineForm;
 import com.jo.application.core.form.TimeLineViewParameter;
 import com.vaadin.componentfactory.tuigrid.model.AATContextMenu;
 import com.vaadin.componentfactory.tuigrid.model.GuiItem;
+import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
 
 public class TimeLineCommonForm extends TimeLineForm<ZJTService> {
@@ -51,11 +52,11 @@ public class TimeLineCommonForm extends TimeLineForm<ZJTService> {
     }
 
     @Override
-    public void addCustomButton(int index, Button button) {
+    public void addCustomComponent(int index, Component component) {
         if (index < 0) {
-            getToolbar().add(button);
+            getToolbar().add(component);
         } else {
-            getToolbar().addComponentAtIndex(index, button);
+            getToolbar().addComponentAtIndex(index, component);
         }
 
     }

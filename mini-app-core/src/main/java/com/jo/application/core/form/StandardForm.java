@@ -12,6 +12,7 @@ import com.jo.application.util.GlobalData;
 import com.vaadin.componentfactory.tuigrid.TuiGrid;
 import com.vaadin.componentfactory.tuigrid.model.*;
 import com.vaadin.flow.component.AttachEvent;
+import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
@@ -604,14 +605,14 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService> ex
         lblMessage.setValue(msg);
     }
 
-    public void addCustomButton(Button button) {
-        addCustomButton(-1, button);
+    public void addCustomButton(Component component) {
+        addCustomComponent(-1, component);
     }
-    public void addCustomButton(int index, Button button) {
+    public void addCustomComponent(int index, Component component) {
         if (index < 0) {
-            toolbar.add(button);
+            toolbar.add(component);
         } else {
-            toolbar.addComponentAtIndex(index, button);
+            toolbar.addComponentAtIndex(index, component);
         }
     }
 

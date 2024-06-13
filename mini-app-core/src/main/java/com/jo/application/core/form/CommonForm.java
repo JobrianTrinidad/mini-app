@@ -4,6 +4,7 @@ import com.jo.application.core.data.entity.ZJTEntity;
 import com.vaadin.componentfactory.tuigrid.TuiGrid;
 import com.vaadin.componentfactory.tuigrid.model.AATContextMenu;
 import com.vaadin.componentfactory.tuigrid.model.GuiItem;
+import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.datepicker.DatePicker;
@@ -43,7 +44,7 @@ public abstract class CommonForm extends VerticalLayout {
 
     abstract public void setMessageStatus(String msg);
 
-    abstract public void addCustomButton(int index, Button button);
+    abstract public void addCustomComponent(int index, Component component);
 
     abstract public String getHamburgerText();
 

@@ -6,6 +6,7 @@ import com.jo.application.core.form.CustCompViewParameter;
 import com.jo.application.core.form.CustomComponentForm;
 import com.vaadin.componentfactory.tuigrid.model.AATContextMenu;
 import com.vaadin.componentfactory.tuigrid.model.GuiItem;
+import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
 
 public class CustomCompCommonForm<T extends ZJTEntity> extends CustomComponentForm<ZJTService> {
@@ -52,7 +53,7 @@ public class CustomCompCommonForm<T extends ZJTEntity> extends CustomComponentFo
     }
 
     @Override
-    public void addCustomButton(int index, Button button) {
+    public void addCustomComponent(int index, Component component) {
 
     }
 

@@ -6,6 +6,7 @@ import com.jo.application.core.data.entity.ZJTEntity;
 import com.jo.application.core.data.service.ZJTService;
 import com.jo.application.data.service.BaseEntityService;
 import com.jo.application.data.service.TableInfoService;
+import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
 
 public class GridCommonForm<T extends ZJTEntity> extends StandardForm<T, ZJTService> {
@@ -15,8 +16,8 @@ public class GridCommonForm<T extends ZJTEntity> extends StandardForm<T, ZJTServ
     }
 
     @Override
-    public void addCustomButton(int index, Button button) {
-        super.addCustomButton(index, button);
+    public void addCustomComponent(int index, Component component) {
+        super.addCustomComponent(index, component);
     }
 
 }

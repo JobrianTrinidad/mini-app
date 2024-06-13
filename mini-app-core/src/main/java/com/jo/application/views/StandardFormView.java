@@ -116,12 +116,12 @@ public class StandardFormView extends CommonView {
 
     public void addCustomButton(Button button) {
         if (form != null) {
-            form.addCustomButton(-1, button);
+            form.addCustomComponent(-1, button);
         }
     }
     public void addCustomButton(int index, Button button) {
         if (form != null && form instanceof StandardForm) {
-            form.addCustomButton(index, button);
+            form.addCustomComponent(index, button);
         }
     }
 
