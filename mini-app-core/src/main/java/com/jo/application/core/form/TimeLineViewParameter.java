@@ -9,6 +9,10 @@ import com.vaadin.flow.router.PageTitle;
 public class TimeLineViewParameter {
 
     /**
+     * Field name for the ID
+     */
+    private String idFieldName = null;
+    /**
      * Name of the column to display in the content
      * e.g  e.employeename
      */
@@ -90,13 +94,17 @@ public class TimeLineViewParameter {
      * @return
      */
 
-    public boolean isValid() {
-        boolean valid = titleFieldName != null;
-        //TODO - add some logging or notification to developer for missing definition
+    public boolean isValid() throws Exception {
+        boolean valid = true;
 
+        if (titleFieldName == null) {
+            throw new Exception("Title FieldName is null");
+        }
+        if (idFieldName == null) {
+            throw new Exception("ID Field name is null");
+        }
         if (fromDefinition == null) {
-            valid = false;
-            //TODO - add some logging or notification to developer for missing definition
+            throw new Exception("from Definition is null");
         }
 
         return valid;
@@ -112,6 +120,12 @@ public class TimeLineViewParameter {
         return whereDefinition != null;
     }
 
+    /**
+     * Will display another horizontal layout below date parameter
+     * Comprise of a combox for the Timeline item and a combobox for timeline group
+     * User may be able assign item to another group by selecting the combobox
+     */
+    private boolean isShowItemSelector = false;
 
     public TimeLineViewParameter(String[] titleFieldName, String groupIDFieldName, String[] startDateFieldNames, String[] endDateFieldName, String classNameFieldName, String fromDefinition) {
         this.titleFieldName = titleFieldName;
@@ -126,6 +140,14 @@ public class TimeLineViewParameter {
         this.titleFieldName = titleFieldName;
         this.groupIDFieldName = groupIDFieldName;
         this.startDateFieldNames = startDateFieldNames;
+    }
+
+    public String getIdFieldName() {
+        return idFieldName;
+    }
+
+    public void setIdFieldName(String idFieldName) {
+        this.idFieldName = idFieldName;
     }
 
     public String[] getTitleFieldName() {
@@ -267,4 +289,11 @@ public class TimeLineViewParameter {
         this.groupCSSClass = groupCSSClass;
     }
 
+    public boolean isShowItemSelector() {
+        return isShowItemSelector;
+    }
+
+    public void setShowItemSelector(boolean showItemSelector) {
+        isShowItemSelector = showItemSelector;
+    }
 }

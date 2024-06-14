@@ -47,17 +47,22 @@ public class BaseEntityRepository {
             String groupID = null;
             String className = null;
             String style = null;
+            int id = 0;
             //must be paired in sequence - startdate1, enddate1, startdate2, enddate2
             LocalDateTime startDate = null;
             LocalDateTime endDate = null;
             if (result[0] != null) {
-                title = (String) result[0];
+                id = (int)result[0];
             }
+
             if (result[1] != null) {
-                groupID = String.valueOf(((ZJTEntity) result[1]).getId());
+                title = (String) result[1];
             }
             if (result[2] != null) {
-                className = (String) result[2];
+                groupID = String.valueOf(((ZJTEntity) result[2]).getId());
+            }
+            if (result[3] != null) {
+                className = (String) result[3];
                 if (className.isEmpty()) {
                     className = null;
                 } else if (className.startsWith("#")) {  //hex color
@@ -86,6 +91,7 @@ public class BaseEntityRepository {
                     formattedDate = endDate.format(inputFormatter);
                     endDate = LocalDateTime.parse(formattedDate, inputFormatter);
                     ZJTItem item = new ZJTItem(title, groupID, startDate, endDate, className);
+                    item.setId(id);
                     item.setStartDateId(nStartDateId);
                     if (style != null) {
                         item.setStyle(style);

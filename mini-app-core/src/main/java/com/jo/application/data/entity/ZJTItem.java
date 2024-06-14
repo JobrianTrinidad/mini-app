@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 //@Table(name = "zjt_timeline")
 public class ZJTItem implements ZJTEntity {
     @Id
-    private Long id;
+    private int id;
     @Column
     private String title;
     @Column
@@ -64,12 +64,12 @@ public class ZJTItem implements ZJTEntity {
         this.content = content;
     }
 
-    public void setId(Long id) {
+    public void setId(int id) {
         this.id = id;
     }
 
     public int getId() {
-        return Math.toIntExact(id);
+        return id;
     }
 
     public LocalDateTime getStartTime() {
