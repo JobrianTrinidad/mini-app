@@ -271,7 +271,7 @@ public class VehicleServiceScheduleView extends StandardFormView implements HasU
         button.setTooltipText("Create workshop job.");
         button.addClickListener(e -> createWorkshopJob());
         if (event.getRouteParameters().get("subcategory").isEmpty()) {
-            this.addCustomButton(button);
+            this.addCustomComponent(button);
         }
 
         button = new Button();
@@ -279,7 +279,7 @@ public class VehicleServiceScheduleView extends StandardFormView implements HasU
         button.setTooltipText("Complete current workshop job.");
         button.addClickListener(e -> completeWorkshopJob());
         if (event.getRouteParameters().get("subcategory").isEmpty()) {
-            this.addCustomButton(button);
+            this.addCustomComponent(button);
         }
     }
 }

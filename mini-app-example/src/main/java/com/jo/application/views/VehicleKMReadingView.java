@@ -77,7 +77,7 @@ public class VehicleKMReadingView extends StandardFormView implements HasUrlPara
 
         button.addClickListener(e -> importTele());
 
-        this.addCustomButton(button);
+        this.addCustomComponent(button);
     }
 
     private void importTele() {
