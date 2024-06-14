@@ -30,15 +30,25 @@ public class ZJTUser implements ZJTEntity {
     @DisplayName(value = "Name")
     private String name = "";
 
+    @Column(name = "ad_Cameraimage_id")
+    @DisplayName(value = "Camera")
+    @CustomComponent(value = "Camera")
+    private int[] adCameraImageId;
+
     @Column(name = "ad_image_id")
     @DisplayName(value = "Signature")
     @CustomComponent(value = "Signature")
     private int adImageId;
 
-    @Column(name = "ad_camera_id")
-    @DisplayName(value = "Camera")
-    @CustomComponent(value = "Camera")
-    private int adCameraId;
+
+
+    public int[] getAdCameraImageId() {
+        return adCameraImageId;
+    }
+
+    public void setAdCameraImageId(int[] adCameraImageId) {
+        this.adCameraImageId = adCameraImageId;
+    }
 
     public int getAdImageId() {
         return adImageId;
@@ -69,11 +79,6 @@ public class ZJTUser implements ZJTEntity {
         this.name = name;
     }
 
-    public int getAdCameraId() {
-        return adCameraId;
-    }
 
-    public void setAdCameraId(int adCameraId) {
-        this.adCameraId = adCameraId;
-    }
+
 }

@@ -10,12 +10,13 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Optional;
 
 @RestController
+@RequestMapping("/images")
 public class ImageController {
 
     @Autowired
     private ADImageService adImageService;
 
-    @PostMapping("/images")
+    @PostMapping
     public ResponseEntity<ImageResponse> saveImage(@RequestBody ImageRequest imageRequest) {
         try {
             ADImage adImage = new ADImage();
@@ -30,7 +31,7 @@ public class ImageController {
         }
     }
 
-    @GetMapping("/images/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<ADImage> getImageById(@PathVariable int id) {
         ADImage image = (ADImage) adImageService.findEntityByID(id);
         return Optional.ofNullable(image)
@@ -38,7 +39,7 @@ public class ImageController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    @PutMapping("/images/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<ImageResponse> updateImage(@PathVariable int id, @RequestBody ImageRequest imageRequest) {
         try {
             // Set the ID of the updatedImage to match the path variable ID
@@ -56,7 +57,7 @@ public class ImageController {
         }
     }
 
-    @DeleteMapping("/images/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<ImageResponse> deleteImage(@PathVariable int id) {
         try {
             ADImage deletedImg = adImageService.deleteImage(id);
