@@ -12,7 +12,7 @@ import com.vaadin.componentfactory.tuigrid.event.ItemChangeEvent;
 import com.vaadin.componentfactory.tuigrid.event.ItemDeleteEvent;
 import com.vaadin.componentfactory.tuigrid.event.ItemMultiSelectEvent;
 import com.vaadin.componentfactory.tuigrid.model.AATContextMenu;
-import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.Component;
 import com.vaadin.flow.router.BeforeEnterEvent;
 
 import java.util.Optional;
@@ -114,14 +114,14 @@ public class StandardFormView extends CommonView {
         }
     }
 
-    public void addCustomButton(Button button) {
+    public void addCustomComponent(Component component) {
         if (form != null) {
-            form.addCustomComponent(-1, button);
+            form.addCustomComponent(-1, component);
         }
     }
-    public void addCustomButton(int index, Button button) {
-        if (form != null && form instanceof StandardForm) {
-            form.addCustomComponent(index, button);
+    public void addCustomComponent(int index, Component component) {
+        if (form != null) {
+            form.addCustomComponent(index, component);
         }
     }
 
