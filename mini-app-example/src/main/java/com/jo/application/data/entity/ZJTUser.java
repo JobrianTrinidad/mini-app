@@ -35,6 +35,11 @@ public class ZJTUser implements ZJTEntity {
     @CustomComponent(value = "Signature")
     private int adImageId;
 
+    @Column(name = "ad_camera_id")
+    @DisplayName(value = "Camera")
+    @CustomComponent(value = "Camera")
+    private int adCameraId;
+
     public int getAdImageId() {
         return adImageId;
     }
@@ -64,6 +69,11 @@ public class ZJTUser implements ZJTEntity {
         this.name = name;
     }
 
+    public int getAdCameraId() {
+        return adCameraId;
+    }
 
-
+    public void setAdCameraId(int adCameraId) {
+        this.adCameraId = adCameraId;
+    }
 }
