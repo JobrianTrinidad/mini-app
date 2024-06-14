@@ -54,6 +54,13 @@ public class MainLayout extends CoreMainLayout {
                 .withParameter("layout", this.getClass().getName()));
 
 
+        parent = new AppNavItem("Timeline Test");
+        parent.setIcon(LineAwesomeIcon.FOLDER.create());
+        parent.addItem(new AppNavItem("Vehicle Assignment", "vehicle-assignment", LineAwesomeIcon.BUS_SOLID.create())
+                .withParameter("layout", this.getClass().getName()));
+
+        nav.addItem(parent);
+
         parent = new AppNavItem("Transaction");
         parent.setIcon(LineAwesomeIcon.FOLDER.create());
         parent.addItem(new AppNavItem("Vehicle KM Reading", "vehiclekmreading", LineAwesomeIcon.PRODUCT_HUNT.create())
