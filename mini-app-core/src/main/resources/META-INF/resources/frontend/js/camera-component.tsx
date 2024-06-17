@@ -61,6 +61,7 @@ class CameraComponent extends LitElement {
         });
         roundButtonElement.addEventListener('click', () => {
             const dialog = document.createElement('file-dialog') as FileDialog;
+            dialog.style.width = "50%";
             dialog.fileMap = this.fileMap;
             document.body.appendChild(dialog);
             dialog.addEventListener('close-dialog', () => {
@@ -151,16 +152,6 @@ class CameraComponent extends LitElement {
                                 });
                                 this.dispatchEvent(imageSaveEvent);
                                 this.dispatchEvent(new CustomEvent('update-button-count'));
-                                // Clear only the successfully uploaded file from the vaadin-upload-file-list
-                                const fileList = uploadInput.querySelector('vaadin-upload-file-list') as HTMLInputElement;
-                                if (fileList) {
-                                    const fileItem = Array.from(fileList.items).find(item => item === file);
-                                    if (fileItem) {
-                                        if (fileList.items) {
-                                            fileList.items.delete(fileItem);
-                                        }
-                                    }
-                                }
                             } else {
                                 console.error('Failed to save image:', response.message);
                             }
@@ -309,13 +300,18 @@ class FileDialog extends LitElement {
     `;
     }
 
-    private renderDialog = () => html`
-    ${Array.from(this.fileMap).map(([id, file]) => html`
-      <div data-file-id="${id}" style="display: flex; justify-content: space-between; align-items: center; padding: 10px;">
-        <span style="padding-right: 10px;">${file.name}</span>
-        <button @click="${(event: Event) => this.deleteFile(event, id)}" style="background-color: transparent; border: none; align-self: flex-end; cursor: pointer">X</button>
-      </div>
-    `)}
+  private renderDialog = () => html`
+   <div class="flex-container" style="display: flex; flex-wrap: wrap; gap: 10px; max-width: 100%; max-height: 100%; overflow-y: auto;">
+      ${Array.from(this.fileMap).map(([id, file]) => html`
+        <div data-file-id="${id}" class="flex-item" style="display: flex; flex-direction: column; align-items: center; padding: 10px; width: 120px;">
+          <div style="position: relative; display: flex; flex-direction: column; align-items: center;">
+            <img src="data:image/png;base64,${file.fileData}" alt="${file.name}" style="width: 100px; height: 100px; margin-bottom: 5px;">
+            <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; background-color: rgba(0, 0, 0, 0.7); color: white; padding: 5px; width: 100px; text-align: center;" title="${file.name}">${file.name}</span>
+          </div>
+          <button @click="${(event: Event) => this.deleteFile(event, id)}" style="background-color: #ff5c5c; border: none; color: white; cursor: pointer; padding: 8px 15px; font-size: 14px; margin-top: 10px;">Delete</button>
+        </div>
+      `)}
+       </div>
   `;
 
     private renderFooter = () => html`
@@ -339,6 +335,15 @@ class FileDialog extends LitElement {
             }
         } as CustomEventInit<{ imageID: number }>);
         this.dispatchEvent(customEvent);
+    }
+
+   firstUpdated() {
+        const dialog = document.querySelector('vaadin-dialog-overlay')
+        const overlay = dialog.shadowRoot.querySelector('#overlay');
+        overlay.style.width = "80%";
+        overlay.style.height = "80%";
+        const content = dialog.shadowRoot.querySelector('#content');
+        content.style = "display: flex; flex-direction: column; height: 100%;";
     }
 
     public open() {

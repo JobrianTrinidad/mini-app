@@ -235,7 +235,10 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService> ex
                     break;
                 }
                 if (originHeaders.contains(allowedHeader)) {
-                    allowedWidths.add(colWidthsResized.get(originHeaders.indexOf(allowedHeader)));
+                    int hdrIndex = originHeaders.indexOf(allowedHeader);
+                    if(hdrIndex > 0 & colWidthsResized.size() > hdrIndex)
+                        allowedWidths.add(colWidthsResized.get(originHeaders.indexOf(allowedHeader)));
+                    else allowedWidths.add(0);
                 } else allowedWidths.add(0);
             }
 
