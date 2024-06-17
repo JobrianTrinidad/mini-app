@@ -1,9 +1,11 @@
 package com.jo.application.views;
 
+import com.jo.application.core.data.entity.ZJTEntity;
 import com.jo.application.core.form.TimeLineViewParameter;
 import com.jo.application.data.entity.ZJTDepot;
 import com.jo.application.data.entity.ZJTItem;
 import com.jo.application.data.entity.ZJTVehicle;
+import com.jo.application.data.entity.ZJTVehicleAssignment;
 import com.jo.application.data.repository.BaseEntityRepository;
 import com.jo.application.data.service.TableInfoService;
 import com.vaadin.flow.component.Component;
@@ -11,6 +13,7 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.router.*;
 
@@ -79,5 +82,21 @@ public class VehicleAssignmentView extends StandardFormView implements HasUrlPar
     private void filterByDepot()
     {
 
+    }
+
+    @Override
+    public void onTimelineItemUpdate(ZJTItem item) {
+        //Update ResourceAssignment here
+        //TODO findEntityById seems not working
+        ZJTVehicleAssignment assignment = (ZJTVehicleAssignment) this.repository.findEntityById(ZJTVehicleAssignment.class, item.getId());
+        ZJTVehicle vehicle = (ZJTVehicle) this.repository.findEntityById(ZJTVehicle.class, Integer.parseInt(item.getGroupId()));
+//        List<ZJTVehicleAssignment> assignments = (List<ZJTVehicleAssignment>) this.repository.findEntitiesByIds(ZJTVehicleAssignment.class, new int[]{item.getId()});
+//        List<ZJTVehicle> vehicles = (List<ZJTVehicle>) this.repository.findEntitiesByIds(ZJTVehicle.class, new int[]{ Integer.parseInt(item.getGroupId())});
+//        ZJTVehicleAssignment assignment = assignments.get(0);
+//        ZJTVehicle vehicle = vehicles.get(0);
+        assignment.setVehicle(vehicle);
+        this.repository.updateEntity(assignment);
+
+        Notification.show(assignment.getDescription() + " has been assigned to " + vehicle.getFleetid());
     }
 }

@@ -3,6 +3,7 @@ package com.jo.application.data.entity;
 
 import com.jo.application.annotations.DisplayName;
 import com.jo.application.annotations.timeline.StartDate;
+import com.jo.application.core.data.entity.ZJTEntity;
 import com.vaadin.flow.router.PageTitle;
 import jakarta.persistence.*;
 
@@ -11,7 +12,7 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "zjt_vehicleassignment")
 @PageTitle("Vehicle Assignment")
-public class ZJTVehicleAssignment {
+public class ZJTVehicleAssignment implements ZJTEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     @Column(name = "zjt_vehicleassignment_id")
@@ -55,9 +56,9 @@ public class ZJTVehicleAssignment {
     private boolean isTripComplete;
 
     //vehicle is in scheduled service - vehicle is automatically assigned
-    @Column(name="inservice")
-    @DisplayName(value = "In Service")
-    private boolean inService;
+    @Column(name="inmaintenance")
+    @DisplayName(value = "In Maintenance")
+    private boolean inMaintenance;
 
     public int getId() {
         return zjt_vehicleassignment_id;
@@ -127,11 +128,11 @@ public class ZJTVehicleAssignment {
         isTripComplete = tripComplete;
     }
 
-    public boolean isInService() {
-        return inService;
+    public boolean isInMaintenance() {
+        return inMaintenance;
     }
 
-    public void setInService(boolean inService) {
-        this.inService = inService;
+    public void setInMaintenance(boolean inMaintenance) {
+        this.inMaintenance = inMaintenance;
     }
 }
