@@ -1,6 +1,7 @@
 package com.jo.application.views;
 
 import com.jo.application.core.form.CommonForm;
+import com.jo.application.data.entity.ZJTItem;
 import com.jo.application.data.repository.BaseEntityRepository;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
@@ -25,6 +26,7 @@ public abstract class CommonView extends VerticalLayout implements RouterLayout,
 
     protected void setForm(CommonForm form) {
         try {
+            form.setCommonView(this);
             layout = (CoreMainLayout) LayoutClass.getDeclaredConstructor().newInstance();
             layout.setContent(form);
             layout.setHamburgerTitle(form.getHamburgerText());
@@ -68,4 +70,6 @@ public abstract class CommonView extends VerticalLayout implements RouterLayout,
     public String getPageTitle() {
         return "";
     }
+
+    public void onTimelineItemUpdate(ZJTItem item)  {}
 }

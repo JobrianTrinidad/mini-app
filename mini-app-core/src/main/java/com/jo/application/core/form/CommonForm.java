@@ -1,6 +1,7 @@
 package com.jo.application.core.form;
 
 import com.jo.application.core.data.entity.ZJTEntity;
+import com.jo.application.views.CommonView;
 import com.vaadin.componentfactory.tuigrid.TuiGrid;
 import com.vaadin.componentfactory.tuigrid.model.AATContextMenu;
 import com.vaadin.componentfactory.tuigrid.model.GuiItem;
@@ -29,6 +30,8 @@ public abstract class CommonForm extends VerticalLayout {
     protected final DatePicker endDatePicker = new DatePicker("");
     private final ComboBox<EnumDateFilter> dateFilterComboBox = new ComboBox<>("");
     protected HorizontalLayout dateFilter;
+
+    protected CommonView commonView;
 
     abstract public void onNewItem(GuiItem item);
 
@@ -156,5 +159,13 @@ public abstract class CommonForm extends VerticalLayout {
                 query.append(" AND DATE(p.").append(dateFilterOn)
                         .append(") < '").append(endDatePicker.getValue().plusDays(1).atStartOfDay()).append("'");
         }
+    }
+
+    public CommonView getCommonView() {
+        return commonView;
+    }
+
+    public void setCommonView(CommonView commonView) {
+        this.commonView = commonView;
     }
 }

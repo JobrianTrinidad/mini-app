@@ -444,9 +444,10 @@ public abstract class TimeLineForm<S extends ZJTService> extends CommonForm {
         ItemGroup group = groupComboBox.getValue();
 
         if (item != null && group != null) {
-//            item.setGroupId(String.valueOf(group.getGroupId()));
+            item.setGroupId(String.valueOf(group.getGroupId()));
             timeline.updateItemContent(String.valueOf(item.getId()), item.getTitle() + " " + String.valueOf(group.getGroupId()));
             timeline.updateItemGroup(String.valueOf(item.getId()), String.valueOf(group.getGroupId()));
+            getCommonView().onTimelineItemUpdate(item);
         }
     }
 }
