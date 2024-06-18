@@ -140,24 +140,32 @@ public abstract class CommonForm extends VerticalLayout {
         if (startDatePicker.getValue() != null
                 && endDatePicker.getValue() != null) {
             if (!startDatePicker.getValue().equals(endDatePicker.getValue())) {
-                query.append(" AND DATE(p.").append(dateFilterOn)
+                query.append(" DATE(p.").append(dateFilterOn)
                         .append(") >= '").append(startDatePicker.getValue().atStartOfDay()).append("'");
                 query.append(" AND DATE(p.").append(dateFilterOn)
                         .append(") < '").append(endDatePicker.getValue().plusDays(1).atStartOfDay()).append("'");
             } else {
-                query.append(" AND DATE(p.").append(dateFilterOn)
+                query.append(" DATE(p.").append(dateFilterOn)
                         .append(") >= '").append(startDatePicker.getValue().atStartOfDay()).append("'");
                 query.append(" AND DATE(p.").append(dateFilterOn)
                         .append(") < '").append(endDatePicker.getValue().plusDays(1).atStartOfDay()).append("'");
             }
 
         } else {
-            if (startDatePicker.getValue() != null)
-                query.append(" AND DATE(p.").append(dateFilterOn)
+            boolean addAndStatement = false;
+            if (startDatePicker.getValue() != null) {
+                query.append(" DATE(p.").append(dateFilterOn)
                         .append(") >= '").append(startDatePicker.getValue().atStartOfDay()).append("'");
-            if (endDatePicker.getValue() != null)
+                addAndStatement = true;
+            }
+            if (endDatePicker.getValue() != null) {
+                if (addAndStatement) {
+                    query.append(" AND ");
+                }
                 query.append(" AND DATE(p.").append(dateFilterOn)
                         .append(") < '").append(endDatePicker.getValue().plusDays(1).atStartOfDay()).append("'");
+            }
+
         }
     }
 
