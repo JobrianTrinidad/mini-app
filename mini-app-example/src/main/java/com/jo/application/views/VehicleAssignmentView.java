@@ -19,10 +19,13 @@ import com.vaadin.flow.router.*;
 
 import java.util.List;
 
+
 @Route(value = "vehicle-assignment/:subcategory?/:filter?", layout = MainLayout.class)
 public class VehicleAssignmentView extends StandardFormView implements HasUrlParameter<String> {
 
     TimeLineViewParameter timeLineViewParameter;
+    private ComboBox<ZJTDepot> depotComboBox = new ComboBox<>();
+
     public VehicleAssignmentView(BaseEntityRepository repository, TableInfoService tableInfoService) {
         super(repository, tableInfoService);
         timeLineViewParameter = new TimeLineViewParameter(new String[]{"description"}
@@ -37,6 +40,10 @@ public class VehicleAssignmentView extends StandardFormView implements HasUrlPar
         timeLineViewParameter.setDateFilterOn("startDate");
         timeLineViewParameter.setSelectDefinition("fleetid");
         timeLineViewParameter.setGroupSelectDefinition("fleetid");
+        timeLineViewParameter.setGroupWhereDefinitions(new String[]{"depot.zjt_depot_id"});
+        timeLineViewParameter.setParameters(new Object[]{0});
+        timeLineViewParameter.setWhereDefinitions(new String[]{"depot.zjt_depot_id"});
+
 //        timeLineViewParameter.setGroupCSSClass("classname");
         // css class is set to this field
         timeLineViewParameter.setGroupCSSClass("fuelcardname1");
@@ -66,22 +73,31 @@ public class VehicleAssignmentView extends StandardFormView implements HasUrlPar
         int[] allowedDepot = {1000003, 1000002};
         List<ZJTDepot> depots = (List<ZJTDepot>) this.repository.findEntitiesByIds(ZJTDepot.class, allowedDepot);
 
-        ComboBox<ZJTDepot> depotComboBox = new ComboBox<>();
         depotComboBox.setWidth("300px");
         depotComboBox.setItems(depots);
         depotComboBox.setItemLabelGenerator(ZJTDepot::getName);
+
+        depotComboBox.addValueChangeListener( e-> {
+            try {
+                filterByDepot();
+            } catch (Exception ex) {
+                throw new RuntimeException(ex);
+            }
+        });
+
         if (!depots.isEmpty()) {
             depotComboBox.setValue(depots.get(0));
+            timeLineViewParameter.setParameters(new Object[] {depots.get(0).getId()});
         }
         this.addCustomComponent(0, depotComboBox);
 
-        //TODO - add itemUpdated event listener to save entity
-        //form.addl
+
+
     }
 
-    private void filterByDepot()
-    {
-
+    private void filterByDepot() throws Exception {
+        timeLineViewParameter.setParameters(new Object[] {depotComboBox.getValue().getId()});
+        form.onUpdateForm();
     }
 
     @Override
