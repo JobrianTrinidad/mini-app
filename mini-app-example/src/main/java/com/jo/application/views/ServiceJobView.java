@@ -90,7 +90,7 @@ public class ServiceJobView extends StandardFormView implements HasUrlParameter<
                 TimeLineViewParameter timeLineViewParameter = new TimeLineViewParameter(new String[]{"vehicleServiceJob.comments"}, "vehicleServiceJob", new String[]{"planDate"});
                 timeLineViewParameter.setGroupClass(ZJTVehicleServiceJob.class);
                 timeLineViewParameter.setSelectDefinition("vehicle.fleetid");
-                timeLineViewParameter.setWhereDefinition("vehicleServiceJob.zjt_vehicleservicejob_id");
+                timeLineViewParameter.setWhereDefinitions(new String[]{"vehicleServiceJob.zjt_vehicleservicejob_id"});
 
                 switch (event.getRouteParameters().get("subcategory").get()) {
                     case "servicetype":

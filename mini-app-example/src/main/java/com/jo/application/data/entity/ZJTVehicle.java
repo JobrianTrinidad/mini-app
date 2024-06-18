@@ -106,6 +106,11 @@ public class ZJTVehicle implements ZJTEntity {
     @BaseItems
     private List<ZJTVehicleKMReading> kmReadings;
 
+    @ManyToOne
+    @JoinColumn(name = "zjt_depot_id")
+    @DisplayName(value = "Depot")
+    private ZJTDepot depot;
+
     @OneToMany(mappedBy = "vehicle", cascade = CascadeType.ALL)
     @BaseItems
     private List<ZJTVehicleServiceJob> vehicleServiceJobs;
@@ -273,5 +278,13 @@ public class ZJTVehicle implements ZJTEntity {
 
     public void setFleetid(String fleetid) {
         this.fleetid = fleetid;
+    }
+
+    public ZJTDepot getDepot() {
+        return depot;
+    }
+
+    public void setDepot(ZJTDepot depot) {
+        this.depot = depot;
     }
 }

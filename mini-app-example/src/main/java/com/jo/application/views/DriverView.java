@@ -20,7 +20,7 @@ public class DriverView<T extends ZJTEntity> extends StandardFormView implements
     public DriverView(BaseEntityRepository repository, TableInfoService tableInfoService) {
         super(repository, tableInfoService);
         TimeLineViewParameter timeLineViewParameter =  new TimeLineViewParameter(new String[]{"timelineItemTitle"}, "vehicle", new String[]{"planDate"}, null, null, "ZJTVehicleServiceSchedule");
-        timeLineViewParameter.setWhereDefinition("vehicle.zjt_vehicle_id");
+        timeLineViewParameter.setWhereDefinitions(new String[]{"vehicle.zjt_vehicle_id"});
         super.setTimeLineViewParameter(timeLineViewParameter);
         addMenu();
     }

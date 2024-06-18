@@ -98,7 +98,7 @@ public class VehicleServiceScheduleView extends StandardFormView implements HasU
                 TimeLineViewParameter timeLineViewParameter = new TimeLineViewParameter(new String[]{"vehicleServiceJob.vehicle.fleetid"}, "vehicleServiceJob.vehicle", new String[]{"vehicleServiceJob.planDate"});
                 timeLineViewParameter.setGroupClass(ZJTVehicleServiceSchedule.class);
                 timeLineViewParameter.setSelectDefinition("vehicleServiceJob.vehicle.fleetid");
-                timeLineViewParameter.setWhereDefinition("vehicleServiceJob.vehicle.zjt_vehicle_id");
+                timeLineViewParameter.setWhereDefinitions(new String[]{"vehicleServiceJob.vehicle.zjt_vehicle_id"});
                 timeLineViewParameter.setGroupSelectDefinition("vehicle.fleetid");
                 timeLineViewParameter.setGroupName("vehicleServiceJob");
 
