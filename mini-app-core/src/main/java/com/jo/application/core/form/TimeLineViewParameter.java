@@ -68,11 +68,15 @@ public class TimeLineViewParameter {
     private String fromDefinition = null;
 
     /**
-     * Add where condition if applicable
+     * Add where condition to load the items
      * e.g. d.orgid = ?
      */
-    private String whereDefinition = null;
     private String[] whereDefinitions = null;
+
+    /**
+     * Where condition to load group items
+     */
+    private String[] groupWhereDefinitions = null;
     private String selectDefinition = null;
     private String groupSelectDefinition = null;
 
@@ -117,7 +121,7 @@ public class TimeLineViewParameter {
      * @return
      */
     public boolean isRequireParameter() {
-        return whereDefinition != null;
+        return whereDefinitions.length > 0;
     }
 
     /**
@@ -196,14 +200,6 @@ public class TimeLineViewParameter {
 
     public void setFromDefinition(String fromDefinition) {
         this.fromDefinition = fromDefinition;
-    }
-
-    public String getWhereDefinition() {
-        return whereDefinition;
-    }
-
-    public void setWhereDefinition(String whereDefinition) {
-        this.whereDefinition = whereDefinition;
     }
 
     public String[] getWhereDefinitions() {
@@ -295,5 +291,13 @@ public class TimeLineViewParameter {
 
     public void setShowItemSelector(boolean showItemSelector) {
         isShowItemSelector = showItemSelector;
+    }
+
+    public String[] getGroupWhereDefinitions() {
+        return groupWhereDefinitions;
+    }
+
+    public void setGroupWhereDefinitions(String[] groupWhereDefinitions) {
+        this.groupWhereDefinitions = groupWhereDefinitions;
     }
 }
