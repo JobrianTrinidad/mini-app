@@ -54,11 +54,12 @@ public abstract class TimeLineForm<S extends ZJTService> extends CommonForm {
         configureTimeLine();
         try {
             configureToolbar();
+            addComponentAtIndex(0, toolbar);
+            configureItemSummary();
+            onUpdateForm();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        addComponentAtIndex(0, toolbar);
-        configureItemSummary();
     }
 
     /**
