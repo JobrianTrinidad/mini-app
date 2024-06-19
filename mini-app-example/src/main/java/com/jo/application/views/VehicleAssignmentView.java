@@ -1,6 +1,5 @@
 package com.jo.application.views;
 
-import com.jo.application.core.data.entity.ZJTEntity;
 import com.jo.application.core.form.TimeLineViewParameter;
 import com.jo.application.data.entity.ZJTDepot;
 import com.jo.application.data.entity.ZJTItem;
@@ -8,13 +7,9 @@ import com.jo.application.data.entity.ZJTVehicle;
 import com.jo.application.data.entity.ZJTVehicleAssignment;
 import com.jo.application.data.repository.BaseEntityRepository;
 import com.jo.application.data.service.TableInfoService;
-import com.vaadin.flow.component.Component;
-import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.combobox.ComboBox;
-import com.vaadin.flow.component.icon.Icon;
-import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.router.*;
 
 import java.util.List;
@@ -61,16 +56,15 @@ public class VehicleAssignmentView extends StandardFormView implements HasUrlPar
     }
 
     @Override
-    public void beforeEnter(BeforeEnterEvent event) {
-        super.beforeEnter(event);
-//        Button button = new Button();
+    public void initLayout() {
+        super.initLayout();
+        //        Button button = new Button();
 //        button.setIcon(new Icon(VaadinIcon.START_COG));
 //        button.setTooltipText("Filter by Depot");
 //        button.addClickListener(e -> filterByDepot());
 //        this.addCustomComponent(button);
-
         //TODO allowed ids coming from depot - user roles
-        int[] allowedDepot = {1000003, 1000002};
+        int[] allowedDepot = {1000002, 1000003};
         List<ZJTDepot> depots = (List<ZJTDepot>) this.repository.findEntitiesByIds(ZJTDepot.class, allowedDepot);
 
         depotComboBox.setWidth("300px");
@@ -87,16 +81,12 @@ public class VehicleAssignmentView extends StandardFormView implements HasUrlPar
 
         if (!depots.isEmpty()) {
             depotComboBox.setValue(depots.get(0));
-            timeLineViewParameter.setParameters(new Object[] {depots.get(0).getId()});
         }
         this.addCustomComponent(0, depotComboBox);
-
-
-
     }
 
     private void filterByDepot() throws Exception {
-        timeLineViewParameter.setParameters(new Object[] {depotComboBox.getValue().getId()});
+        timeLineViewParameter.setParameters(new Object[]{depotComboBox.getValue().getId()});
         form.onUpdateForm();
     }
 

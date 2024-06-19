@@ -56,13 +56,12 @@ public abstract class TimeLineForm<S extends ZJTService> extends CommonForm {
             configureToolbar();
             addComponentAtIndex(0, toolbar);
             configureItemSummary();
-            onUpdateForm();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
-    /**
+     /**
      *  Fillup contents of the toolbar
      * @throws Exception
      */
@@ -455,7 +454,6 @@ public abstract class TimeLineForm<S extends ZJTService> extends CommonForm {
     private List<ItemGroup> getGroupItems(List<Object[]> groupResults) {
         if (groupResults == null)
             return null;
-
         List<ItemGroup> itemGroups = new ArrayList<>();
         for (Object[] groupResult : groupResults) {
             ItemGroup itemGroup = new ItemGroup();
@@ -489,8 +487,11 @@ public abstract class TimeLineForm<S extends ZJTService> extends CommonForm {
     public void onUpdateForm() throws Exception {
         if (this.timeLineViewParameter == null)
             return;
-        timeline.setGroups(this.getGroupItems(configureGroup()));
-        timeline.setItems(this.getItems(true), true);
+
+        itemGroups = this.getGroupItems(configureGroup());
+        items = this.getItems(true);
+        timeline.setGroups(itemGroups);
+        timeline.setItems(items, true);
 
     }
 

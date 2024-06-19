@@ -72,4 +72,7 @@ public abstract class CommonView extends VerticalLayout implements RouterLayout,
     }
 
     public void onTimelineItemUpdate(ZJTItem item)  {}
+
+    public void initLayout() {
+    }
 }
