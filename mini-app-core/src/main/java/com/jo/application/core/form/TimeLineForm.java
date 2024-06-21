@@ -169,7 +169,7 @@ public abstract class TimeLineForm<S extends ZJTService> extends CommonForm {
                     break;
                 }
             }
-            if (gSelected != null) {
+            if (gSelected != null && !gSelected.equals(groupComboBox.getValue())) {
                 groupComboBox.setValue(gSelected);
             }
         });
@@ -188,12 +188,17 @@ public abstract class TimeLineForm<S extends ZJTService> extends CommonForm {
         });
 
         groupComboBox.addValueChangeListener( e-> {
-            //TODO - select
+            if(groupComboBox.getValue() != null) {
+                String groupId = groupComboBox.getValue().getGroupId() + "";
+                timeline.setSelectGroup(groupId);
+            }
         });
 
         itemComboBox.addValueChangeListener( e-> {
-            String itemId = itemComboBox.getValue().getId() + "";
-            timeline.onSelectItem(timeline, itemId, true);
+            if(itemComboBox.getValue() != null) {
+                String itemId = itemComboBox.getValue().getId() + "";
+                timeline.onSelectItem(timeline, itemId, true);
+            }
         });
 
 
