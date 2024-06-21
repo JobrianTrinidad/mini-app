@@ -143,11 +143,9 @@ public abstract class TimeLineForm<S extends ZJTService> extends CommonForm {
             return;
         }
 
-        groupComboBox.setItems(itemGroups);
         groupComboBox.setItemLabelGenerator(ItemGroup::getContent);
         groupComboBox.setWidth("250px");
 
-        itemComboBox.setItems(entityItems);
         itemComboBox.setItemLabelGenerator(ZJTItem::getTitle);
         itemComboBox.setWidth("750px");
 
@@ -493,6 +491,10 @@ public abstract class TimeLineForm<S extends ZJTService> extends CommonForm {
         timeline.setGroups(itemGroups);
         timeline.setItems(items, true);
 
+        if (timeLineViewParameter.isShowItemSelector()) {
+            groupComboBox.setItems(itemGroups);
+            itemComboBox.setItems(entityItems);
+        }
     }
 
     public HorizontalLayout getToolbar() {
