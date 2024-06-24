@@ -428,7 +428,8 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService> ex
 
             String headerName = this.gridViewParameter.getHeaderNames().get(header);
             int headerIndex = this.gridViewParameter.getHeaders().indexOf(header);
-            ColumnBaseOption baseOption = new ColumnBaseOption(nId++, headerName, header, (colWidths.size() > headerIndex) ? colWidths.get(headerIndex) : 0, "left", "");
+            int  columnWidth = (colWidths.size() > headerIndex && colWidths.get(headerIndex) > 0) ? colWidths.get(headerIndex) : getDefaultColumnWidth(header);
+            ColumnBaseOption baseOption = new ColumnBaseOption(nId++, headerName, header, columnWidth, "left", "");
             com.vaadin.componentfactory.tuigrid.model.Column column = new com.vaadin.componentfactory.tuigrid.model.Column(baseOption);
             column.setEditable(true);
             column.setSortable(true);
@@ -510,6 +511,29 @@ public abstract class StandardForm<T extends ZJTEntity, S extends ZJTService> ex
             columns.add(column);
         }
         return columns;
+    }
+
+    private int getDefaultColumnWidth(String header) {
+        int columnWidth = 0;
+        String columnType = this.gridViewParameter.getHeaderOptions().get(header);
+        if (columnType == null)
+            return columnWidth;
+        switch (columnType) {
+            case "check":
+                columnWidth = 100;
+                break;
+            case "CustomComponent":
+                String componentName = this.gridViewParameter.getHeaderOptions().get("CustomComponentName_" + header);
+                if (componentName.equalsIgnoreCase("Camera"))
+                    columnWidth = 350;
+                else if (componentName.equalsIgnoreCase("Signature"))
+                    columnWidth = 300;
+                break;
+            default:
+                columnWidth = 250;
+                break;
+        }
+        return columnWidth;
     }
 
     private void getToolbar() throws Exception {
