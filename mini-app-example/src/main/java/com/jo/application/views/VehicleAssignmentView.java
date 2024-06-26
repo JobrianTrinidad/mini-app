@@ -86,7 +86,7 @@ public class VehicleAssignmentView extends StandardFormView implements HasUrlPar
     }
 
     private void filterByDepot() throws Exception {
-        timeLineViewParameter.setParameters(new Object[]{depotComboBox.getValue().getId()});
+        timeLineViewParameter.setParameters(new Object[]{(depotComboBox.getValue() != null ? depotComboBox.getValue().getId() : 0)});
         form.onUpdateForm();
     }
 
@@ -96,6 +96,8 @@ public class VehicleAssignmentView extends StandardFormView implements HasUrlPar
         //TODO findEntityById seems not working
         ZJTVehicleAssignment assignment = (ZJTVehicleAssignment) this.repository.findEntityById(ZJTVehicleAssignment.class, item.getId());
         ZJTVehicle vehicle = (ZJTVehicle) this.repository.findEntityById(ZJTVehicle.class, Integer.parseInt(item.getGroupId()));
+        assignment.setStartDate(item.getStartTime());
+        assignment.setEndDate(item.getEndTime());
 //        List<ZJTVehicleAssignment> assignments = (List<ZJTVehicleAssignment>) this.repository.findEntitiesByIds(ZJTVehicleAssignment.class, new int[]{item.getId()});
 //        List<ZJTVehicle> vehicles = (List<ZJTVehicle>) this.repository.findEntitiesByIds(ZJTVehicle.class, new int[]{ Integer.parseInt(item.getGroupId())});
 //        ZJTVehicleAssignment assignment = assignments.get(0);

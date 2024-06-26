@@ -1,6 +1,5 @@
 package com.jo.application.core.form;
 
-import com.jo.application.annotations.timeline.Group;
 import com.jo.application.core.data.service.ZJTService;
 import com.jo.application.data.entity.ZJTItem;
 import com.jo.application.util.GlobalData;
@@ -11,6 +10,7 @@ import com.vaadin.componentfactory.timeline.model.ItemGroup;
 import com.vaadin.flow.component.Unit;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.ComboBox;
+import com.vaadin.flow.component.datetimepicker.DateTimePicker;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
@@ -35,6 +35,9 @@ public abstract class TimeLineForm<S extends ZJTService> extends CommonForm {
     protected S service;
     private final HorizontalLayout toolbar = new HorizontalLayout();
     private final HorizontalLayout itemSummaryLayout = new HorizontalLayout();
+
+    private final HorizontalLayout itemDateLayout = new HorizontalLayout();
+
     private String filteredValue = "";
 
 
@@ -44,6 +47,10 @@ public abstract class TimeLineForm<S extends ZJTService> extends CommonForm {
 
     ComboBox<ZJTItem> itemComboBox = new ComboBox<>();
     ComboBox<ItemGroup> groupComboBox = new ComboBox<>();
+
+    DateTimePicker datePickerStart = new DateTimePicker();
+
+    DateTimePicker datePickerEnd = new DateTimePicker();
 
     public TimeLineForm(TimeLineViewParameter timeLineViewParameter,
                         S service) {
@@ -156,8 +163,16 @@ public abstract class TimeLineForm<S extends ZJTService> extends CommonForm {
 
         itemSummaryLayout.add(itemComboBox, groupComboBox, button);
 
+        Button buttonDate = new Button();
+        buttonDate.setIcon(new Icon(VaadinIcon.CHEVRON_DOWN));
+        buttonDate.setTooltipText("Update item date range");
+        buttonDate.addClickListener(e -> updateItem());
+
+        itemDateLayout.add(datePickerStart, datePickerEnd, buttonDate);
 
         addComponentAtIndex(1, itemSummaryLayout);
+
+        addComponentAtIndex(2, itemDateLayout);
 
         //TODO - add listeners
         timeline.addGroupItemClickListener(e-> {
@@ -184,6 +199,8 @@ public abstract class TimeLineForm<S extends ZJTService> extends CommonForm {
             }
             if (iSelected != null) {
                 itemComboBox.setValue(iSelected);
+                datePickerStart.setValue(iSelected.getStartTime());
+                datePickerEnd.setValue(iSelected.getEndTime());
             }
         });
 
@@ -513,12 +530,18 @@ public abstract class TimeLineForm<S extends ZJTService> extends CommonForm {
     public void updateItem()
     {
         ZJTItem item = itemComboBox.getValue();
-        ItemGroup group = groupComboBox.getValue();
-
-        if (item != null && group != null) {
-            item.setGroupId(String.valueOf(group.getGroupId()));
-            timeline.updateItemContent(String.valueOf(item.getId()), item.getTitle() + " " + String.valueOf(group.getGroupId()));
-            timeline.updateItemGroup(String.valueOf(item.getId()), String.valueOf(group.getGroupId()));
+        if (item != null) {
+            ItemGroup group = groupComboBox.getValue();
+            if(group != null) {
+                item.setGroupId(String.valueOf(group.getGroupId()));
+                timeline.updateItemGroup(String.valueOf(item.getId()), String.valueOf(group.getGroupId()));
+                timeline.updateItemContent(String.valueOf(item.getId()), item.getTitle() + " " + String.valueOf(group.getGroupId()));
+            }
+            if(datePickerStart.getValue() != null && datePickerEnd.getValue() != null) {
+                item.setStartTime(datePickerStart.getValue());
+                item.setEndTime(datePickerEnd.getValue());
+                timeline.revertMove(String.valueOf(item.getId()), item.getStartTime(), item.getEndTime());
+            }
             getCommonView().onTimelineItemUpdate(item);
         }
     }
