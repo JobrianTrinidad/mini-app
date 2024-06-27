@@ -8,7 +8,7 @@
     <modules>
         <module>toast-ui-grid</module>
         <module>mini-app-core</module>
-        <module>mini-app-example</module>
+<!--        <module>mini-app-example</module>-->
     </modules>
     <name>mini-app</name>
     <description>mini-app-core component based on mini-app-core library</description>
