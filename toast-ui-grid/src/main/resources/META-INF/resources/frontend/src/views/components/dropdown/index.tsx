@@ -182,7 +182,6 @@ const DropDown: React.FC<DropDownProps & { onValueChange: (newValue: number) => 
          width: "91%",
            maxHeight: "200px",
            overflowY: "auto",
-           backgroundColor: "#fff",
            border: "1px solid #ccc",
            borderRadius: "4px",
            boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
