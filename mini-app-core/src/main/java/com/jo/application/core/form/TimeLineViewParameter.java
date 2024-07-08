@@ -87,6 +87,7 @@ public class TimeLineViewParameter {
     String groupName;
     private String pageName;
     private Object[] parameters;
+    private Object[] groupParameters;
     private String dateFilterOn;
 
     private String groupCSSClass = null;
@@ -299,5 +300,13 @@ public class TimeLineViewParameter {
 
     public void setGroupWhereDefinitions(String[] groupWhereDefinitions) {
         this.groupWhereDefinitions = groupWhereDefinitions;
+    }
+
+    public Object[] getGroupParameters() {
+        return groupParameters;
+    }
+
+    public void setGroupParameters(Object[] groupParameters) {
+        this.groupParameters = groupParameters;
     }
 }

@@ -11,6 +11,7 @@ import com.vaadin.flow.component.Unit;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.datetimepicker.DateTimePicker;
+import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
@@ -18,13 +19,13 @@ import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.dependency.CssImport;
 import org.apache.commons.lang3.ArrayUtils;
 
 import java.io.Serial;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+
 @CssImport(value = "./styles/timeline.css")
 public abstract class TimeLineForm<S extends ZJTService> extends CommonForm {
 
@@ -261,10 +262,10 @@ public abstract class TimeLineForm<S extends ZJTService> extends CommonForm {
         boolean addAndStatement = false;
         int i = 0;
         if (!ArrayUtils.isEmpty(timeLineViewParameter.getGroupWhereDefinitions())
-                && !ArrayUtils.isEmpty(timeLineViewParameter.getParameters())
-                && timeLineViewParameter.getParameters().length == timeLineViewParameter.getGroupWhereDefinitions().length
+                && !ArrayUtils.isEmpty(timeLineViewParameter.getGroupParameters())
+                && timeLineViewParameter.getGroupParameters().length == timeLineViewParameter.getGroupWhereDefinitions().length
         ) {
-            for (String where : timeLineViewParameter.getWhereDefinitions()) {
+            for (String where : timeLineViewParameter.getGroupWhereDefinitions()) {
                 if (addWhereStatement) {
                     query.append(" WHERE ");
                     addWhereStatement = false;
@@ -273,7 +274,7 @@ public abstract class TimeLineForm<S extends ZJTService> extends CommonForm {
                     query.append(" AND ");
                 }
 
-                query.append(" p.").append(where).append("=").append(timeLineViewParameter.getParameters()[i]);
+                query.append(" p.").append(where).append("=").append(timeLineViewParameter.getGroupParameters()[i]);
                 i++;
                 addAndStatement = true;
             }
@@ -425,7 +426,7 @@ public abstract class TimeLineForm<S extends ZJTService> extends CommonForm {
 //
 //        }
 
-        if (!ArrayUtils.isEmpty(timeLineViewParameter.getGroupWhereDefinitions())
+        if (!ArrayUtils.isEmpty(timeLineViewParameter.getWhereDefinitions())
                 && !ArrayUtils.isEmpty(parameters)
                 && timeLineViewParameter.getWhereDefinitions().length == parameters.length) {
             int i = 0;

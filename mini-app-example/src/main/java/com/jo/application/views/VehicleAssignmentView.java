@@ -7,7 +7,6 @@ import com.jo.application.data.entity.ZJTVehicle;
 import com.jo.application.data.entity.ZJTVehicleAssignment;
 import com.jo.application.data.repository.BaseEntityRepository;
 import com.jo.application.data.service.TableInfoService;
-import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.router.*;
@@ -37,6 +36,7 @@ public class VehicleAssignmentView extends StandardFormView implements HasUrlPar
         timeLineViewParameter.setGroupSelectDefinition("fleetid");
         timeLineViewParameter.setGroupWhereDefinitions(new String[]{"depot.zjt_depot_id"});
         timeLineViewParameter.setParameters(new Object[]{0});
+        timeLineViewParameter.setGroupParameters(new Object[]{0});
         timeLineViewParameter.setWhereDefinitions(new String[]{"depot.zjt_depot_id"});
 
 //        timeLineViewParameter.setGroupCSSClass("classname");
@@ -44,6 +44,7 @@ public class VehicleAssignmentView extends StandardFormView implements HasUrlPar
         timeLineViewParameter.setGroupCSSClass("fuelcardname1");
         timeLineViewParameter.setShowItemSelector(true);  //to test this feature
         super.setTimeLineViewParameter(timeLineViewParameter);
+
     }
 
     @Override
@@ -86,7 +87,9 @@ public class VehicleAssignmentView extends StandardFormView implements HasUrlPar
     }
 
     private void filterByDepot() throws Exception {
-        timeLineViewParameter.setParameters(new Object[]{(depotComboBox.getValue() != null ? depotComboBox.getValue().getId() : 0)});
+        Object[] depotID = {(depotComboBox.getValue() != null ? depotComboBox.getValue().getId() : 0)};
+        timeLineViewParameter.setParameters(depotID);
+        timeLineViewParameter.setGroupParameters(depotID);
         form.onUpdateForm();
     }
 
