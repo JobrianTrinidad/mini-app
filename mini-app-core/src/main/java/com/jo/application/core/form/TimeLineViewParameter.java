@@ -93,6 +93,12 @@ public class TimeLineViewParameter {
     private String groupCSSClass = null;
 
     /**
+     * true = items are displayed as stacked
+     *      =  items will be stacked on top of each other such that they do not overlap
+     */
+    private boolean stack = false;
+
+    /**
      * This is to test if the definition is valid or not
      * this assists the developer if the call is valid
      *
@@ -308,5 +314,13 @@ public class TimeLineViewParameter {
 
     public void setGroupParameters(Object[] groupParameters) {
         this.groupParameters = groupParameters;
+    }
+
+    public boolean isStack() {
+        return stack;
+    }
+
+    public void setStack(boolean stack) {
+        this.stack = stack;
     }
 }

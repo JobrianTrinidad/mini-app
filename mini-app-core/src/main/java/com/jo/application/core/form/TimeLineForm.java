@@ -309,7 +309,7 @@ public abstract class TimeLineForm<S extends ZJTService> extends CommonForm {
         timeline.setMultiselect(true);
         timeline.setVerticalScroll(true);
         timeline.setAxisOrientation(AxisOrientation.BOTH);
-        timeline.setStack(true);
+        timeline.setStack(this.timeLineViewParameter.isStack());
         timeline.setWidthFull();
         timeline.addItemAddListener(e -> {
             ZJTItem zjtItem = new ZJTItem();
