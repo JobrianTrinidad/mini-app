@@ -518,6 +518,8 @@ public abstract class TimeLineForm<S extends ZJTService> extends CommonForm {
             groupComboBox.setItems(itemGroups);
             itemComboBox.setItems(entityItems);
         }
+        if (startDatePicker.getValue() != null && endDatePicker.getValue() != null)
+            timeline.moveWindowTo(startDatePicker.getValue().atStartOfDay(), endDatePicker.getValue().atStartOfDay());
     }
 
     public HorizontalLayout getToolbar() {
