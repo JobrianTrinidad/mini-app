@@ -71,4 +71,9 @@ public class CustomCompCommonForm<T extends ZJTEntity> extends CustomComponentFo
     public void onUpdateForm() throws Exception {
 
     }
+
+    @Override
+    public void onUpdateTimeWindow() throws Exception {
+
+    }
 }

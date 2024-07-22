@@ -22,7 +22,9 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import org.apache.commons.lang3.ArrayUtils;
 
 import java.io.Serial;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -69,8 +71,9 @@ public abstract class TimeLineForm<S extends ZJTService> extends CommonForm {
         }
     }
 
-     /**
-     *  Fillup contents of the toolbar
+    /**
+     * Fillup contents of the toolbar
+     *
      * @throws Exception
      */
     private void configureToolbar() throws Exception {
@@ -144,8 +147,7 @@ public abstract class TimeLineForm<S extends ZJTService> extends CommonForm {
             toolbar.add(dateFilter);
     }
 
-    private void configureItemSummary()
-    {
+    private void configureItemSummary() {
         if (!timeLineViewParameter.isShowItemSelector()) {
             //don't do anything
             return;
@@ -176,7 +178,7 @@ public abstract class TimeLineForm<S extends ZJTService> extends CommonForm {
         addComponentAtIndex(2, itemDateLayout);
 
         //TODO - add listeners
-        timeline.addGroupItemClickListener(e-> {
+        timeline.addGroupItemClickListener(e -> {
 //            int groupID = Integer.parseInt(e.getGroupId());
             ItemGroup gSelected = null;
             for (ItemGroup group : itemGroups) {
@@ -190,7 +192,7 @@ public abstract class TimeLineForm<S extends ZJTService> extends CommonForm {
             }
         });
 
-        timeline.addItemSelectListener(e-> {
+        timeline.addItemSelectListener(e -> {
             ZJTItem iSelected = null;
             for (ZJTItem item : entityItems) {
                 if (item.getId() == Integer.parseInt(e.getItemId())) {
@@ -205,15 +207,15 @@ public abstract class TimeLineForm<S extends ZJTService> extends CommonForm {
             }
         });
 
-        groupComboBox.addValueChangeListener( e-> {
-            if(groupComboBox.getValue() != null) {
+        groupComboBox.addValueChangeListener(e -> {
+            if (groupComboBox.getValue() != null) {
                 String groupId = groupComboBox.getValue().getGroupId() + "";
                 timeline.setSelectGroup(groupId);
             }
         });
 
-        itemComboBox.addValueChangeListener( e-> {
-            if(itemComboBox.getValue() != null) {
+        itemComboBox.addValueChangeListener(e -> {
+            if (itemComboBox.getValue() != null) {
                 String itemId = itemComboBox.getValue().getId() + "";
                 timeline.onSelectItem(timeline, itemId, true);
             }
@@ -221,6 +223,7 @@ public abstract class TimeLineForm<S extends ZJTService> extends CommonForm {
 
 
     }
+
     private List<Object[]> configureGroup() throws Exception {
         if (!timeLineViewParameter.isValid()) {
             throw new Exception("Timeline parameter Definition is not valid.");
@@ -230,8 +233,8 @@ public abstract class TimeLineForm<S extends ZJTService> extends CommonForm {
 //        }
 
         StringBuilder query = new StringBuilder("SELECT p.")
-            .append(timeLineViewParameter.getGroupClassPKField())
-            .append(", p.").append(timeLineViewParameter.getGroupSelectDefinition());
+                .append(timeLineViewParameter.getGroupClassPKField())
+                .append(", p.").append(timeLineViewParameter.getGroupSelectDefinition());
 
 
         if (timeLineViewParameter.getGroupCSSClass() == null) {
@@ -333,6 +336,13 @@ public abstract class TimeLineForm<S extends ZJTService> extends CommonForm {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+
+        timeline.addWindowRangeChangedListener(event -> {
+            if (!endDatePicker.getValue().isEqual(event.getNewEnd().toLocalDate()))
+                endDatePicker.setValue(event.getNewEnd().toLocalDate());
+            if (!(startDatePicker.getValue().isEqual(event.getNewStart().plusDays(1).toLocalDate()) || startDatePicker.getValue().isEqual(event.getNewStart().toLocalDate())))
+                startDatePicker.setValue(event.getNewStart().toLocalDate());
+        });
     }
 
     /**
@@ -386,7 +396,7 @@ public abstract class TimeLineForm<S extends ZJTService> extends CommonForm {
 
     private String getStandardQuery(Object[] parameters) throws Exception {
         StringBuilder query = new StringBuilder("SELECT ");
-        boolean  addAndStatement = false;
+        boolean addAndStatement = false;
         boolean addWhereStatement = true;
 
         //ID must be mandatory - otherwise you'll not be able to identify the item
@@ -412,7 +422,7 @@ public abstract class TimeLineForm<S extends ZJTService> extends CommonForm {
         //much check pairing of series
         for (String startDateFieldName : timeLineViewParameter.getStartDateFieldNames()) {
             query.append(", p.").append(startDateFieldName).append(" AS startDate").append(count);
-            String endDateFieldName =  timeLineViewParameter.getEndDateFieldName()[count];
+            String endDateFieldName = timeLineViewParameter.getEndDateFieldName()[count];
             query.append(", p.").append(endDateFieldName).append(" AS endDate").append(count);
             count++;
         }
@@ -505,6 +515,18 @@ public abstract class TimeLineForm<S extends ZJTService> extends CommonForm {
     }
 
     @Override
+    public void onUpdateTimeWindow() throws Exception {
+        LocalDate start = startDatePicker.getValue();
+        LocalDate end = endDatePicker.getValue();
+        if (timeline != null && start != null && end != null && (start.isEqual(end) || start.isBefore(end))) {
+            if (start.isEqual(end))
+                timeline.moveWindowTo(start.atStartOfDay(), LocalDateTime.of(end, LocalTime.MAX));
+            else
+                timeline.moveWindowTo(start.atStartOfDay(), end.atStartOfDay());
+        }
+    }
+
+    @Override
     public void onUpdateForm() throws Exception {
         if (this.timeLineViewParameter == null)
             return;
@@ -518,8 +540,7 @@ public abstract class TimeLineForm<S extends ZJTService> extends CommonForm {
             groupComboBox.setItems(itemGroups);
             itemComboBox.setItems(entityItems);
         }
-        if (startDatePicker.getValue() != null && endDatePicker.getValue() != null)
-            timeline.moveWindowTo(startDatePicker.getValue().atStartOfDay(), endDatePicker.getValue().atStartOfDay());
+
     }
 
     public HorizontalLayout getToolbar() {

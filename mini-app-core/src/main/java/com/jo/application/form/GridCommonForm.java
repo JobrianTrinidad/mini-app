@@ -20,4 +20,9 @@ public class GridCommonForm<T extends ZJTEntity> extends StandardForm<T, ZJTServ
         super.addCustomComponent(index, component);
     }
 
+    @Override
+    public void onUpdateTimeWindow() throws Exception {
+
+    }
+
 }

@@ -55,6 +55,8 @@ public abstract class CommonForm extends VerticalLayout {
 
     abstract public void onUpdateForm() throws Exception;
 
+    abstract public void onUpdateTimeWindow() throws Exception;
+
     public CommonForm() {
         startDatePicker.addValueChangeListener(e -> {
             try {
@@ -62,9 +64,8 @@ public abstract class CommonForm extends VerticalLayout {
                     if (e.getValue() != null && !e.getValue().atStartOfDay().isEqual(endDatePicker.getValue().atStartOfDay())
                             && !e.getValue().atStartOfDay().isBefore(endDatePicker.getValue().atStartOfDay())) {
                         endDatePicker.setValue(e.getValue().plusMonths(1));
-                    } else {
-                        this.filterByDate(e.getValue().atStartOfDay(), endDatePicker.getValue().atStartOfDay());
                     }
+                    this.filterByDate(e.getValue().atStartOfDay(), endDatePicker.getValue().atStartOfDay());
                 }
                 else
                     this.filterByDate(e.getValue().atStartOfDay(), null);
@@ -139,6 +140,7 @@ public abstract class CommonForm extends VerticalLayout {
                 return;
             }
         }
+        onUpdateTimeWindow();
         onUpdateForm();
     }
 
