@@ -10,6 +10,7 @@ import com.vaadin.componentfactory.timeline.model.ItemGroup;
 import com.vaadin.flow.component.Unit;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.ComboBox;
+import com.vaadin.flow.component.combobox.MultiSelectComboBox;
 import com.vaadin.flow.component.datetimepicker.DateTimePicker;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.html.Div;
@@ -25,8 +26,8 @@ import java.io.Serial;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @CssImport(value = "./styles/timeline.css")
 public abstract class TimeLineForm<S extends ZJTService> extends CommonForm {
@@ -48,7 +49,7 @@ public abstract class TimeLineForm<S extends ZJTService> extends CommonForm {
     List<Item> items;
     List<ItemGroup> itemGroups;
 
-    ComboBox<ZJTItem> itemComboBox = new ComboBox<>();
+    MultiSelectComboBox<ZJTItem> itemComboBox = new MultiSelectComboBox<>();
     ComboBox<ItemGroup> groupComboBox = new ComboBox<>();
 
     DateTimePicker datePickerStart = new DateTimePicker();
@@ -162,7 +163,7 @@ public abstract class TimeLineForm<S extends ZJTService> extends CommonForm {
         Button button = new Button();
         button.setIcon(new Icon(VaadinIcon.CHEVRON_DOWN));
         button.setTooltipText("Assign item to group");
-        button.addClickListener(e -> updateItem());
+        button.addClickListener(e -> updateItemGroup());
 
         itemSummaryLayout.add(itemComboBox, groupComboBox, button);
 
@@ -179,7 +180,6 @@ public abstract class TimeLineForm<S extends ZJTService> extends CommonForm {
 
         //TODO - add listeners
         timeline.addGroupItemClickListener(e -> {
-//            int groupID = Integer.parseInt(e.getGroupId());
             ItemGroup gSelected = null;
             for (ItemGroup group : itemGroups) {
                 if (group.getGroupId() == Integer.parseInt(e.getGroupId())) {
@@ -193,17 +193,29 @@ public abstract class TimeLineForm<S extends ZJTService> extends CommonForm {
         });
 
         timeline.addItemSelectListener(e -> {
-            ZJTItem iSelected = null;
+            List<String> selecteItems = Arrays.asList(e.getItemId().split(","));
+            List<ZJTItem> iSelectedItems = new ArrayList<>();
             for (ZJTItem item : entityItems) {
-                if (item.getId() == Integer.parseInt(e.getItemId())) {
-                    iSelected = item;
-                    break;
+                if (selecteItems.contains(String.valueOf(item.getId()))) {
+                    iSelectedItems.add(item);
                 }
             }
-            if (iSelected != null) {
-                itemComboBox.setValue(iSelected);
-                datePickerStart.setValue(iSelected.getStartTime());
-                datePickerEnd.setValue(iSelected.getEndTime());
+            if (!iSelectedItems.isEmpty()) {
+                itemComboBox.setValue(iSelectedItems);
+                datePickerStart.setValue(iSelectedItems.get(iSelectedItems.size() - 1).getStartTime());
+                datePickerEnd.setValue(iSelectedItems.get(iSelectedItems.size() - 1).getEndTime());
+            }
+        });
+
+        timeline.addGroupItemSelectListener(e -> {
+            List<ZJTItem> selectItems = new ArrayList<>();
+            for (ZJTItem item : entityItems) {
+                if (item.getGroupId().equalsIgnoreCase(e.getGroupId())) {
+                    selectItems.add(item);
+                }
+            }
+            if (!selectItems.isEmpty()) {
+                itemComboBox.setValue(selectItems);
             }
         });
 
@@ -216,7 +228,10 @@ public abstract class TimeLineForm<S extends ZJTService> extends CommonForm {
 
         itemComboBox.addValueChangeListener(e -> {
             if (itemComboBox.getValue() != null) {
-                String itemId = itemComboBox.getValue().getId() + "";
+                String itemId = itemComboBox.getValue().stream()
+                        .filter(Objects::nonNull) // Filter out null items
+                        .map(item -> String.valueOf(item.getId()))
+                        .collect(Collectors.joining(","));
                 timeline.onSelectItem(timeline, itemId, true);
             }
         });
@@ -553,20 +568,30 @@ public abstract class TimeLineForm<S extends ZJTService> extends CommonForm {
      */
     public void updateItem()
     {
-        ZJTItem item = itemComboBox.getValue();
-        if (item != null) {
-            ItemGroup group = groupComboBox.getValue();
-            if(group != null) {
-                item.setGroupId(String.valueOf(group.getGroupId()));
-                timeline.updateItemGroup(String.valueOf(item.getId()), String.valueOf(group.getGroupId()));
-                timeline.updateItemContent(String.valueOf(item.getId()), item.getTitle() + " " + String.valueOf(group.getGroupId()));
-            }
-            if(datePickerStart.getValue() != null && datePickerEnd.getValue() != null) {
+        Set<ZJTItem> items = itemComboBox.getValue();
+        for(ZJTItem item : items) {
+            if (item != null && datePickerStart.getValue() != null && datePickerEnd.getValue() != null) {
                 item.setStartTime(datePickerStart.getValue());
                 item.setEndTime(datePickerEnd.getValue());
                 timeline.revertMove(String.valueOf(item.getId()), item.getStartTime(), item.getEndTime());
+                getCommonView().onTimelineItemUpdate(item);
             }
-            getCommonView().onTimelineItemUpdate(item);
+        }
+    }
+
+    public void updateItemGroup()
+    {
+        Set<ZJTItem> items = itemComboBox.getValue();
+        for(ZJTItem item : items) {
+            if (item != null) {
+                ItemGroup group = groupComboBox.getValue();
+                if (group != null) {
+                    item.setGroupId(String.valueOf(group.getGroupId()));
+                    timeline.updateItemGroup(String.valueOf(item.getId()), String.valueOf(group.getGroupId()));
+                    timeline.updateItemContent(String.valueOf(item.getId()), item.getTitle() + " " + String.valueOf(group.getGroupId()));
+                    getCommonView().onTimelineItemUpdate(item);
+                }
+            }
         }
     }
 }
