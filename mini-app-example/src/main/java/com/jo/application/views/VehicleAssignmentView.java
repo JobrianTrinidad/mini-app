@@ -8,17 +8,20 @@ import com.jo.application.data.entity.ZJTVehicleAssignment;
 import com.jo.application.data.repository.BaseEntityRepository;
 import com.jo.application.data.service.TableInfoService;
 import com.vaadin.flow.component.combobox.ComboBox;
+import com.vaadin.flow.component.combobox.MultiSelectComboBox;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.router.*;
 
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 
 @Route(value = "vehicle-assignment/:subcategory?/:filter?", layout = MainLayout.class)
 public class VehicleAssignmentView extends StandardFormView implements HasUrlParameter<String> {
 
     TimeLineViewParameter timeLineViewParameter;
-    private ComboBox<ZJTDepot> depotComboBox = new ComboBox<>();
+    private MultiSelectComboBox<ZJTDepot> depotComboBox = new MultiSelectComboBox<ZJTDepot>();
 
     public VehicleAssignmentView(BaseEntityRepository repository, TableInfoService tableInfoService) {
         super(repository, tableInfoService);
@@ -87,7 +90,7 @@ public class VehicleAssignmentView extends StandardFormView implements HasUrlPar
     }
 
     private void filterByDepot() throws Exception {
-        Object[] depotID = {(depotComboBox.getValue() != null ? depotComboBox.getValue().getId() : 0)};
+        Object[] depotID = {(depotComboBox.getValue() != null ? (depotComboBox.getValue().stream().filter(Objects::nonNull).map(ZJTDepot::getId).collect(Collectors.toList())) : 0) };
         timeLineViewParameter.setParameters(depotID);
         timeLineViewParameter.setGroupParameters(depotID);
         form.onUpdateForm();

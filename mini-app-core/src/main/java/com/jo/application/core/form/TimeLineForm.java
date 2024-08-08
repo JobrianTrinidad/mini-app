@@ -195,15 +195,23 @@ public abstract class TimeLineForm<S extends ZJTService> extends CommonForm {
         timeline.addItemSelectListener(e -> {
             List<String> selecteItems = Arrays.asList(e.getItemId().split(","));
             List<ZJTItem> iSelectedItems = new ArrayList<>();
+            HashSet<String> gSelectedItems = new HashSet<String>();
             for (ZJTItem item : entityItems) {
                 if (selecteItems.contains(String.valueOf(item.getId()))) {
                     iSelectedItems.add(item);
+                    gSelectedItems.add(item.getGroupId());
                 }
             }
             if (!iSelectedItems.isEmpty()) {
                 itemComboBox.setValue(iSelectedItems);
-                datePickerStart.setValue(iSelectedItems.get(iSelectedItems.size() - 1).getStartTime());
-                datePickerEnd.setValue(iSelectedItems.get(iSelectedItems.size() - 1).getEndTime());
+                if (gSelectedItems.size() == 1) {
+                    datePickerStart.setValue(iSelectedItems.get(0).getStartTime());
+                    datePickerEnd.setValue(iSelectedItems.get(0).getEndTime());
+                } else {
+                    datePickerStart.setValue(null);
+                    datePickerEnd.setValue(null);
+                    groupComboBox.setValue(null);
+                }
             }
         });
 
@@ -291,8 +299,19 @@ public abstract class TimeLineForm<S extends ZJTService> extends CommonForm {
                 if (addAndStatement) {
                     query.append(" AND ");
                 }
-
-                query.append(" p.").append(where).append("=").append(timeLineViewParameter.getGroupParameters()[i]);
+                if(timeLineViewParameter.getGroupParameters()[i] instanceof List<?>)
+                {
+                    List<?> parameters = (List<?>) timeLineViewParameter.getGroupParameters()[i];
+                    // Convert the list to a comma-separated string of values
+                    String inClause = parameters.stream()
+                            .map(Object::toString) // Convert each item to a string
+                            .collect(Collectors.joining(", ", "(", ")")); // Format with parentheses
+                    // Append the IN clause to the query
+                    query.append(" p.").append(where).append(" IN ").append(inClause);
+                }
+                else {
+                    query.append(" p.").append(where).append("=").append(timeLineViewParameter.getGroupParameters()[i]);
+                }
                 i++;
                 addAndStatement = true;
             }
@@ -463,7 +482,18 @@ public abstract class TimeLineForm<S extends ZJTService> extends CommonForm {
                 if (addAndStatement) {
                     query.append(" AND ");
                 }
-                query.append(" p.").append(where).append("=").append(parameters[i]);
+                if(timeLineViewParameter.getGroupParameters()[i] instanceof List<?>)
+                {
+                    List<?> lparameters = (List<?>) parameters[i];
+                    // Convert the list to a comma-separated string of values
+                    String inClause = lparameters.stream()
+                            .map(Object::toString) // Convert each item to a string
+                            .collect(Collectors.joining(", ", "(", ")")); // Format with parentheses
+                    // Append the IN clause to the query
+                    query.append(" p.").append(where).append(" IN ").append(inClause);
+                } else {
+                    query.append(" p.").append(where).append("=").append(parameters[i]);
+                }
                 i++;
                 addAndStatement = true;
             }
