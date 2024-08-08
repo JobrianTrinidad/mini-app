@@ -2,12 +2,6 @@
     z-index: 2;
 }
 
-.timeline .vis-item.vis-selected {
-    z-index: 3;
-    border-color: #000000;
-    border-width: 3px;
-}
-
 .timeline .vis-timeline {
 	overflow-y: visible;
     overflow-x: clip;
@@ -29,10 +23,51 @@
 .vis-label {
 	min-width: 100px;
 }
+
+.vis-item {
+  height:12px;
+  font-size:8px;
+  top : 2px !important;
+}
+
+.vis-item-content {
+    padding: 0px !important;
+}
+
 .vis-label.vis-group-level-0.coach-owned {
 	background: gray;
 }
 
+.coach-owned, .coach-hired {
+    padding: 0px;
+    margin: 0px;
+    font-size: 9px;
+}
+
 .vis-label.vis-group-level-0.coach-hired {
 	background: lightgray;
+}
+
+.vis-label .vis-inner {
+  height: 10px;
+}
+
+.vis-labelset .vis-label:last-child {
+	border-bottom: 1px solid #bfbfbf !important;
+}
+
+.vis-panel.vis-left {
+	background: gray;
+}
+
+.vis-foreground .vis-group:last-child {
+	border-bottom: 1px solid #bfbfbf !important;
+}
+
+.vis-label.vis-group-selected .vis-inner {
+	color: red;
+}
+
+.vis-label.vis-group-selected {
+	border: white 1px solid !important;
 }
