@@ -1,6 +1,7 @@
 package com.jo.application.core.form;
 
 import com.jo.application.util.GlobalData;
+import com.vaadin.componentfactory.timeline.model.AxisOrientation;
 import com.vaadin.flow.router.PageTitle;
 
 /**
@@ -97,6 +98,8 @@ public class TimeLineViewParameter {
      *      =  items will be stacked on top of each other such that they do not overlap
      */
     private boolean stack = false;
+
+    private AxisOrientation axisOrientation = AxisOrientation.TOP;
 
     /**
      * This is to test if the definition is valid or not
@@ -322,5 +325,13 @@ public class TimeLineViewParameter {
 
     public void setStack(boolean stack) {
         this.stack = stack;
+    }
+
+    public AxisOrientation getAxisOrientation() {
+        return axisOrientation;
+    }
+
+    public void setAxisOrientation(AxisOrientation axisOrientation) {
+        this.axisOrientation = axisOrientation;
     }
 }
