@@ -37,12 +37,15 @@
 	background: gray;
 }
 
-.coach-owned, .coach-hired {
+.coach-owned, .coach-hired, .coach-unassigned {
     padding: 0px;
     margin: 0px;
     font-size: 9px;
 }
 
+.vis-label.vis-group-level-0.coach-unassigned {
+	background: white;
+}
 .vis-label.vis-group-level-0.coach-hired {
 	background: lightgray;
 }
