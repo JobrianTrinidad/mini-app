@@ -33,3 +33,28 @@
    background-color: white !important;
 }
 
+vaadin-multi-select-combo-box, vaadin-combo-box
+{
+    --lumo-text-field-size: var(--lumo-size-xs);
+    --lumo-button-size: var(--lumo-size-xs);
+     font-size: 8px;
+}
+
+vaadin-multi-select-combo-box-overlay vaadin-multi-select-combo-box-item {
+    height: 8px;
+    line-height: 8px;
+    padding: 0px;
+    font-size: 8px;
+}
+
+vaadin-date-picker, vaadin-date-time-picker,
+vaadin-button, vaadin-time-picker, vaadin-multi-select-combo-box-chip,
+vaadin-horizontal-layout, .vis-text  {
+    --lumo-text-field-size: var(--lumo-size-xs);
+    --lumo-button-size: var(--lumo-size-xs);
+     font-size: 8px;
+}
+
+.vis-item-content {
+    transform: translate(0px, -2px);
+}

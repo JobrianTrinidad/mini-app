@@ -73,3 +73,20 @@
 .vis-label.vis-group-selected {
 	border: white 1px solid !important;
 }
+
+.vis-label {
+    position: relative;
+}
+
+.vis-label .icon-collapsed, .vis-label .icon-expanded {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 10px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    height: 98%;
+    color: white;
+}
