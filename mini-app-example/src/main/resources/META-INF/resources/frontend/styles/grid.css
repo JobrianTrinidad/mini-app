@@ -55,6 +55,10 @@ vaadin-horizontal-layout, .vis-text  {
      font-size: 8px;
 }
 
+vaadin-vertical-layout {
+    gap: var(--lumo-space-xs);
+}
+
 .vis-item-content {
     transform: translate(0px, -2px);
 }

@@ -155,28 +155,29 @@ public abstract class TimeLineForm<S extends ZJTService> extends CommonForm {
         }
 
         groupComboBox.setItemLabelGenerator(ItemGroup::getContent);
-        groupComboBox.setWidth("250px");
+        groupComboBox.setWidth("200px");
 
         itemComboBox.setItemLabelGenerator(ZJTItem::getTitle);
-        itemComboBox.setWidth("750px");
+        itemComboBox.setWidth("600px");
 
         Button button = new Button();
         button.setIcon(new Icon(VaadinIcon.CHEVRON_DOWN));
         button.setTooltipText("Assign item to group");
         button.addClickListener(e -> updateItemGroup());
 
-        itemSummaryLayout.add(itemComboBox, groupComboBox, button);
+        itemSummaryLayout.add(itemComboBox, groupComboBox, datePickerStart, datePickerEnd,  button);
 
-        Button buttonDate = new Button();
-        buttonDate.setIcon(new Icon(VaadinIcon.CHEVRON_DOWN));
-        buttonDate.setTooltipText("Update item date range");
-        buttonDate.addClickListener(e -> updateItem());
+//        update within updateItemGroup
+//        Button buttonDate = new Button();
+//        buttonDate.setIcon(new Icon(VaadinIcon.CHEVRON_DOWN));
+//        buttonDate.setTooltipText("Update item date range");
+//        buttonDate.addClickListener(e -> updateItem());
 
-        itemDateLayout.add(datePickerStart, datePickerEnd, buttonDate);
+//        itemDateLayout.add(datePickerStart, datePickerEnd, buttonDate);
 
         addComponentAtIndex(1, itemSummaryLayout);
 
-        addComponentAtIndex(2, itemDateLayout);
+//        addComponentAtIndex(2, itemDateLayout);
 
         //TODO - add listeners
         timeline.addGroupItemClickListener(e -> {
@@ -341,7 +342,7 @@ public abstract class TimeLineForm<S extends ZJTService> extends CommonForm {
 
         //height must be specified otherwise timeline will just expand beyond screen size
         //TODO - must adjust based on screen resolution
-        timeline.setHeight("800px");
+        timeline.setHeight("840px");
 
         timeline.setMultiselect(true);
         timeline.setVerticalScroll(true);
@@ -623,5 +624,7 @@ public abstract class TimeLineForm<S extends ZJTService> extends CommonForm {
                 }
             }
         }
+
+        updateItem();
     }
 }
