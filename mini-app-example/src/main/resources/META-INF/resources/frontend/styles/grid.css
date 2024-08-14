@@ -45,6 +45,7 @@ vaadin-multi-select-combo-box-overlay vaadin-multi-select-combo-box-item {
     line-height: 8px;
     padding: 0px;
     font-size: 8px;
+    gap: 1px;
 }
 
 vaadin-date-picker, vaadin-date-time-picker,

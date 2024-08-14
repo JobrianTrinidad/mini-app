@@ -90,3 +90,14 @@
     height: 98%;
     color: white;
 }
+
+vaadin-drawer-toggle {
+    font-size: var(--lumo-icon-size-s);
+    width: var(--lumo-size-s);
+    height: var(--lumo-size-s);
+}
+
+
+vaadin-app-layout::part(navbar) {
+    min-height: var(--lumo-size-s);
+}
