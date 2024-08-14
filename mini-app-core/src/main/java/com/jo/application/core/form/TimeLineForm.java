@@ -208,6 +208,8 @@ public abstract class TimeLineForm<S extends ZJTService> extends CommonForm {
                 if (gSelectedItems.size() == 1) {
                     datePickerStart.setValue(iSelectedItems.get(0).getStartTime());
                     datePickerEnd.setValue(iSelectedItems.get(0).getEndTime());
+                    if (groupComboBox.getValue() != null && groupComboBox.getValue().getGroupId() != Integer.parseInt(iSelectedItems.get(0).getGroupId()))
+                        groupComboBox.setValue(null);
                 } else {
                     datePickerStart.setValue(null);
                     datePickerEnd.setValue(null);
