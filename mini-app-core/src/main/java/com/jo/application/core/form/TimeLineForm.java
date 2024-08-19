@@ -485,7 +485,7 @@ public abstract class TimeLineForm<S extends ZJTService> extends CommonForm {
                 if (addAndStatement) {
                     query.append(" AND ");
                 }
-                if(timeLineViewParameter.getGroupParameters()[i] instanceof List<?>)
+                if(parameters[i] instanceof List<?>)
                 {
                     List<?> lparameters = (List<?>) parameters[i];
                     // Convert the list to a comma-separated string of values
