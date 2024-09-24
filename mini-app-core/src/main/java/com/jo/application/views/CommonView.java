@@ -71,7 +71,12 @@ public abstract class CommonView extends VerticalLayout implements RouterLayout,
         return "";
     }
 
-    public void onTimelineItemUpdate(ZJTItem item)  {}
+    /**
+     *
+     * @param item
+     * @param isMultipleSelection - option to indicate if item is part of multiple selections
+     */
+    public void onTimelineItemUpdate(ZJTItem item, boolean isMultipleSelection)  {}
 
     public void initLayout() {
     }

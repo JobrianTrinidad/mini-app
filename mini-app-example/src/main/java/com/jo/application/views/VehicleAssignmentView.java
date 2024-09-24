@@ -97,13 +97,15 @@ public class VehicleAssignmentView extends StandardFormView implements HasUrlPar
     }
 
     @Override
-    public void onTimelineItemUpdate(ZJTItem item) {
+    public void onTimelineItemUpdate(ZJTItem item, boolean isMultipleSelection) {
         //Update ResourceAssignment here
         //TODO findEntityById seems not working
         ZJTVehicleAssignment assignment = (ZJTVehicleAssignment) this.repository.findEntityById(ZJTVehicleAssignment.class, item.getId());
         ZJTVehicle vehicle = (ZJTVehicle) this.repository.findEntityById(ZJTVehicle.class, Integer.parseInt(item.getGroupId()));
-        assignment.setStartDate(item.getStartTime());
-        assignment.setEndDate(item.getEndTime());
+        if (!isMultipleSelection) {
+            assignment.setStartDate(item.getStartTime());
+            assignment.setEndDate(item.getEndTime());
+        }
 //        List<ZJTVehicleAssignment> assignments = (List<ZJTVehicleAssignment>) this.repository.findEntitiesByIds(ZJTVehicleAssignment.class, new int[]{item.getId()});
 //        List<ZJTVehicle> vehicles = (List<ZJTVehicle>) this.repository.findEntitiesByIds(ZJTVehicle.class, new int[]{ Integer.parseInt(item.getGroupId())});
 //        ZJTVehicleAssignment assignment = assignments.get(0);
