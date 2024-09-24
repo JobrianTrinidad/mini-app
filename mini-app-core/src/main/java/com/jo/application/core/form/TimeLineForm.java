@@ -607,7 +607,7 @@ public abstract class TimeLineForm<S extends ZJTService> extends CommonForm {
                 item.setStartTime(datePickerStart.getValue());
                 item.setEndTime(datePickerEnd.getValue());
                 timeline.revertMove(String.valueOf(item.getId()), item.getStartTime(), item.getEndTime());
-                getCommonView().onTimelineItemUpdate(item);
+                getCommonView().onTimelineItemUpdate(item, items.size() > 1);
             }
         }
     }
@@ -622,7 +622,7 @@ public abstract class TimeLineForm<S extends ZJTService> extends CommonForm {
                     item.setGroupId(String.valueOf(group.getGroupId()));
                     timeline.updateItemGroup(String.valueOf(item.getId()), String.valueOf(group.getGroupId()));
                     timeline.updateItemContent(String.valueOf(item.getId()), item.getTitle() + " " + String.valueOf(group.getGroupId()));
-                    getCommonView().onTimelineItemUpdate(item);
+                    getCommonView().onTimelineItemUpdate(item, items.size() > 1);
                 }
             }
         }
