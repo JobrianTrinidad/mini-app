@@ -6,7 +6,6 @@ import com.vaadin.componentfactory.tuigrid.TuiGrid;
 import com.vaadin.componentfactory.tuigrid.model.AATContextMenu;
 import com.vaadin.componentfactory.tuigrid.model.GuiItem;
 import com.vaadin.flow.component.Component;
-import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.html.Span;
@@ -94,6 +93,11 @@ public abstract class CommonForm extends VerticalLayout {
         dateFilterComboBox.setValue(EnumDateFilter.TM);
         dateFilter = new HorizontalLayout(dateFilterComboBox, startDatePicker, new Span("To"), endDatePicker);
         dateFilter.setAlignItems(FlexComponent.Alignment.CENTER);
+    }
+
+    public void updateDateFilter(EnumDateFilter enumDateFilter) {
+        dateFilterComboBox.setValue(enumDateFilter);
+        updateDateFilter();
     }
 
     private void updateDateFilter() {
