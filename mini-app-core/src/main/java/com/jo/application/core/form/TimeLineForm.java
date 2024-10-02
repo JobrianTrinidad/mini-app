@@ -576,7 +576,7 @@ public abstract class TimeLineForm<S extends ZJTService> extends CommonForm {
 
     @Override
     public void onUpdateForm() throws Exception {
-        if (this.timeLineViewParameter == null)
+        if (this.timeLineViewParameter == null || timeline == null)
             return;
 
         itemGroups = this.getGroupItems(configureGroup());
@@ -589,6 +589,12 @@ public abstract class TimeLineForm<S extends ZJTService> extends CommonForm {
             itemComboBox.setItems(entityItems);
         }
 
+        LocalDate start = startDatePicker.getValue();
+        LocalDate end = endDatePicker.getValue();
+        if (start != null && end != null) {
+            timeline.setStart(start.atStartOfDay());
+            timeline.setEnd(end.atTime(LocalTime.MAX));
+        }
     }
 
     public HorizontalLayout getToolbar() {

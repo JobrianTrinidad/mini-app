@@ -95,9 +95,10 @@ public abstract class CommonForm extends VerticalLayout {
         dateFilter.setAlignItems(FlexComponent.Alignment.CENTER);
     }
 
-    public void updateDateFilter(EnumDateFilter enumDateFilter) {
+    public void updateDateFilter(EnumDateFilter enumDateFilter) throws Exception {
         dateFilterComboBox.setValue(enumDateFilter);
         updateDateFilter();
+        onUpdateForm();
     }
 
     private void updateDateFilter() {
