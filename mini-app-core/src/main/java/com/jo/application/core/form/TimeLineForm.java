@@ -4,7 +4,6 @@ import com.jo.application.core.data.service.ZJTService;
 import com.jo.application.data.entity.ZJTItem;
 import com.jo.application.util.GlobalData;
 import com.vaadin.componentfactory.timeline.Timeline;
-import com.vaadin.componentfactory.timeline.model.AxisOrientation;
 import com.vaadin.componentfactory.timeline.model.Item;
 import com.vaadin.componentfactory.timeline.model.ItemGroup;
 import com.vaadin.flow.component.Unit;
@@ -43,7 +42,6 @@ public abstract class TimeLineForm<S extends ZJTService> extends CommonForm {
     private final HorizontalLayout itemDateLayout = new HorizontalLayout();
 
     private String filteredValue = "";
-
 
     List<ZJTItem> entityItems;
     List<Item> items;
@@ -180,7 +178,7 @@ public abstract class TimeLineForm<S extends ZJTService> extends CommonForm {
 //        addComponentAtIndex(2, itemDateLayout);
 
         //TODO - add listeners
-        timeline.addGroupItemClickListener(e -> {
+        timeline.addGroupClickListener(e -> {
             ItemGroup gSelected = null;
             for (ItemGroup group : itemGroups) {
                 if (group.getGroupId() == Integer.parseInt(e.getGroupId())) {
@@ -220,14 +218,14 @@ public abstract class TimeLineForm<S extends ZJTService> extends CommonForm {
 
         timeline.addGroupItemSelectListener(e -> {
             List<ZJTItem> selectItems = new ArrayList<>();
-            for (ZJTItem item : entityItems) {
-                if (item.getGroupId().equalsIgnoreCase(e.getGroupId())) {
-                    selectItems.add(item);
+            if(e.isSelectRequest()) {
+                for (ZJTItem item : entityItems) {
+                    if (item.getGroupId().equalsIgnoreCase(e.getGroupId())) {
+                        selectItems.add(item);
+                    }
                 }
             }
-            if (!selectItems.isEmpty()) {
-                itemComboBox.setValue(selectItems);
-            }
+            itemComboBox.setValue(selectItems);
         });
 
         groupComboBox.addValueChangeListener(e -> {

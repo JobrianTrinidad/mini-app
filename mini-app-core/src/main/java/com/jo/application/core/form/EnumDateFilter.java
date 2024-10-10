@@ -2,7 +2,7 @@ package com.jo.application.core.form;
 
 
 public enum EnumDateFilter {
-    TD("Today"), TW ("This week"), NW ("Next Week"), TM("This month"), NM("Next Month");
+    TD("Today"), TD3("Today + Next 3 Days"), TW ("This week"), NW ("Next Week"), TM("This month"), NM("Next Month");
 
     private final String name;
 

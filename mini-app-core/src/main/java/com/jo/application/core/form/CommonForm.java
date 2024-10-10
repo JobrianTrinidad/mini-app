@@ -110,7 +110,10 @@ public abstract class CommonForm extends VerticalLayout {
                 dateFrom = LocalDate.from(LocalDateTime.now().truncatedTo(ChronoUnit.DAYS));
                 dateTo = LocalDate.from(LocalDateTime.now().truncatedTo(ChronoUnit.DAYS));
                 break;
-
+            case TD3:
+                dateFrom = LocalDate.from(LocalDateTime.now().truncatedTo(ChronoUnit.DAYS));
+                dateTo = LocalDate.from(LocalDateTime.now().plusDays(3).truncatedTo(ChronoUnit.DAYS));
+                break;
             case TW:
                 dateFrom = LocalDate.now();
                 dateFrom = dateFrom.with(WeekFields.of(Locale.UK).getFirstDayOfWeek());
