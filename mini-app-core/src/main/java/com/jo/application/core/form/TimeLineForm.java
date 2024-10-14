@@ -461,20 +461,15 @@ public abstract class TimeLineForm<S extends ZJTService> extends CommonForm {
             query.append(", p.").append(endDateFieldName).append(" AS endDate").append(count);
             count++;
         }
-//        query.append(timeLineViewParameter.getEndDateFieldName() != null ? ", p." + timeLineViewParameter.getEndDateFieldName() : "")
-//                .append(timeLineViewParameter.getClassNameFieldName() != null ? ", p." + timeLineViewParameter.getClassNameFieldName() : "");
 
         query.append(" FROM ").append(timeLineViewParameter.getFromDefinition()).append(" as p");
 
-//        if (timeLineViewParameter.getWhereDefinitions().length != parameters.length) {
-//            throw new Exception("Size of where condition is not compatible to parameter");
-//
-//        }
 
         if (!ArrayUtils.isEmpty(timeLineViewParameter.getWhereDefinitions())
                 && !ArrayUtils.isEmpty(parameters)
                 && timeLineViewParameter.getWhereDefinitions().length == parameters.length) {
             int i = 0;
+            boolean addClosingBracket = false;
             for (String where : timeLineViewParameter.getWhereDefinitions()) {
                 if (addWhereStatement) {
                     query.append(" WHERE ");
@@ -483,37 +478,41 @@ public abstract class TimeLineForm<S extends ZJTService> extends CommonForm {
                 if (addAndStatement) {
                     query.append(" AND ");
                 }
-                if(parameters[i] instanceof List<?>)
-                {
-                    List<?> lparameters = (List<?>) parameters[i];
-                    // Convert the list to a comma-separated string of values
-                    String inClause = lparameters.stream()
-                            .map(Object::toString) // Convert each item to a string
-                            .collect(Collectors.joining(", ", "(", ")")); // Format with parentheses
-                    // Append the IN clause to the query
-                    query.append(" p.").append(where).append(" IN ").append(inClause);
+
+                //add support for OR statement - no support for parameter
+                //where would be something like this - must pass alias p explicitly
+                // parameter -->  p.resource_id < 100 or p.filter_id
+                // result -->  (p.resource_id < 100 or p.filter_id IN (1, 2))
+                if (where.toUpperCase().contains("OR")) {
+                    if(parameters[i] instanceof List<?>) {
+                        List<?> lparameters = (List<?>) parameters[i];
+                        // Convert the list to a comma-separated string of values
+                        String inClause = lparameters.stream()
+                                .map(Object::toString) // Convert each item to a string
+                                .collect(Collectors.joining(", ", "(", ")")); // Format with parentheses
+                        query.append ("(").append(where).append(" IN ").append(inClause).append(")");
+                    } else {
+                        query.append ("(").append(where).append("=").append(parameters[i]).append(")");
+                    }
                 } else {
-                    query.append(" p.").append(where).append("=").append(parameters[i]);
+                    if(parameters[i] instanceof List<?>)
+                    {
+                        List<?> lparameters = (List<?>) parameters[i];
+                        // Convert the list to a comma-separated string of values
+                        String inClause = lparameters.stream()
+                                .map(Object::toString) // Convert each item to a string
+                                .collect(Collectors.joining(", ", "(", ")")); // Format with parentheses
+                        // Append the IN clause to the query
+                        query.append(" p.").append(where).append(" IN ").append(inClause);
+                    } else {
+                        query.append(" p.").append(where).append("=").append(parameters[i]);
+                    }
                 }
+
                 i++;
                 addAndStatement = true;
             }
         }
-//        if (timeLineViewParameter.getWhereDefinitions() != null) {
-//            query.append(" WHERE p.").append(timeLineViewParameter.getWhereDefinitions()[0]);
-//            query.append(" = ").append(parameters[0]);
-//            query.append(" AND p.").append(timeLineViewParameter.getWhereDefinitions()[1]);
-//            query.append(" = ").append(parameters[2]);
-//        } else if (timeLineViewParameter.getWhereDefinition() != null) {
-//            query.append(" WHERE p.").append(timeLineViewParameter.getWhereDefinition());
-//            //TODO -set parameter
-//            query.append(" = ").append(parameters[0]);
-////            if (dateFilterOn != null) {
-////                addConditionWhenFilteringDate(query);
-////            }
-//        } else {
-//
-//        }
 
         if (dateFilterOn != null) {
             if (addWhereStatement) {
@@ -635,5 +634,6 @@ public abstract class TimeLineForm<S extends ZJTService> extends CommonForm {
         if (items.size() == 1) {
             updateItem();
         }
+        itemComboBox.deselectAll();
     }
 }
