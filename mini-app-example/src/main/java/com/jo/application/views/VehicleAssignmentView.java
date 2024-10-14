@@ -40,7 +40,7 @@ public class VehicleAssignmentView extends StandardFormView implements HasUrlPar
         timeLineViewParameter.setGroupWhereDefinitions(new String[]{"depot.zjt_depot_id"});
         timeLineViewParameter.setParameters(new Object[]{0});
         timeLineViewParameter.setGroupParameters(new Object[]{0});
-        timeLineViewParameter.setWhereDefinitions(new String[]{"depot.zjt_depot_id"});
+        timeLineViewParameter.setWhereDefinitions(new String[]{"p.vehicle.zjt_vehicle_id = 1000003 OR p.depot.zjt_depot_id"});
         timeLineViewParameter.setStack(true);
 //        timeLineViewParameter.setGroupCSSClass("classname");
         // css class is set to this field
