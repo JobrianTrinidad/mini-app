@@ -268,23 +268,6 @@ public abstract class TimeLineForm<S extends ZJTService> extends CommonForm {
         }
         query.append(" FROM ").append(timeLineViewParameter.getGroupClass().getSimpleName()).append(" as p");
 
-        /*
-        if (timeLineViewParameter.getParameters() != null
-                && (int) timeLineViewParameter.getParameters()[0] != -1) {
-            Object[] parameters = timeLineViewParameter.getParameters();
-            if (parameters.length > 1 && parameters[1] != null) {
-                query.append(" WHERE ").append("p.").append(timeLineViewParameter.getGroupClassPKField());
-                //TODO - set parameter
-                query.append(" = ").append(parameters[1]);
-            } else {
-                query.append(" WHERE ").append("p.").append(timeLineViewParameter.getGroupClassPKField());
-                //TODO - set parameter
-                query.append(" = ").append(parameters[0]);
-            }
-        }
-
-         */
-
         boolean addWhereStatement = true;
         boolean addAndStatement = false;
         int i = 0;
@@ -300,19 +283,35 @@ public abstract class TimeLineForm<S extends ZJTService> extends CommonForm {
                 if (addAndStatement) {
                     query.append(" AND ");
                 }
-                if(timeLineViewParameter.getGroupParameters()[i] instanceof List<?>)
-                {
-                    List<?> parameters = (List<?>) timeLineViewParameter.getGroupParameters()[i];
-                    // Convert the list to a comma-separated string of values
-                    String inClause = parameters.stream()
-                            .map(Object::toString) // Convert each item to a string
-                            .collect(Collectors.joining(", ", "(", ")")); // Format with parentheses
-                    // Append the IN clause to the query
-                    query.append(" p.").append(where).append(" IN ").append(inClause);
+
+                if (where.toUpperCase().contains("OR")) {
+                    if(timeLineViewParameter.getGroupParameters()[i] instanceof List<?>) {
+                        List<?> parameters = (List<?>) timeLineViewParameter.getGroupParameters()[i];
+                        // Convert the list to a comma-separated string of values
+                        String inClause = parameters.stream()
+                                .map(Object::toString) // Convert each item to a string
+                                .collect(Collectors.joining(", ", "(", ")")); // Format with parentheses
+
+                        query.append ("(").append(where).append(" IN ").append(inClause).append(")");
+                    }   else {
+                        query.append ("(").append(where).append("=").append(timeLineViewParameter.getGroupParameters()[i]).append(")");
+                    }
+                } else {
+                    if(timeLineViewParameter.getGroupParameters()[i] instanceof List<?>)
+                    {
+                        List<?> parameters = (List<?>) timeLineViewParameter.getGroupParameters()[i];
+                        // Convert the list to a comma-separated string of values
+                        String inClause = parameters.stream()
+                                .map(Object::toString) // Convert each item to a string
+                                .collect(Collectors.joining(", ", "(", ")")); // Format with parentheses
+                        // Append the IN clause to the query
+                        query.append(" p.").append(where).append(" IN ").append(inClause);
+                    }
+                    else {
+                        query.append(" p.").append(where).append("=").append(timeLineViewParameter.getGroupParameters()[i]);
+                    }
                 }
-                else {
-                    query.append(" p.").append(where).append("=").append(timeLineViewParameter.getGroupParameters()[i]);
-                }
+
                 i++;
                 addAndStatement = true;
             }
