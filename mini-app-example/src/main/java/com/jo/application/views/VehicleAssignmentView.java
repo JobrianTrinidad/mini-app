@@ -36,6 +36,9 @@ public class VehicleAssignmentView extends StandardFormView implements HasUrlPar
         timeLineViewParameter.setGroupClass(ZJTVehicle.class);
         timeLineViewParameter.setDateFilterOn("startDate");
         timeLineViewParameter.setSelectDefinition("fleetid");
+        timeLineViewParameter.setItemBorderClassField("bordercolor");
+        timeLineViewParameter.setItemEditableField("isFinal");
+        timeLineViewParameter.setEditableFlagInverted(true);
         timeLineViewParameter.setGroupSelectDefinition("fleetid");
         timeLineViewParameter.setGroupWhereDefinitions(new String[]{"p.depot.zjt_depot_id = 1000003 OR p.depot.zjt_depot_id"});
         timeLineViewParameter.setParameters(new Object[]{0});

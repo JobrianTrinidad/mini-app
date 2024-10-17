@@ -60,6 +60,10 @@ public class ZJTVehicleAssignment implements ZJTEntity {
     @DisplayName(value = "In Maintenance")
     private boolean inMaintenance;
 
+    @Column(name="bordercolor")
+    @DisplayName(value = "Border Color")
+    private String bordercolor = "";
+
     public int getId() {
         return zjt_vehicleassignment_id;
     }
@@ -134,5 +138,13 @@ public class ZJTVehicleAssignment implements ZJTEntity {
 
     public void setInMaintenance(boolean inMaintenance) {
         this.inMaintenance = inMaintenance;
+    }
+
+    public String getBordercolor() {
+        return bordercolor;
+    }
+
+    public void setBordercolor(String bordercolor) {
+        this.bordercolor = bordercolor;
     }
 }
