@@ -47,6 +47,7 @@ public class BaseEntityRepository {
             String groupID = null;
             String className = null;
             String style = null;
+            boolean editable = true;
             int id = 0;
             //must be paired in sequence - startdate1, enddate1, startdate2, enddate2
             LocalDateTime startDate = null;
@@ -67,11 +68,17 @@ public class BaseEntityRepository {
                     className = null;
                 } else if (className.startsWith("#")) {  //hex color
                     style = "background-color : " + className + ";";
+
+                    if (result[4] != null) {
+                        String borderColor = (String) result[4];
+                        style += "border-width: 2px; border-color: " + borderColor + ";";
+                    }
                     className = null;
 
                 }
             }
 
+            editable = (int)result[5] == 1;
 
             boolean isStartandEndPaired = false;
             for (Object resultObj : result) {
@@ -96,6 +103,7 @@ public class BaseEntityRepository {
                     if (style != null) {
                         item.setStyle(style);
                     }
+                    item.setEditable(editable);
                     items.add(item);
                     startDate = null;
                     endDate = null;

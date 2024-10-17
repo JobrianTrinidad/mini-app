@@ -453,6 +453,25 @@ public abstract class TimeLineForm<S extends ZJTService> extends CommonForm {
             query.append(", p.").append(timeLineViewParameter.getClassNameFieldName()).append(" AS classname");
         }
 
+        if (timeLineViewParameter.getItemBorderClassField() == null) {
+            query.append(", '' AS borderstyle");
+        } else {
+            query.append(", p.").append(timeLineViewParameter.getItemBorderClassField()).append(" AS borderstyle");
+        }
+
+        if (timeLineViewParameter.getItemEditableField() == null) {
+            if (timeLineViewParameter.isEditableFlagInverted()) {
+                query.append(", 0 AS editable");
+            } else {
+                query.append(", 1 AS editable");
+            }
+        } else {
+            if (timeLineViewParameter.isEditableFlagInverted()) {
+                query.append(", case when p.").append(timeLineViewParameter.getItemEditableField()).append(" then 0 else 1 end AS editable");
+            } else {
+                query.append(", case when p.").append(timeLineViewParameter.getItemEditableField()).append(" then 1 else 0 end AS editable");
+            }
+        }
         //much check pairing of series
         for (String startDateFieldName : timeLineViewParameter.getStartDateFieldNames()) {
             query.append(", p.").append(startDateFieldName).append(" AS startDate").append(count);
@@ -620,6 +639,7 @@ public abstract class TimeLineForm<S extends ZJTService> extends CommonForm {
         Set<ZJTItem> items = itemComboBox.getValue();
         for(ZJTItem item : items) {
             if (item != null) {
+                if (!item.isEditable()) {continue;}
                 ItemGroup group = groupComboBox.getValue();
                 if (group != null) {
                     item.setGroupId(String.valueOf(group.getGroupId()));

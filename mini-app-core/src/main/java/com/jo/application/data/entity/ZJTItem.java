@@ -28,6 +28,12 @@ public class ZJTItem implements ZJTEntity {
     @Column
     private String style;
 
+    @Column
+    private boolean editable = true;
+
+    @Column
+    private boolean selectable = true;
+
     public ZJTItem() {
         this.startTime = LocalDateTime.now(); // Set start time to current time
         this.endTime = LocalDateTime.now(); // Set end time to current time
@@ -118,5 +124,21 @@ public class ZJTItem implements ZJTEntity {
 
     public void setStyle(String style) {
         this.style = style;
+    }
+
+    public boolean isEditable() {
+        return editable;
+    }
+
+    public void setEditable(boolean editable) {
+        this.editable = editable;
+    }
+
+    public boolean isSelectable() {
+        return selectable;
+    }
+
+    public void setSelectable(boolean selectable) {
+        this.selectable = selectable;
     }
 }

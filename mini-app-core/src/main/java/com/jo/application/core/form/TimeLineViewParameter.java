@@ -334,4 +334,54 @@ public class TimeLineViewParameter {
     public void setAxisOrientation(AxisOrientation axisOrientation) {
         this.axisOrientation = axisOrientation;
     }
+
+    /**
+     * This is the name of the field to control if item is editable or not
+     * User will not be able to reassign this item to another group nor change start and end date
+     */
+    private String itemEditableField;
+
+    /**
+     * Sometimes the editable flag is opposite the intended  purpose,
+     * this is flag should be able to address this
+     */
+    private  boolean isEditableFlagInverted = false;
+    /**
+     * This is the name of the field to control the border color of the item
+     * The border color of the item adds another dimension for the user to see
+     * some distinction e.g.
+     */
+    private String itemBorderClassField;
+
+    public String getItemCSSClassField() {
+        return itemCSSClassField;
+    }
+
+    public void setItemCSSClassField(String itemCSSClassField) {
+        this.itemCSSClassField = itemCSSClassField;
+    }
+
+    public String getItemEditableField() {
+        return itemEditableField;
+    }
+
+    public void setItemEditableField(String itemEditableField) {
+        this.itemEditableField = itemEditableField;
+    }
+
+    public String getItemBorderClassField() {
+        return itemBorderClassField;
+    }
+
+    public void setItemBorderClassField(String itemBorderClassField) {
+        this.itemBorderClassField = itemBorderClassField;
+    }
+
+    public boolean isEditableFlagInverted() {
+        return isEditableFlagInverted;
+    }
+
+    public void setEditableFlagInverted(boolean editableFlagInverted) {
+        isEditableFlagInverted = editableFlagInverted;
+    }
 }
