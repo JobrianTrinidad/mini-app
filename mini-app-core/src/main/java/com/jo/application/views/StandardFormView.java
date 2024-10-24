@@ -61,7 +61,7 @@ public class StandardFormView extends CommonView {
             case "timeline":
                 bGrid = false;
                 this.timeLineViewParameter.setParameters(filterObjectIds);
-                form = new TimeLineCommonForm(this.timeLineViewParameter, new BaseEntityService<>(repository));
+                form = new TimeLineCommonForm(this.timeLineViewParameter, new BaseEntityService<>(repository), tableInfoService);
                 this.initLayout();
                 break;
             case "grid":
@@ -92,7 +92,7 @@ public class StandardFormView extends CommonView {
                     }
                 } else {
                     bGrid = false;
-                    form = new TimeLineCommonForm(this.timeLineViewParameter, new BaseEntityService<>(repository));
+                    form = new TimeLineCommonForm(this.timeLineViewParameter, new BaseEntityService<>(repository), tableInfoService);
                     this.initLayout();
                 }
                 break;

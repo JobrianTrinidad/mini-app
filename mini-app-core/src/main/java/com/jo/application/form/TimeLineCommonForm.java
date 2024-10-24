@@ -4,14 +4,15 @@ import com.jo.application.core.data.entity.ZJTEntity;
 import com.jo.application.core.data.service.ZJTService;
 import com.jo.application.core.form.TimeLineForm;
 import com.jo.application.core.form.TimeLineViewParameter;
+import com.jo.application.data.service.TableInfoService;
 import com.vaadin.componentfactory.tuigrid.model.AATContextMenu;
 import com.vaadin.componentfactory.tuigrid.model.GuiItem;
 import com.vaadin.flow.component.Component;
 
 public class TimeLineCommonForm extends TimeLineForm<ZJTService> {
     public TimeLineCommonForm(TimeLineViewParameter timeLineViewParameter,
-                              ZJTService service) {
-        super(timeLineViewParameter, service);
+                              ZJTService service, TableInfoService tableInfoService) {
+        super(timeLineViewParameter, service, tableInfoService);
         addClassName("mobile-app-form");
     }
 

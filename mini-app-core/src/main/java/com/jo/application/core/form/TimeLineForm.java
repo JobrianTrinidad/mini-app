@@ -2,8 +2,11 @@ package com.jo.application.core.form;
 
 import com.jo.application.core.data.service.ZJTService;
 import com.jo.application.data.entity.ZJTItem;
+import com.jo.application.data.service.TableInfoService;
 import com.jo.application.util.GlobalData;
+import com.jo.application.util.ZoomUtil;
 import com.vaadin.componentfactory.timeline.Timeline;
+import com.vaadin.componentfactory.timeline.context.ItemContextMenuEventHandler;
 import com.vaadin.componentfactory.timeline.model.Item;
 import com.vaadin.componentfactory.timeline.model.ItemGroup;
 import com.vaadin.flow.component.Unit;
@@ -35,6 +38,9 @@ public abstract class TimeLineForm<S extends ZJTService> extends CommonForm {
     private static final long serialVersionUID = -5183438338263448740L;
     Timeline timeline;
     private final TimeLineViewParameter timeLineViewParameter;
+
+    protected  TableInfoService tableInfoService;
+
     protected S service;
     private final HorizontalLayout toolbar = new HorizontalLayout();
     private final HorizontalLayout itemSummaryLayout = new HorizontalLayout();
@@ -42,7 +48,6 @@ public abstract class TimeLineForm<S extends ZJTService> extends CommonForm {
     private final HorizontalLayout itemDateLayout = new HorizontalLayout();
 
     private String filteredValue = "";
-
     List<ZJTItem> entityItems;
     List<Item> items;
     List<ItemGroup> itemGroups;
@@ -55,9 +60,10 @@ public abstract class TimeLineForm<S extends ZJTService> extends CommonForm {
     DateTimePicker datePickerEnd = new DateTimePicker();
 
     public TimeLineForm(TimeLineViewParameter timeLineViewParameter,
-                        S service) {
+                        S service, TableInfoService tableInfoService) {
         this.timeLineViewParameter = timeLineViewParameter;
         this.service = service;
+        this.tableInfoService = tableInfoService;
         dateFilterOn = timeLineViewParameter.getDateFilterOn();
         addClassName("mobile-app-form");
         configureTimeLine();
@@ -177,7 +183,7 @@ public abstract class TimeLineForm<S extends ZJTService> extends CommonForm {
 
 //        addComponentAtIndex(2, itemDateLayout);
 
-        //TODO - add listeners
+        // add listeners
         timeline.addGroupClickListener(e -> {
             ItemGroup gSelected = null;
             for (ItemGroup group : itemGroups) {
@@ -190,6 +196,39 @@ public abstract class TimeLineForm<S extends ZJTService> extends CommonForm {
                 groupComboBox.setValue(gSelected);
             }
         });
+
+        ItemContextMenuEventHandler eventHandler = new ItemContextMenuEventHandler();
+        if (this.timeLineViewParameter.getItemContextMenuEventHandler() != null) {
+            eventHandler = this.timeLineViewParameter.getItemContextMenuEventHandler();
+        }
+        eventHandler.setGroupZoomable(this.timeLineViewParameter.getGroupZoomTableID() > 0);
+        timeline.setTimeLineContextHandler(eventHandler);
+
+        timeline.addGroupItemsSelectListener((event) -> {
+            StringBuilder temp = new StringBuilder();
+            List<ZJTItem> selectItems = new ArrayList<>();
+            for (ZJTItem item : entityItems) {
+                String itemGroup = item.getGroupId();
+                boolean isSelectedGroup = event.getSelectedGroupList().stream()
+                        .anyMatch(group -> String.valueOf(group.getGroupId()).equalsIgnoreCase(itemGroup));
+                if (isSelectedGroup) {
+                    if (!temp.isEmpty())
+                        temp.append(",").append(item.getId());
+                    else
+                        temp.append(item.getId());
+                    selectItems.add(item);
+                }
+            }
+            itemComboBox.setValue(selectItems);
+            event.getTimeline().onSelectItem(event.getTimeline(), temp.toString(), false);
+        });
+
+        timeline.addGroupZoomListener((event) -> {
+                ZoomUtil.generateAndOpenUrl(this.timeLineViewParameter.getGroupZoomTableID(), event.getGroupId());
+        });
+
+        if (this.timeLineViewParameter.getContextFormEventHandler() != null)
+            timeline.addItemContextForm(this.timeLineViewParameter.getContextFormEventHandler());
 
         timeline.addItemSelectListener(e -> {
             List<String> selecteItems = Arrays.asList(e.getItemId().split(","));
@@ -214,18 +253,6 @@ public abstract class TimeLineForm<S extends ZJTService> extends CommonForm {
                     groupComboBox.setValue(null);
                 }
             }
-        });
-
-        timeline.addGroupItemSelectListener(e -> {
-            List<ZJTItem> selectItems = new ArrayList<>();
-            if(e.isSelectRequest()) {
-                for (ZJTItem item : entityItems) {
-                    if (item.getGroupId().equalsIgnoreCase(e.getGroupId())) {
-                        selectItems.add(item);
-                    }
-                }
-            }
-            itemComboBox.setValue(selectItems);
         });
 
         groupComboBox.addValueChangeListener(e -> {
@@ -489,6 +516,12 @@ public abstract class TimeLineForm<S extends ZJTService> extends CommonForm {
             int i = 0;
             boolean addClosingBracket = false;
             for (String where : timeLineViewParameter.getWhereDefinitions()) {
+
+                if (parameters[i] == null) {
+                    i++;
+                    continue;
+                }
+
                 if (addWhereStatement) {
                     query.append(" WHERE ");
                     addWhereStatement = false;
@@ -610,6 +643,10 @@ public abstract class TimeLineForm<S extends ZJTService> extends CommonForm {
             timeline.setStart(start.atStartOfDay());
             timeline.setEnd(end.atTime(LocalTime.MAX));
         }
+        if (timeLineViewParameter.getContextFormEventHandler() != null) {
+            timeLineViewParameter.getContextFormEventHandler().setZjtItems(entityItems);
+            timeLineViewParameter.getContextFormEventHandler().setItemGroups(itemGroups);
+        }
     }
 
     public HorizontalLayout getToolbar() {
@@ -654,5 +691,21 @@ public abstract class TimeLineForm<S extends ZJTService> extends CommonForm {
             updateItem();
         }
         itemComboBox.deselectAll();
+    }
+
+    public List<ZJTItem> getEntityItems() {
+        return entityItems;
+    }
+
+    public void setEntityItems(List<ZJTItem> entityItems) {
+        this.entityItems = entityItems;
+    }
+
+    public List<ItemGroup> getItemGroups() {
+        return itemGroups;
+    }
+
+    public void setItemGroups(List<ItemGroup> itemGroups) {
+        this.itemGroups = itemGroups;
     }
 }

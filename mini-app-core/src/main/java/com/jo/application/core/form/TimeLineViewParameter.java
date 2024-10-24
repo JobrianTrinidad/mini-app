@@ -1,6 +1,9 @@
 package com.jo.application.core.form;
 
+import com.jo.application.events.ZJTContextFormEventHandler;
 import com.jo.application.util.GlobalData;
+import com.vaadin.componentfactory.timeline.context.ContextFormEventHandler;
+import com.vaadin.componentfactory.timeline.context.ItemContextMenuEventHandler;
 import com.vaadin.componentfactory.timeline.model.AxisOrientation;
 import com.vaadin.flow.router.PageTitle;
 
@@ -18,6 +21,10 @@ public class TimeLineViewParameter {
      * e.g  e.employeename
      */
     private String[] titleFieldName = null;
+    private ItemContextMenuEventHandler ItemContextMenuEventHandler;
+    private ZJTContextFormEventHandler contextFormEventHandler;
+
+    private int groupZoomTableID = -1;
 
     public String getToolTipFieldName() {
         return toolTipFieldName;
@@ -383,5 +390,29 @@ public class TimeLineViewParameter {
 
     public void setEditableFlagInverted(boolean editableFlagInverted) {
         isEditableFlagInverted = editableFlagInverted;
+    }
+
+    public ItemContextMenuEventHandler getItemContextMenuEventHandler() {
+        return this.ItemContextMenuEventHandler;
+    }
+
+    public void setItemContextMenuEventHandler(com.vaadin.componentfactory.timeline.context.ItemContextMenuEventHandler itemContextMenuEventHandler) {
+        ItemContextMenuEventHandler = itemContextMenuEventHandler;
+    }
+
+    public ZJTContextFormEventHandler getContextFormEventHandler() {
+        return this.contextFormEventHandler;
+    }
+
+    public void setContextFormEventHandler(ZJTContextFormEventHandler contextFormEventHandler) {
+        this.contextFormEventHandler = contextFormEventHandler;
+    }
+
+    public int getGroupZoomTableID() {
+        return groupZoomTableID;
+    }
+
+    public void setGroupZoomTableID(int groupZoomTableID) {
+        this.groupZoomTableID = groupZoomTableID;
     }
 }
