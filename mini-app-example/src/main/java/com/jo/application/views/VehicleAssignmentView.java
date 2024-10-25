@@ -1,17 +1,18 @@
 package com.jo.application.views;
 
+import com.jo.application.core.form.EnumDateFilter;
 import com.jo.application.core.form.TimeLineViewParameter;
-import com.jo.application.data.entity.ZJTDepot;
-import com.jo.application.data.entity.ZJTItem;
-import com.jo.application.data.entity.ZJTVehicle;
-import com.jo.application.data.entity.ZJTVehicleAssignment;
+import com.jo.application.data.entity.*;
 import com.jo.application.data.event.CustomContextFormEventHandler;
+import com.jo.application.data.event.CustomItemContextMenuEventHandler;
 import com.jo.application.data.repository.BaseEntityRepository;
 import com.jo.application.data.service.TableInfoService;
-import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.combobox.MultiSelectComboBox;
 import com.vaadin.flow.component.notification.Notification;
-import com.vaadin.flow.router.*;
+import com.vaadin.flow.router.BeforeEvent;
+import com.vaadin.flow.router.HasUrlParameter;
+import com.vaadin.flow.router.OptionalParameter;
+import com.vaadin.flow.router.Route;
 
 import java.util.List;
 import java.util.Objects;
@@ -51,13 +52,13 @@ public class VehicleAssignmentView extends StandardFormView implements HasUrlPar
         // css class is set to this field
         timeLineViewParameter.setGroupCSSClass("fuelcardname1");
 // TODO: Set the group table ID for enabling the zoom option on the timeline., This ID will be used to create zoom url with This ID as table and selected group id as id.
-//        this.timeLineViewParameter.setGroupZoomTableID(1000);
+        this.timeLineViewParameter.setGroupZoomTableID(1000);
 // TODO: Retrieve the HTML content and styles from the database for rendering dynamic forms for item
-//        ZJTTableInfo tableInfo = tableInfoService.findByTableName(this.timeLineViewParameter.getFromDefinition());
-//        eventHandler = new CustomContextFormEventHandler(tableInfo.getHtmlContent(), tableInfo.getHtmlStyle(), tableInfo.isSubmitForm());
-//        timeLineViewParameter.setContextFormEventHandler(eventHandler);
+        ZJTTableInfo tableInfo = tableInfoService.findByTableName(this.timeLineViewParameter.getFromDefinition());
+        eventHandler = new CustomContextFormEventHandler(tableInfo.getHtmlContent(), tableInfo.getHtmlStyle(), tableInfo.isSubmitForm());
+        timeLineViewParameter.setContextFormEventHandler(eventHandler);
 // TODO Extend the context menu by adding a custom event handler for additional options.
-//        this.timeLineViewParameter.setItemContextMenuEventHandler()
+        this.timeLineViewParameter.setItemContextMenuEventHandler(new CustomItemContextMenuEventHandler());
 
         timeLineViewParameter.setShowItemSelector(true);  //to test this feature
         super.setTimeLineViewParameter(timeLineViewParameter);
@@ -101,6 +102,12 @@ public class VehicleAssignmentView extends StandardFormView implements HasUrlPar
             depotComboBox.setValue(depots.get(0));
         }
         this.addCustomComponent(0, depotComboBox);
+
+        try {
+            form.updateDateFilter(EnumDateFilter.TD3);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private void filterByDepot() throws Exception {

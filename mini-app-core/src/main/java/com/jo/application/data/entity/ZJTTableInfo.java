@@ -25,6 +25,15 @@ public class ZJTTableInfo {
     @Column(name = "frozenCount")
     private Integer frozenCount;
 
+    @Column(name = "html_content", columnDefinition = "TEXT")
+    private String htmlContent;
+
+    @Column(name = "html_style", columnDefinition = "TEXT")
+    private String htmlStyle;
+
+    @Column(name = "is_submit_form", nullable = false, columnDefinition = "boolean default false")
+    private boolean isSubmitForm = false;
+
     public String getTable_name() {
         return table_name;
     }
@@ -63,5 +72,37 @@ public class ZJTTableInfo {
 
     public void setFrozenCount(Integer frozenCount) {
         this.frozenCount = frozenCount;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public boolean isSubmitForm() {
+        return isSubmitForm;
+    }
+
+    public void setSubmitForm(boolean submitForm) {
+        isSubmitForm = submitForm;
+    }
+
+    public String getHtmlStyle() {
+        return htmlStyle;
+    }
+
+    public void setHtmlStyle(String htmlStyle) {
+        this.htmlStyle = htmlStyle;
+    }
+
+    public String getHtmlContent() {
+        return htmlContent;
+    }
+
+    public void setHtmlContent(String htmlContent) {
+        this.htmlContent = htmlContent;
     }
 }
