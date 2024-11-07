@@ -134,12 +134,6 @@
             <groupId>com.vaadin</groupId>
             <artifactId>vaadin-notification-flow</artifactId>
         </dependency>
-        <dependency>
-            <groupId>com.github.JobrianTrinidad</groupId>
-            <artifactId>visjs-timeline-addon</artifactId>
-            <version>2.33</version>
-            <scope>compile</scope>
-        </dependency>
     </dependencies>
 
     <build>
