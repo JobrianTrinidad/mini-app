@@ -147,4 +147,30 @@ public class ZJTVehicleAssignment implements ZJTEntity {
     public void setBordercolor(String bordercolor) {
         this.bordercolor = bordercolor;
     }
+
+    @ManyToOne
+    @JoinColumn(name = "zjt_tripleg_id")
+    @DisplayName(value = "Trip Leg")
+    private ZJTTripLeg tripleg;
+
+    public ZJTTripLeg getTripleg() {
+        return tripleg;
+    }
+
+    public void setTripleg(ZJTTripLeg tripleg) {
+        this.tripleg = tripleg;
+    }
+
+
+    //just the id for now - no need to link to entity
+    @Column(name="zjt_trip_id")
+    private String zjt_trip_id;
+
+    public String getZjt_trip_id() {
+        return zjt_trip_id;
+    }
+
+    public void setZjt_trip_id(String zjt_trip_id) {
+        this.zjt_trip_id = zjt_trip_id;
+    }
 }
