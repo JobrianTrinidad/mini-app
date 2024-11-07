@@ -23,6 +23,8 @@ public class ZJTItem implements ZJTEntity {
     @Column
     private String groupId;
     @Column
+    private String subgroupId;
+    @Column
     private String className;
 
     @Column
@@ -108,6 +110,14 @@ public class ZJTItem implements ZJTEntity {
 
     public void setGroupId(String groupId) {
         this.groupId = groupId;
+    }
+
+    public String getSubgroupId() {
+        return subgroupId;
+    }
+
+    public void setSubgroupId(String subgroupId) {
+        this.subgroupId = subgroupId;
     }
 
     public String getClassName() {

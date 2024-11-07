@@ -47,6 +47,7 @@ public class BaseEntityRepository {
             String groupID = null;
             String className = null;
             String style = null;
+            String subgroup = null;
             boolean editable = true;
             int id = 0;
             //must be paired in sequence - startdate1, enddate1, startdate2, enddate2
@@ -79,6 +80,7 @@ public class BaseEntityRepository {
             }
 
             editable = (int)result[5] == 1;
+            subgroup = (String) result[6];
 
             boolean isStartandEndPaired = false;
             for (Object resultObj : result) {
@@ -104,6 +106,7 @@ public class BaseEntityRepository {
                         item.setStyle(style);
                     }
                     item.setEditable(editable);
+                    item.setSubgroupId(subgroup);
                     items.add(item);
                     startDate = null;
                     endDate = null;

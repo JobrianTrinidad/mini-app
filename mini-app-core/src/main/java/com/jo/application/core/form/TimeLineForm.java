@@ -449,7 +449,7 @@ public abstract class TimeLineForm<S extends ZJTService> extends CommonForm {
             item.setStart(data.getStartTime());
             item.setEnd(data.getEndTime());
             item.setGroup(data.getGroupId());
-
+            item.setSubgroup(data.getSubgroupId());
             TableData.add(item);
         }
         return TableData;
@@ -498,6 +498,12 @@ public abstract class TimeLineForm<S extends ZJTService> extends CommonForm {
             } else {
                 query.append(", case when p.").append(timeLineViewParameter.getItemEditableField()).append(" then 1 else 0 end AS editable");
             }
+        }
+
+        if (timeLineViewParameter.getSubgroupIDFieldName() == null) {
+            query.append(", '' AS subgroup");
+        } else {
+            query.append(", p.").append(timeLineViewParameter.getSubgroupIDFieldName()).append(" AS subgroup");
         }
         //much check pairing of series
         for (String startDateFieldName : timeLineViewParameter.getStartDateFieldNames()) {

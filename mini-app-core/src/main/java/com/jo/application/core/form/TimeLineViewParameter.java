@@ -46,6 +46,7 @@ public class TimeLineViewParameter {
      */
     private String groupIDFieldName = null;
 
+    private String subgroupIDFieldName = null;
     /**
      * Name of the column for the startdate
      * e.g pd.birthdate
@@ -185,6 +186,14 @@ public class TimeLineViewParameter {
 
     public void setGroupIDFieldName(String groupIDFieldName) {
         this.groupIDFieldName = groupIDFieldName;
+    }
+
+    public String getSubgroupIDFieldName() {
+        return subgroupIDFieldName;
+    }
+
+    public void setSubgroupIDFieldName(String subgroupIDFieldName) {
+        this.subgroupIDFieldName = subgroupIDFieldName;
     }
 
     public String[] getStartDateFieldNames() {
