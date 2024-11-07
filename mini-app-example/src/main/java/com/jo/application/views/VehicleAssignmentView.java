@@ -48,11 +48,12 @@ public class VehicleAssignmentView extends StandardFormView implements HasUrlPar
         timeLineViewParameter.setGroupParameters(new Object[]{0});
         timeLineViewParameter.setWhereDefinitions(new String[]{"p.vehicle.zjt_vehicle_id = 1000003 OR p.depot.zjt_depot_id"});
         timeLineViewParameter.setStack(true);
+        timeLineViewParameter.setSubgroupIDFieldName("colorcode");
 //        timeLineViewParameter.setGroupCSSClass("classname");
         // css class is set to this field
         timeLineViewParameter.setGroupCSSClass("fuelcardname1");
 // TODO: Set the group table ID for enabling the zoom option on the timeline., This ID will be used to create zoom url with This ID as table and selected group id as id.
-        this.timeLineViewParameter.setGroupZoomTableID(1000);
+        this.timeLineViewParameter.setGroupZoomTableID(539);
 // TODO: Retrieve the HTML content and styles from the database for rendering dynamic forms for item
         ZJTTableInfo tableInfo = tableInfoService.findByTableName(this.timeLineViewParameter.getFromDefinition());
         eventHandler = new CustomContextFormEventHandler(tableInfo.getHtmlContent(), tableInfo.getHtmlStyle(), tableInfo.isSubmitForm());
