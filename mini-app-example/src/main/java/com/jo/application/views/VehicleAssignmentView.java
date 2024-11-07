@@ -28,7 +28,7 @@ public class VehicleAssignmentView extends StandardFormView implements HasUrlPar
 
     public VehicleAssignmentView(BaseEntityRepository repository, TableInfoService tableInfoService) {
         super(repository, tableInfoService);
-        timeLineViewParameter = new TimeLineViewParameter(new String[]{"description"}
+        timeLineViewParameter = new TimeLineViewParameter(new String[]{"zjt_trip_id", "description"}
                 , "vehicle"
                 , new String[]{"startDate"}
                 , new String[]{"endDate"}
@@ -48,7 +48,7 @@ public class VehicleAssignmentView extends StandardFormView implements HasUrlPar
         timeLineViewParameter.setGroupParameters(new Object[]{0});
         timeLineViewParameter.setWhereDefinitions(new String[]{"p.vehicle.zjt_vehicle_id = 1000003 OR p.depot.zjt_depot_id"});
         timeLineViewParameter.setStack(true);
-        timeLineViewParameter.setSubgroupIDFieldName("colorcode");
+        timeLineViewParameter.setSubgroupIDFieldName("zjt_trip_id");
 //        timeLineViewParameter.setGroupCSSClass("classname");
         // css class is set to this field
         timeLineViewParameter.setGroupCSSClass("fuelcardname1");
@@ -84,7 +84,7 @@ public class VehicleAssignmentView extends StandardFormView implements HasUrlPar
 //        button.addClickListener(e -> filterByDepot());
 //        this.addCustomComponent(button);
         //TODO allowed ids coming from depot - user roles
-        int[] allowedDepot = {1000002, 1000003};
+        int[] allowedDepot = {1000001, 1000002, 1000003};
         List<ZJTDepot> depots = (List<ZJTDepot>) this.repository.findEntitiesByIds(ZJTDepot.class, allowedDepot);
 
         depotComboBox.setWidth("300px");
