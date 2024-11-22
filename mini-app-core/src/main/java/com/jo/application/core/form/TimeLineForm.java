@@ -364,7 +364,7 @@ public abstract class TimeLineForm<S extends ZJTService> extends CommonForm {
         else
             timeline = new Timeline(items, itemGroups);
 
-        timeline.setTimelineRange(LocalDateTime.of(2023, 1, 1, 0, 0, 0), LocalDateTime.of(2024, 12, 25, 0, 0, 0));
+//        timeline.setTimelineRange(LocalDateTime.of(2023, 1, 1, 0, 0, 0), LocalDateTime.of(2025, 12, 25, 0, 0, 0));
 
         //height must be specified otherwise timeline will just expand beyond screen size
         //TODO - must adjust based on screen resolution
