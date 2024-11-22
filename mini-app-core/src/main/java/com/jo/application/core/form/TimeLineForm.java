@@ -374,6 +374,7 @@ public abstract class TimeLineForm<S extends ZJTService> extends CommonForm {
         timeline.setVerticalScroll(true);
         timeline.setAxisOrientation(this.timeLineViewParameter.getAxisOrientation());
         timeline.setStack(this.timeLineViewParameter.isStack());
+        timeline.setStackSubgroups(this.timeLineViewParameter.isStackSubgroups());
         timeline.setWidthFull();
         timeline.addItemAddListener(e -> {
             ZJTItem zjtItem = new ZJTItem();
@@ -594,6 +595,7 @@ public abstract class TimeLineForm<S extends ZJTService> extends CommonForm {
             itemGroup.setNestedGroups(null);
             itemGroup.setClassName((String) groupResult[2]);
             itemGroup.setVisible(true);
+            itemGroup.setSubgroupStack(false);
             itemGroup.setId((Integer) groupResult[0]);
             itemGroup.setContent((String) groupResult[1]);
 

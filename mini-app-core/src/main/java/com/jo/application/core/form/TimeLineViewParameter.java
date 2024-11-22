@@ -107,6 +107,8 @@ public class TimeLineViewParameter {
      */
     private boolean stack = false;
 
+    private  boolean stackSubgroups = false;
+
     private AxisOrientation axisOrientation = AxisOrientation.TOP;
 
     /**
@@ -423,5 +425,13 @@ public class TimeLineViewParameter {
 
     public void setGroupZoomTableID(int groupZoomTableID) {
         this.groupZoomTableID = groupZoomTableID;
+    }
+
+    public boolean isStackSubgroups() {
+        return stackSubgroups;
+    }
+
+    public void setStackSubgroups(boolean stackSubgroups) {
+        this.stackSubgroups = stackSubgroups;
     }
 }

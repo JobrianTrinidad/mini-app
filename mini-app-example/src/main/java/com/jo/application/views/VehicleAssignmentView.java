@@ -48,6 +48,7 @@ public class VehicleAssignmentView extends StandardFormView implements HasUrlPar
         timeLineViewParameter.setGroupParameters(new Object[]{0});
         timeLineViewParameter.setWhereDefinitions(new String[]{"p.vehicle.zjt_vehicle_id = 1000003 OR p.depot.zjt_depot_id"});
         timeLineViewParameter.setStack(true);
+        timeLineViewParameter.setStackSubgroups(false);
         timeLineViewParameter.setSubgroupIDFieldName("zjt_trip_id");
 //        timeLineViewParameter.setGroupCSSClass("classname");
         // css class is set to this field
@@ -86,7 +87,6 @@ public class VehicleAssignmentView extends StandardFormView implements HasUrlPar
         //TODO allowed ids coming from depot - user roles
         int[] allowedDepot = {1000001, 1000002, 1000003};
         List<ZJTDepot> depots = (List<ZJTDepot>) this.repository.findEntitiesByIds(ZJTDepot.class, allowedDepot);
-
         depotComboBox.setWidth("300px");
         depotComboBox.setItems(depots);
         depotComboBox.setItemLabelGenerator(ZJTDepot::getName);
