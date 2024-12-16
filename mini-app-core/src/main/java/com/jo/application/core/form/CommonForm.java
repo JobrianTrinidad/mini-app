@@ -62,7 +62,7 @@ public abstract class CommonForm extends VerticalLayout {
                 if (endDatePicker.getValue() != null) {
                     if (e.getValue() != null && !e.getValue().atStartOfDay().isEqual(endDatePicker.getValue().atStartOfDay())
                             && !e.getValue().atStartOfDay().isBefore(endDatePicker.getValue().atStartOfDay())) {
-                        endDatePicker.setValue(e.getValue().plusMonths(1));
+                        updateEndDateByDateFilter(e.getValue());
                     }
                     this.filterByDate(e.getValue().atStartOfDay(), endDatePicker.getValue().atStartOfDay());
                 }
@@ -139,6 +139,49 @@ public abstract class CommonForm extends VerticalLayout {
             startDatePicker.setValue(dateFrom);
         if (dateTo != null)
             endDatePicker.setValue(dateTo);
+    }
+    /**
+     * Updates the end date picker value based on a given starting date and the selected date filter.
+     * <p>
+     * This method calculates the new end date based on the selected value from the `dateFilterComboBox`.
+     * The behavior of each filter is as follows:
+     * <ul>
+     *     <li><strong>TD:</strong> Sets the end date to the given starting date.</li>
+     *     <li><strong>TD3:</strong> Sets the end date to 3 days after the given starting date.</li>
+     *     <li><strong>TW:</strong> Sets the end date to the end of the current week starting from the given date (6 days later).</li>
+     *     <li><strong>NW:</strong> Sets the end date to the end of the next week starting from the given date.</li>
+     *     <li><strong>TM:</strong> Sets the end date to the last day of the current month.</li>
+     *     <li><strong>NM:</strong> Sets the end date to the last day of the next month.</li>
+     * </ul>
+     * The computed date is then set in the `endDatePicker`.
+     * <p>
+     * Edge Cases:
+     * <ul>
+     *     <li><strong>dateFrom:</strong> Must not be null. If null, an {@code IllegalArgumentException} is thrown.</li>
+     *     <li><strong>Valid Ranges:</strong> Ensure that the provided {@code dateFrom} falls within the acceptable range for the desired filter logic. Out-of-range dates could lead to unexpected results.</li>
+     * </ul>
+     *
+     * @param dateFrom the starting date from which the end date will be calculated. Must be non-null.
+     */
+    private void updateEndDateByDateFilter(LocalDate dateFrom) {
+        if (dateFrom == null) {
+            throw new IllegalArgumentException("dateFrom must not be null");
+        }
+
+        var filterValue = dateFilterComboBox.getValue();
+        if (filterValue == null) {
+            throw new IllegalArgumentException("dateFilterComboBox value must not be null");
+        }
+
+        LocalDate dateTo = switch (filterValue) {
+            case TD -> dateFrom;
+            case TD3 -> dateFrom.plusDays(3);
+            case TW -> dateFrom.with(java.time.DayOfWeek.SUNDAY);
+            case NW -> dateFrom.plusWeeks(1).with(java.time.DayOfWeek.SUNDAY);
+            case TM -> YearMonth.from(dateFrom).atEndOfMonth();
+            case NM -> YearMonth.from(dateFrom.plusMonths(1)).atEndOfMonth();
+        };
+        endDatePicker.setValue(dateTo);
     }
 
     public void filterByDate(LocalDateTime start, LocalDateTime end) throws Exception {
