@@ -56,6 +56,8 @@ public abstract class CommonForm extends VerticalLayout {
 
     abstract public void onUpdateTimeWindow() throws Exception;
 
+    abstract public void setDatePickerReadonly(boolean readonly);
+
     public CommonForm() {
         startDatePicker.addValueChangeListener(e -> {
             try {

@@ -76,4 +76,9 @@ public class CustomCompCommonForm<T extends ZJTEntity> extends CustomComponentFo
     public void onUpdateTimeWindow() throws Exception {
 
     }
+
+    @Override
+    public void setDatePickerReadonly(boolean readonly) {
+
+    }
 }

@@ -25,4 +25,8 @@ public class GridCommonForm<T extends ZJTEntity> extends StandardForm<T, ZJTServ
 
     }
 
+    @Override
+    public void setDatePickerReadonly(boolean readonly) {
+
+    }
 }

@@ -716,4 +716,10 @@ public abstract class TimeLineForm<S extends ZJTService> extends CommonForm {
     public void setItemGroups(List<ItemGroup> itemGroups) {
         this.itemGroups = itemGroups;
     }
+
+    public void setDatePickerReadonly(boolean readonly)
+    {
+        datePickerStart.setReadOnly(readonly);
+        datePickerEnd.setReadOnly(readonly);
+    }
 }
