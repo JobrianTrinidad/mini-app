@@ -107,6 +107,10 @@ public class TimeLineViewParameter {
      */
     private boolean stack = false;
 
+    /**
+     * true = items are displayed as stacked by subgroup
+     *      =  items will be stacked on top of each other such that they do not overlap
+     */
     private  boolean stackSubgroups = false;
 
     private AxisOrientation axisOrientation = AxisOrientation.TOP;

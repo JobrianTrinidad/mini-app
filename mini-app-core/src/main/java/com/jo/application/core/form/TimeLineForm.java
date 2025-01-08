@@ -23,6 +23,7 @@ import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serial;
 import java.time.LocalDate;
@@ -374,7 +375,8 @@ public abstract class TimeLineForm<S extends ZJTService> extends CommonForm {
         timeline.setVerticalScroll(true);
         timeline.setAxisOrientation(this.timeLineViewParameter.getAxisOrientation());
         timeline.setStack(this.timeLineViewParameter.isStack());
-        timeline.setStackSubgroups(this.timeLineViewParameter.isStackSubgroups());
+        // TODO: Uncomment to use the default logic of timeline to stack the sub-group
+//        timeline.setStackSubgroups(this.timeLineViewParameter.isStackSubgroups());
         timeline.setWidthFull();
         timeline.addItemAddListener(e -> {
             ZJTItem zjtItem = new ZJTItem();
@@ -451,6 +453,7 @@ public abstract class TimeLineForm<S extends ZJTService> extends CommonForm {
             item.setEnd(data.getEndTime());
             item.setGroup(data.getGroupId());
             item.setSubgroup(data.getSubgroupId());
+            item.setSubgroupOrder(StringUtils.isEmpty(data.getSubgroupId())? 0 : Integer.parseInt(data.getSubgroupId()));
             TableData.add(item);
         }
         return TableData;
@@ -595,7 +598,8 @@ public abstract class TimeLineForm<S extends ZJTService> extends CommonForm {
             itemGroup.setNestedGroups(null);
             itemGroup.setClassName((String) groupResult[2]);
             itemGroup.setVisible(true);
-            itemGroup.setSubgroupStack(false);
+            // TODO: This will run the custom logic for the sub-group stack.
+            itemGroup.setSubgroupStack(this.timeLineViewParameter.isStackSubgroups());
             itemGroup.setId((Integer) groupResult[0]);
             itemGroup.setContent((String) groupResult[1]);
 
