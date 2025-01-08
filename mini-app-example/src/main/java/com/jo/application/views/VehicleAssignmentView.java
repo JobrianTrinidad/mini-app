@@ -109,6 +109,7 @@ public class VehicleAssignmentView extends StandardFormView implements HasUrlPar
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+        form.setDatePickerReadonly(true);
     }
 
     private void filterByDepot() throws Exception {
