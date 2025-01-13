@@ -636,7 +636,7 @@ public abstract class TimeLineForm<S extends ZJTService> extends CommonForm {
 
     @Override
     public void onUpdateForm() throws Exception {
-        if (this.timeLineViewParameter == null || timeline == null)
+        if (this.timeLineViewParameter == null || timeline == null || isFilterInProgress)
             return;
 
         itemGroups = this.getGroupItems(configureGroup());

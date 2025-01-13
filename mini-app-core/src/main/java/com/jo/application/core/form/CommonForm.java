@@ -29,7 +29,7 @@ public abstract class CommonForm extends VerticalLayout {
     protected final DatePicker endDatePicker = new DatePicker("");
     private final ComboBox<EnumDateFilter> dateFilterComboBox = new ComboBox<>("");
     protected HorizontalLayout dateFilter;
-
+    protected boolean isFilterInProgress = false;
     protected CommonView commonView;
 
     abstract public void onNewItem(GuiItem item);
@@ -65,6 +65,7 @@ public abstract class CommonForm extends VerticalLayout {
                     if (e.getValue() != null && !e.getValue().atStartOfDay().isEqual(endDatePicker.getValue().atStartOfDay())
                             && !e.getValue().atStartOfDay().isBefore(endDatePicker.getValue().atStartOfDay())) {
                         updateEndDateByDateFilter(e.getValue());
+                        return;
                     }
                     this.filterByDate(e.getValue().atStartOfDay(), endDatePicker.getValue().atStartOfDay());
                 }
@@ -91,15 +92,33 @@ public abstract class CommonForm extends VerticalLayout {
         endDatePicker.setI18n(i18n);
 
         dateFilterComboBox.setItems(EnumDateFilter.values());
-        dateFilterComboBox.addValueChangeListener(e -> updateDateFilter());
+        dateFilterComboBox.addValueChangeListener(e -> {
+            try {
+                isFilterInProgress = true;
+                updateDateFilter();
+                isFilterInProgress = false;
+                onUpdateForm();
+            } catch (Exception ex) {
+                throw new RuntimeException(ex);
+            } finally {
+                isFilterInProgress = false;
+            }
+        });
         dateFilterComboBox.setValue(EnumDateFilter.TM);
         dateFilter = new HorizontalLayout(dateFilterComboBox, startDatePicker, new Span("To"), endDatePicker);
         dateFilter.setAlignItems(FlexComponent.Alignment.CENTER);
     }
 
     public void updateDateFilter(EnumDateFilter enumDateFilter) throws Exception {
-        dateFilterComboBox.setValue(enumDateFilter);
-        updateDateFilter();
+        try {
+            isFilterInProgress = true;
+            dateFilterComboBox.setValue(enumDateFilter);
+            updateDateFilter();
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
+        } finally {
+            isFilterInProgress = false;
+        }
         onUpdateForm();
     }
 
