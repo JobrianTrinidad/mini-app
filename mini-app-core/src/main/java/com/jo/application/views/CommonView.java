@@ -1,7 +1,6 @@
 package com.jo.application.views;
 
 import com.jo.application.core.form.CommonForm;
-import com.jo.application.data.entity.ZJTItem;
 import com.jo.application.data.repository.BaseEntityRepository;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
@@ -12,7 +11,7 @@ import com.vaadin.flow.server.VaadinSession;
 
 import java.lang.reflect.InvocationTargetException;
 
-public abstract class CommonView extends VerticalLayout implements RouterLayout, BeforeEnterObserver, HasDynamicTitle {
+public abstract class CommonView extends VerticalLayout implements RouterLayout, BeforeEnterObserver, HasDynamicTitle, TimelineItemHandler {
 
     protected final BaseEntityRepository repository;
     protected CoreMainLayout layout;
@@ -69,15 +68,5 @@ public abstract class CommonView extends VerticalLayout implements RouterLayout,
     @Override
     public String getPageTitle() {
         return "";
-    }
-
-    /**
-     *
-     * @param item
-     * @param isMultipleSelection - option to indicate if item is part of multiple selections
-     */
-    public void onTimelineItemUpdate(ZJTItem item, boolean isMultipleSelection)  {}
-
-    public void initLayout() {
     }
 }

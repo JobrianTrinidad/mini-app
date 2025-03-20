@@ -375,6 +375,50 @@ public abstract class TimeLineForm<S extends ZJTService> extends CommonForm {
         timeline.setVerticalScroll(true);
         timeline.setAxisOrientation(this.timeLineViewParameter.getAxisOrientation());
         timeline.setStack(this.timeLineViewParameter.isStack());
+        if (this.timeLineViewParameter.isAllowAllUpdate()) {
+            timeline.setEditable(this.timeLineViewParameter.isAllowAllUpdate());
+        } else {
+            timeline.setUpdateTime(this.timeLineViewParameter.isAllowUpdateTime());
+            timeline.setRemove(this.timeLineViewParameter.isAllowDeleteItem());
+        }
+
+        if (this.timeLineViewParameter.isAllowUpdateTime() || this.timeLineViewParameter.isAllowAllUpdate()) {
+            timeline.addItemResizeListener(e -> {
+                entityItems.forEach(item -> {
+                    if (String.valueOf(item.getId()).equals(e.getItemId())) {
+                        item.setStartTime(e.getNewStart());
+                        item.setEndTime(e.getNewEnd());
+                        timeline.revertMove(String.valueOf(item.getId()), e.getNewStart(), e.getNewEnd());
+                        getCommonView().onTimelineUpdateItem(item);
+                    }
+                });
+            });
+            timeline.addItemsDragAndDropListener(e -> {
+                if (!e.getItems().isEmpty()) {
+                    e.getItems().forEach(movedItem -> {
+                        entityItems.forEach(item -> {
+                            if (String.valueOf(item.getId()).equals(movedItem.getId())) {
+                                item.setStartTime(movedItem.getStart());
+                                item.setEndTime(movedItem.getEnd());
+                                timeline.revertMove(String.valueOf(item.getId()), movedItem.getStart(), movedItem.getEnd());
+                                getCommonView().onTimelineUpdateItem(item);
+                            }
+                        });
+                    });
+                }
+            });
+        }
+        if (this.timeLineViewParameter.isAllowDeleteItem() || this.timeLineViewParameter.isAllowAllUpdate()) {
+            timeline.addItemRemoveListener(e -> {
+                entityItems.forEach(item -> {
+                    if (String.valueOf(item.getId()).equals(e.getItemId())) {
+                        timeline.removeItem(String.valueOf(item.getId()));
+                        getCommonView().onTimelineRemoveItem(item);
+                    }
+                });
+            });
+        }
+        // TODO: Add the listener for the other item action
         // TODO: Uncomment to use the default logic of timeline to stack the sub-group
 //        timeline.setStackSubgroups(this.timeLineViewParameter.isStackSubgroups());
         timeline.setWidthFull();
@@ -402,10 +446,28 @@ public abstract class TimeLineForm<S extends ZJTService> extends CommonForm {
         }
 
         timeline.addWindowRangeChangedListener(event -> {
-            if (!endDatePicker.getValue().isEqual(event.getNewEnd().toLocalDate()))
-                endDatePicker.setValue(event.getNewEnd().toLocalDate());
-            if (!(startDatePicker.getValue().isEqual(event.getNewStart().plusDays(1).toLocalDate()) || startDatePicker.getValue().isEqual(event.getNewStart().toLocalDate())))
-                startDatePicker.setValue(event.getNewStart().toLocalDate());
+            boolean isRangeChange = false;
+            try {
+                isFilterInProgress = true;
+                if (!endDatePicker.getValue().isEqual(event.getNewEnd().toLocalDate())) {
+                    endDatePicker.setValue(event.getNewEnd().toLocalDate());
+                    isRangeChange = true;
+                }
+                if (!(startDatePicker.getValue().isEqual(event.getNewStart().plusDays(1).toLocalDate()) || startDatePicker.getValue().isEqual(event.getNewStart().toLocalDate()))) {
+                    startDatePicker.setValue(event.getNewStart().toLocalDate());
+                    isRangeChange = true;
+                }
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            } finally {
+                isFilterInProgress = false;
+            }
+            try {
+                if (isRangeChange)
+                    onUpdateForm();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
         });
     }
 
@@ -677,8 +739,8 @@ public abstract class TimeLineForm<S extends ZJTService> extends CommonForm {
                 item.setStartTime(datePickerStart.getValue());
                 item.setEndTime(datePickerEnd.getValue());
                 timeline.revertMove(String.valueOf(item.getId()), item.getStartTime(), item.getEndTime());
-//redundant as it's being referenced on by updateItemGroup
-//                getCommonView().onTimelineItemUpdate(item, items.size() > 1);
+                // Removed redundant code and added a new method to update the time item.
+                getCommonView().onTimelineUpdateItem(item);
             }
         }
     }
@@ -694,7 +756,7 @@ public abstract class TimeLineForm<S extends ZJTService> extends CommonForm {
                     item.setGroupId(String.valueOf(group.getGroupId()));
                     timeline.updateItemGroup(String.valueOf(item.getId()), String.valueOf(group.getGroupId()));
                     timeline.updateItemContent(String.valueOf(item.getId()), item.getTitle() + " " + String.valueOf(group.getGroupId()));
-                    getCommonView().onTimelineItemUpdate(item, items.size() > 1);
+                    getCommonView().onTimelineItemUpdateGroup(item, items.size() > 1);
                 }
             }
         }

@@ -56,12 +56,14 @@ public class VehicleAssignmentView extends StandardFormView implements HasUrlPar
 // TODO: Set the group table ID for enabling the zoom option on the timeline., This ID will be used to create zoom url with This ID as table and selected group id as id.
         this.timeLineViewParameter.setGroupZoomTableID(539);
 // TODO: Retrieve the HTML content and styles from the database for rendering dynamic forms for item
-        ZJTTableInfo tableInfo = tableInfoService.findByTableName(this.timeLineViewParameter.getFromDefinition());
-        eventHandler = new CustomContextFormEventHandler(tableInfo.getHtmlContent(), tableInfo.getHtmlStyle(), tableInfo.isSubmitForm());
+//        ZJTTableInfo tableInfo = tableInfoService.findByTableName(this.timeLineViewParameter.getFromDefinition());
+//        eventHandler = new CustomContextFormEventHandler(tableInfo.getHtmlContent(), tableInfo.getHtmlStyle(), tableInfo.isSubmitForm());
         timeLineViewParameter.setContextFormEventHandler(eventHandler);
 // TODO Extend the context menu by adding a custom event handler for additional options.
         this.timeLineViewParameter.setItemContextMenuEventHandler(new CustomItemContextMenuEventHandler());
-
+//        timeLineViewParameter.setAllowAllUpdate(false);
+        timeLineViewParameter.setAllowUpdateTime(true);
+        timeLineViewParameter.setAllowDeleteItem(true);
         timeLineViewParameter.setShowItemSelector(true);  //to test this feature
         super.setTimeLineViewParameter(timeLineViewParameter);
 
@@ -78,7 +80,6 @@ public class VehicleAssignmentView extends StandardFormView implements HasUrlPar
 
     @Override
     public void initLayout() {
-        super.initLayout();
         //        Button button = new Button();
 //        button.setIcon(new Icon(VaadinIcon.START_COG));
 //        button.setTooltipText("Filter by Depot");
@@ -120,15 +121,15 @@ public class VehicleAssignmentView extends StandardFormView implements HasUrlPar
     }
 
     @Override
-    public void onTimelineItemUpdate(ZJTItem item, boolean isMultipleSelection) {
+    public void onTimelineItemUpdateGroup(ZJTItem item, boolean isMultipleSelection) {
         //Update ResourceAssignment here
         //TODO findEntityById seems not working
         ZJTVehicleAssignment assignment = (ZJTVehicleAssignment) this.repository.findEntityById(ZJTVehicleAssignment.class, item.getId());
         ZJTVehicle vehicle = (ZJTVehicle) this.repository.findEntityById(ZJTVehicle.class, Integer.parseInt(item.getGroupId()));
-        if (!isMultipleSelection) {
-            assignment.setStartDate(item.getStartTime());
-            assignment.setEndDate(item.getEndTime());
-        }
+//        if (!isMultipleSelection) {
+//            assignment.setStartDate(item.getStartTime());
+//            assignment.setEndDate(item.getEndTime());
+//        }
 //        List<ZJTVehicleAssignment> assignments = (List<ZJTVehicleAssignment>) this.repository.findEntitiesByIds(ZJTVehicleAssignment.class, new int[]{item.getId()});
 //        List<ZJTVehicle> vehicles = (List<ZJTVehicle>) this.repository.findEntitiesByIds(ZJTVehicle.class, new int[]{ Integer.parseInt(item.getGroupId())});
 //        ZJTVehicleAssignment assignment = assignments.get(0);
@@ -137,5 +138,16 @@ public class VehicleAssignmentView extends StandardFormView implements HasUrlPar
         this.repository.updateEntity(assignment);
 
         Notification.show(assignment.getDescription() + " has been assigned to " + vehicle.getFleetid());
+    }
+
+    @Override
+    public void onTimelineUpdateItem(ZJTItem item) {
+        ZJTVehicleAssignment assignment = (ZJTVehicleAssignment) this.repository.findEntityById(ZJTVehicleAssignment.class, item.getId());
+        if(assignment != null) {
+            assignment.setStartDate(item.getStartTime());
+            assignment.setEndDate(item.getEndTime());
+            this.repository.updateEntity(assignment);
+            Notification.show(assignment.getDescription() + " has been update successfully ");
+        }
     }
 }

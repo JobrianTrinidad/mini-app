@@ -2,7 +2,6 @@ package com.jo.application.core.form;
 
 import com.jo.application.events.ZJTContextFormEventHandler;
 import com.jo.application.util.GlobalData;
-import com.vaadin.componentfactory.timeline.context.ContextFormEventHandler;
 import com.vaadin.componentfactory.timeline.context.ItemContextMenuEventHandler;
 import com.vaadin.componentfactory.timeline.model.AxisOrientation;
 import com.vaadin.flow.router.PageTitle;
@@ -106,6 +105,24 @@ public class TimeLineViewParameter {
      *      =  items will be stacked on top of each other such that they do not overlap
      */
     private boolean stack = false;
+
+    /**
+     * true = items can have their time updated
+     *      = users are allowed to drag items horizontally to change their time
+     */
+    private boolean allowUpdateTime = false;
+
+    /**
+     * true = items can have their manipulation actions enable or disable
+     *      = users are allowed to manipulation items
+     */
+    private boolean allowAllUpdate = false;
+
+    /**
+     * true = items can be deleted
+     *      = users are allowed to remove items from the timeline
+     */
+    private boolean allowDeleteItem = false;
 
     /**
      * true = items are displayed as stacked by subgroup
@@ -437,5 +454,59 @@ public class TimeLineViewParameter {
 
     public void setStackSubgroups(boolean stackSubgroups) {
         this.stackSubgroups = stackSubgroups;
+    }
+
+    /**
+     * Checks if deleting an item is allowed.
+     *
+     * @return {@code true} if item deletion is allowed, {@code false} otherwise.
+     */
+    public boolean isAllowDeleteItem() {
+        return allowDeleteItem;
+    }
+
+    /**
+     * Sets whether deleting an item is allowed.
+     *
+     * @param allowDeleteItem {@code true} to allow item deletion, {@code false} to restrict it.
+     */
+    public void setAllowDeleteItem(boolean allowDeleteItem) {
+        this.allowDeleteItem = allowDeleteItem;
+    }
+
+    /**
+     * Checks if updating time is allowed.
+     *
+     * @return {@code true} if time update is allowed, {@code false} otherwise.
+     */
+    public boolean isAllowUpdateTime() {
+        return allowUpdateTime;
+    }
+
+    /**
+     * Sets whether updating time is allowed.
+     *
+     * @param allowUpdateTime {@code true} to allow time updates, {@code false} to restrict them.
+     */
+    public void setAllowUpdateTime(boolean allowUpdateTime) {
+        this.allowUpdateTime = allowUpdateTime;
+    }
+
+    /**
+     * Checks if all types of updates are allowed.
+     *
+     * @return {@code true} if all updates are allowed, {@code false} otherwise.
+     */
+    public boolean isAllowAllUpdate() {
+        return allowAllUpdate;
+    }
+
+    /**
+     * Sets whether all types of updates are allowed.
+     *
+     * @param allowAllUpdate {@code true} to allow all updates, {@code false} to restrict them.
+     */
+    public void setAllowAllUpdate(boolean allowAllUpdate) {
+        this.allowAllUpdate = allowAllUpdate;
     }
 }
