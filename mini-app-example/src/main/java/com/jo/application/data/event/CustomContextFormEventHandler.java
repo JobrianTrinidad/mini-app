@@ -14,12 +14,10 @@ public class CustomContextFormEventHandler extends ZJTContextFormEventHandler {
 
     @Override
     public void onInputChange(String key, String value, int itemId) {
-        System.out.println("InputOnChange key = " + key + " value = " + value);
     }
 
     @Override
     public void onClickButton(String key, int itemId) {
-        System.out.println("ButtonClick key = " + key);
     }
 
     @Override
@@ -30,6 +28,5 @@ public class CustomContextFormEventHandler extends ZJTContextFormEventHandler {
 
     @Override
     public void onSubmitForm(Map<String, Object> formDataMap, int itemId) {
-        formDataMap.forEach((k, v) -> System.out.println("FormSubmit key = " + k + " value = " + v));
     }
 }

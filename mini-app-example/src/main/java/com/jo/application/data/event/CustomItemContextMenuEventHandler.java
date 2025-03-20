@@ -14,12 +14,10 @@ public class CustomItemContextMenuEventHandler extends ItemContextMenuEventHandl
 
     public CustomItemContextMenuEventHandler() {
         super();
-        System.out.println("CustomItemContextMenuEventHandler   contextMenu: " + contextMenu.getElement());
     }
 
     @Override
     protected void loadGroupItemsContextMenu(int left, int top, int selectedGroupID) {
-        System.out.println("loadGroupItemsContextMenu   left: " + left + "   top: " + top + "   selectedGroupID: " + selectedGroupID);
         super.loadGroupItemsContextMenu(left, top, selectedGroupID);
             ContextMenuItem testSelectItem = new ContextMenuItem("las la-check-square", "Test Select Item", event -> {
                 contextMenu.hideContextMenu();
@@ -30,13 +28,11 @@ public class CustomItemContextMenuEventHandler extends ItemContextMenuEventHandl
 
     @Override
     protected void loadItemsContextMenu(int left, int top, int selectedItemID) {
-        System.out.println("loadItemsContextMenu   left: " + left + "   top: " + top + "   selectedItemID: " + selectedItemID);
         super.loadItemsContextMenu(left, top, selectedItemID);
     }
 
     @Override
     public void loadContextMenu(int left, int top, int selectedCompID, String componentType) {
-        System.out.println("loadContextMenu   left: " + left + "   top: " + top + "   selectedCompID: " + selectedCompID + "   componentType: " + componentType);
         super.loadContextMenu(left, top, selectedCompID, componentType);
     }
 }
